@@ -11,6 +11,6 @@ import {
 
 const userRouter = Router();
 
-userRouter.post("/create_acc", createAccount);
+userRouter.post("/create_account", createAccount);
 
 export default userRouter;
