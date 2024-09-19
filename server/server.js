@@ -11,7 +11,7 @@ app.use(
 );
 
 app.use(express.json());
-app.use(router);
+app.use("/api", router);
 
 let port = 5000;
 app.listen(port, () => {
