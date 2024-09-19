@@ -1,0 +1,7 @@
+# JS specific
+package-lock.json
+node_modules/
+
+# Editor specific
+.zed
+.vscode
