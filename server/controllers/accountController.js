@@ -1,5 +1,11 @@
+import bcrypt from "bcryptjs";
+import { encryptPassword } from "../helpers/ecryptionFuncs.js";
+
+import { insertVerificationCodeQuery } from "../database/queries/verificationQueries.js";
+
 import {
   createAccountQuery,
+  deleteAccountQuery,
   loginToAccountQuery,
   getAccountFromUsernameOrEmailQuery,
   updateUsernameQuery,
@@ -8,10 +14,10 @@ import {
 import bcrypt from 'bcryptjs';
 
 /**
- * Creates a new user account with error checking for missing request params or exisiting username/email
- * @param {*} req
- * @param {*} res
- * @returns a response with a status and json body
+ * Creates a new user account
+ * @param {Object} req - The request object containing username, password, and email
+ * @param {Object} res - The response object to send back to the client
+ * @returns {Object} A response with a status code and JSON body
  */
 async function createAccount(req, res) {
   const { username, password, email } = req.body;
@@ -45,11 +51,27 @@ async function createAccount(req, res) {
       });
     }
 
-    // Create the new user account
+    // Encrypt the password
     const hash = await encryptPassword(password);
 
     const newUser = await createAccountQuery(username, hash, email);
     if (newUser) {
+      // Create a user verification code
+      const verificationCode = Math.floor(100000 + Math.random() * 900000);
+      console.log(`Verification code for ${username}: ${verificationCode}`);
+
+      const verificationResult = await insertVerificationCodeQuery(
+        newUser.user_id,
+        verificationCode,
+      );
+      if (!verificationResult) {
+        throw new Error("Error creating verification code");
+      }
+
+      // Send verification code to user's email
+      const email_subject = "Verify your H3 Pipeline account!";
+      const email_body = `Your verification code is: ${verificationCode}`;
+
       return res.status(200).json({
         message: "Account created successfully",
         user: newUser,
@@ -140,10 +162,10 @@ async function loginToAccount(req, res) {
 }
 
 /**
- * Changes an existing account to new username - verifies new username not already in use
- * @param {*} req
- * @param {*} res
- * @returns a response with a status code and json body
+ * Changes the username for an existing user account
+ * @param {Object} req - The request object containing user_id and new_username
+ * @param {Object} res - The response object to send back to the client
+ * @returns {Object} A response with a status code and JSON body
  */
 async function changeUsername(req, res) {
   const { user_id, new_username } = req.body;
@@ -206,13 +228,47 @@ async function changePassword(req, res) {
 }
 
 /**
- *
- * @param {*} req
- * @param {*} res
+ * Deletes a user account and associated data
+ * @param {Object} req - The request object containing user_id
+ * @param {Object} res - The response object to send back to the client
+ * @returns {Object} A response with a status code and JSON body
  */
 async function deleteAccount(req, res) {
-  console.error("Not implemented...");
-  res.status(501).send("Not implemented");
+  const { user_id } = req.body;
+
+  // Check if request json is missing necessary parameters
+  if (!user_id) {
+    console.error("deleteAccount(): Missing user information...");
+    return res.status(400).json({
+      error: "Missing required information.",
+    });
+  }
+
+  try {
+    // Check if user specified exists
+    const user_acc = await getAccountFromUserIDQuery(user_id);
+    if (!user_acc) {
+      console.error("User account doesn't exist: ", user_id);
+      return res.status(404).json({
+        error: "User account not found",
+      });
+    }
+
+    // Delete the specified user account (cascade deletes all associated data - check schema)
+    const query_status = await deleteAccountQuery(user_id);
+    if (query_status) {
+      return res.status(200).json({
+        message: "Deleted account successfully",
+      });
+    } else {
+      throw Error;
+    }
+  } catch (error) {
+    console.error("Error deleting account:", error);
+    return res.status(500).json({
+      error: "Error deleting account",
+    });
+  }
 }
 
 async function encryptPassword(password) {

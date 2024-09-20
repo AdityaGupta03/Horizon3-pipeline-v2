@@ -16,6 +16,22 @@ async function createAccountQuery(username, password, email) {
   }
 }
 
+async function deleteAccountQuery(user_id) {
+  // Delete user and cascade to related tables
+  const query = `
+    DELETE FROM users
+    WHERE user_id = $1
+  `;
+
+  try {
+    const result = await db_pool.query(query, [user_id]);
+    return result;
+  } catch (error) {
+    console.error("deleteAccountQuery()", error);
+    throw error;
+  }
+}
+
 async function loginToAccountQuery(username) {
   const query = `
     SELECT * FROM users
@@ -26,7 +42,7 @@ async function loginToAccountQuery(username) {
     const result = await db_pool.query(query, [username]);
     return result.rows[0];
   } catch (error) {
-    console.error("loginToAccountQuery()", query);
+    console.error("loginToAccountQuery()", error);
     throw error;
   }
 }
@@ -79,6 +95,7 @@ async function updateUsernameQuery(user_id, username) {
 
 export {
   createAccountQuery,
+  deleteAccountQuery,
   loginToAccountQuery,
   getAccountFromUsernameOrEmailQuery,
   getAccountFromUserIDQuery,
