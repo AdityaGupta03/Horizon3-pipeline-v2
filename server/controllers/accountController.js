@@ -46,38 +46,17 @@ async function createAccount(req, res) {
     }
 
     // Create the new user account
-    bcrypt.genSalt(10, function(err, salt){
-      if (err) {
-          console.error("Error generating salt:", err);
-          return res.status(500).json({ error: "Error generating salt" });
-      }
-      bcrypt.hash(password, salt, function(err, hash) {
-          if(err) {
-              console.error("Error hashing password:", err);
-              return res.status(500).json({ error: "Error hashing password" });
-          }
-          //store hash in db
-          // console.log(hash);
-          const newUser = createAccountQuery(username, hash, email);
-          if (newUser) {
-            return res.status(200).json({
-              message: "Account created successfully",
-              user: newUser,
-            });
-          } else {
-            throw Error;
-          }
+    const hash = await encryptPassword(password);
+
+    const newUser = await createAccountQuery(username, hash, email);
+    if (newUser) {
+      return res.status(200).json({
+        message: "Account created successfully",
+        user: newUser,
       });
-    });
-    // const newUser = await createAccountQuery(username, password, email);
-    // if (newUser) {
-    //   return res.status(200).json({
-    //     message: "Account created successfully",
-    //     user: newUser,
-    //   });
-    // } else {
-    //   throw error;
-    // }
+    } else {
+      throw error;
+    }
   } catch (error) {
     console.error("Error creating account:", error);
     return res.status(500).json({
@@ -229,6 +208,11 @@ async function deleteAccount(req, res) {
   console.error("Not implemented...");
   res.status(501).send("Not implemented");
 }
+
+async function encryptPassword(password) {
+  const salt = await bcrypt.genSalt(10);
+  return bcrypt.hash(password, salt);
+} 
 
 export {
   createAccount,
