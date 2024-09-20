@@ -93,6 +93,22 @@ async function updateUsernameQuery(user_id, username) {
   }
 }
 
+async function updatePasswordQuery(user_id, hash_password) {
+  const query = `
+    UPDATE users
+    SET password = $2
+    WHERE user_id = $1
+  `;
+
+  try {
+    const result = await db_pool.query(query, [user_id, hash_password]);
+    return result;
+  } catch (error) {
+    console.error("Error updating username:", error);
+    throw error;
+  }
+}
+
 export {
   createAccountQuery,
   deleteAccountQuery,
@@ -100,4 +116,5 @@ export {
   getAccountFromUsernameOrEmailQuery,
   getAccountFromUserIDQuery,
   updateUsernameQuery,
+  updatePasswordQuery,
 };

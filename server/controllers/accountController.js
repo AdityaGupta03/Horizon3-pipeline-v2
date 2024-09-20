@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { encryptPassword } from "../helpers/ecryptionFuncs.js";
+import { encryptPassword, comparePassword } from "../helpers/ecryptionFuncs.js";
 
 import { insertVerificationCodeQuery } from "../database/queries/verificationQueries.js";
 
@@ -9,9 +9,9 @@ import {
   loginToAccountQuery,
   getAccountFromUsernameOrEmailQuery,
   updateUsernameQuery,
+  updatePasswordQuery,
   getAccountFromUserIDQuery,
 } from "../database/queries/accountQueries.js";
-import bcrypt from 'bcryptjs';
 
 /**
  * Creates a new user account
@@ -124,23 +124,15 @@ async function loginToAccount(req, res) {
       });
     }
 
-    // Check if login credentials match an account
-    const user_acc = await loginToAccountQuery(username);
-    if (!user_acc) {
-      console.error("loginToAccount(): Invalid credentials");
-      return res.status(401).json({
-        error: "Invalid username",
-      });
-    }
-
     // Check if the account is verified
-    if(!await comparePassword(password, user_acc.password)) {
+    if (!(await comparePassword(password, acc_exists.password))) {
       console.error("loginToAccount(): Invalid password");
       return res.status(401).json({
         error: "Invalid password",
       });
     }
-    if (user_acc.verified == 0) {
+
+    if (acc_exists.verified == 0) {
       console.error("loginToAccount(): Account not verified");
       return res.status(403).json({
         error: "Account not verified",
@@ -150,7 +142,7 @@ async function loginToAccount(req, res) {
       console.log("loginToAccount(): Login successful");
       return res.status(200).json({
         message: "Login successful",
-        user_id: user_acc.user_id,
+        user_id: acc_exists.user_id,
       });
     }
   } catch (error) {
@@ -223,8 +215,52 @@ async function changeUsername(req, res) {
  * @param {*} res
  */
 async function changePassword(req, res) {
-  console.error("Not implemented...");
-  res.status(501).send("Not implemented");
+  const { user_id, old_password, new_password } = req.body;
+
+  // Check if request json is missing necessary parameters
+  if (!user_id || !old_password || !new_password) {
+    console.error("createAccount(): Missing user information...");
+    return res.status(400).json({
+      error: "Missing required information.",
+    });
+  }
+
+  try {
+    // Check if user specified exists
+    const user_acc = await getAccountFromUserIDQuery(user_id);
+    if (!user_acc) {
+      console.error("User account doesn't exist: ", user_id);
+      return res.status(404).json({
+        error: "User account not found",
+      });
+    }
+
+    // Validate old password
+    if (!(await comparePassword(old_password, user_acc.password))) {
+      console.error("loginToAccount(): Invalid password");
+      return res.status(200).json({
+        error: "Old password does not match",
+      });
+    }
+
+    // Hash new password
+    const hash = await encryptPassword(new_password);
+
+    // Update account to new username
+    const query_status = await updatePasswordQuery(user_id, hash);
+    if (query_status) {
+      return res.status(200).json({
+        message: "Updated password successfully",
+      });
+    } else {
+      throw Error;
+    }
+  } catch (error) {
+    console.error("changePassword():", error);
+    return res.status(500).json({
+      error: "Error changing password",
+    });
+  }
 }
 
 /**
@@ -269,15 +305,6 @@ async function deleteAccount(req, res) {
       error: "Error deleting account",
     });
   }
-}
-
-async function encryptPassword(password) {
-  const salt = await bcrypt.genSalt(10);
-  return bcrypt.hash(password, salt);
-} 
-
-async function comparePassword(password, hash) {
-  return bcrypt.compare(password, hash);
 }
 
 export {

@@ -5,4 +5,8 @@ async function encryptPassword(password) {
   return bcrypt.hash(password, salt);
 }
 
-export { encryptPassword };
+async function comparePassword(password, hash) {
+  return bcrypt.compare(password, hash);
+}
+
+export { encryptPassword, comparePassword };
