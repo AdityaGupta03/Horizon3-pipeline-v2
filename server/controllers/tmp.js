@@ -19,18 +19,13 @@ async function encryptPassword(password) {
     return bcrypt.hash(password, salt);
 }
 async function compare(password, hash) {
-    return bcrypt.compare(password, hash, function(err, res) {
-        if (err) {
-            console.error("Error comparing password:", err);
-        }
-        
-        console.log(res);
-    });
+    return bcrypt.compare(password, hash);
 }   
 // const hash = encryptPassword("password123");
 // compare("password123", hash);
-encryptPassword("password123").then((hash) => {
-    console.log(hash);
-});
+
+var hash = await encryptPassword("password123");
+var cmp = await compare("password123", hash);
+console.log(cmp);
 // console.log(tmp);
 
