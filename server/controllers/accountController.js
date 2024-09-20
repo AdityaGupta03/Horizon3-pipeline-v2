@@ -1,12 +1,9 @@
-import bcrypt from "bcryptjs";
 import { encryptPassword, comparePassword } from "../helpers/ecryptionFuncs.js";
 
 import { insertVerificationCodeQuery } from "../database/queries/verificationQueries.js";
-
 import {
   createAccountQuery,
   deleteAccountQuery,
-  loginToAccountQuery,
   getAccountFromUsernameOrEmailQuery,
   updateUsernameQuery,
   updatePasswordQuery,
@@ -210,9 +207,10 @@ async function changeUsername(req, res) {
 }
 
 /**
- *
- * @param {*} req
- * @param {*} res
+ * Changes the password for an existing user account
+ * @param {Object} req - The request object containing user_id, old_password, and new_password
+ * @param {Object} res - The response object to send back to the client
+ * @returns {Object} A response with a status code and JSON body
  */
 async function changePassword(req, res) {
   const { user_id, old_password, new_password } = req.body;

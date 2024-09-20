@@ -32,21 +32,6 @@ async function deleteAccountQuery(user_id) {
   }
 }
 
-async function loginToAccountQuery(username) {
-  const query = `
-    SELECT * FROM users
-    WHERE username = $1
-  `;
-
-  try {
-    const result = await db_pool.query(query, [username]);
-    return result.rows[0];
-  } catch (error) {
-    console.error("loginToAccountQuery()", error);
-    throw error;
-  }
-}
-
 async function getAccountFromUsernameOrEmailQuery(username, email) {
   const query = `
     SELECT * FROM users
@@ -112,7 +97,6 @@ async function updatePasswordQuery(user_id, hash_password) {
 export {
   createAccountQuery,
   deleteAccountQuery,
-  loginToAccountQuery,
   getAccountFromUsernameOrEmailQuery,
   getAccountFromUserIDQuery,
   updateUsernameQuery,
