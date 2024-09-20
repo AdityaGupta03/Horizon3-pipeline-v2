@@ -1,3 +1,8 @@
+import bcrypt from "bcryptjs";
+import { encryptPassword } from "../helpers/ecryptionFuncs.js";
+
+import { insertVerificationCodeQuery } from "../database/queries/verificationQueries.js";
+
 import {
   createAccountQuery,
   deleteAccountQuery,
@@ -45,9 +50,28 @@ async function createAccount(req, res) {
       });
     }
 
+    // Encrypt the password
+    const hash = await encryptPassword(password);
+
     // Create the new user account
-    const newUser = await createAccountQuery(username, password, email);
+    const newUser = await createAccountQuery(username, hash, email);
     if (newUser) {
+      // Create a user verification code
+      const verificationCode = Math.floor(100000 + Math.random() * 900000);
+      console.log(`Verification code for ${username}: ${verificationCode}`);
+
+      const verificationResult = await insertVerificationCodeQuery(
+        newUser.user_id,
+        verificationCode,
+      );
+      if (!verificationResult) {
+        throw new Error("Error creating verification code");
+      }
+
+      // Send verification code to user's email
+      const email_subject = "Verify your H3 Pipeline account!";
+      const email_body = `Your verification code is: ${verificationCode}`;
+
       return res.status(200).json({
         message: "Account created successfully",
         user: newUser,

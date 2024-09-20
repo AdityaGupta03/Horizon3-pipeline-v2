@@ -7,6 +7,15 @@ CREATE TABLE users (
   verified INT DEFAULT 0    -- Flag to check if account is verified
 );
 
+-- Create user verification table
+CREATE TABLE user_verification (
+  id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL,   -- User associated with verification code
+  code INT NOT NULL,      -- Verification code
+
+  FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE  -- foreign key to users table with automatic delete
+);
+
 -- Create teams table
 CREATE TABLE teams (
   team_id SERIAL PRIMARY KEY,
