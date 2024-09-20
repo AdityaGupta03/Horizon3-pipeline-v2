@@ -1,8 +1,9 @@
 import {
   createAccountQuery,
-  getAccountFromUsernameOrEmail,
-  updateUsername,
-  getAccountFromUserID,
+  loginToAccountQuery,
+  getAccountFromUsernameOrEmailQuery,
+  updateUsernameQuery,
+  getAccountFromUserIDQuery,
 } from "../database/queries/accountQueries.js";
 
 /**
@@ -24,7 +25,10 @@ async function createAccount(req, res) {
 
   try {
     // Check if account already exists with the given username or password
-    const existing_acc = await getAccountFromUsernameOrEmail(username, email);
+    const existing_acc = await getAccountFromUsernameOrEmailQuery(
+      username,
+      email,
+    );
     if (existing_acc) {
       let errMsg = "";
       if (existing_acc.email == email) {
@@ -69,13 +73,61 @@ async function verifyAccountEmail(req, res) {
 }
 
 /**
- * Logs into exisiting user account
- * @param {*} req
- * @param {*} res
+ * Handles user login by verifying credentials and account status
+ * @param {Object} req - The request object containing username and password
+ * @param {Object} res - The response object to send back to the client
+ * @returns {Object} A response with a status code and JSON body
  */
 async function loginToAccount(req, res) {
-  console.error("Not implemented...");
-  res.status(501).send("Not implemented");
+  const { username, password } = req.body;
+
+  // Check if request json is missing necessary parameters
+  if (!username || !password) {
+    console.error("loginToAccount(): Missing user information...");
+    return res.status(400).json({
+      error: "Missing required information.",
+    });
+  }
+
+  try {
+    // Check if username exists
+    const acc_exists = await getAccountFromUsernameOrEmailQuery(username, "");
+    if (!acc_exists) {
+      console.error("loginToAccount(): Account does not exist");
+      return res.status(404).json({
+        error: "Account not found",
+      });
+    }
+
+    // Check if login credentials match an account
+    const user_acc = await loginToAccountQuery(username, password);
+    if (!user_acc) {
+      console.error("loginToAccount(): Invalid credentials");
+      return res.status(401).json({
+        error: "Invalid username or password",
+      });
+    }
+
+    // Check if the account is verified
+    if (user_acc.verified == 0) {
+      console.error("loginToAccount(): Account not verified");
+      return res.status(403).json({
+        error: "Account not verified",
+        message: "Please verify your email address to log in",
+      });
+    } else {
+      console.log("loginToAccount(): Login successful");
+      return res.status(200).json({
+        message: "Login successful",
+        user_id: user_acc.user_id,
+      });
+    }
+  } catch (error) {
+    console.error("Error logging in:", error);
+    return res.status(500).json({
+      error: "Error logging in",
+    });
+  }
 }
 
 /**
@@ -97,7 +149,7 @@ async function changeUsername(req, res) {
 
   try {
     // Check if user specified exists
-    const user_acc = await getAccountFromUserID(user_id);
+    const user_acc = await getAccountFromUserIDQuery(user_id);
     if (!user_acc) {
       console.error("User account doesn't exist: ", user_id);
       return res.status(404).json({
@@ -106,7 +158,10 @@ async function changeUsername(req, res) {
     }
 
     // Check if username already exists
-    const existing_acc = await getAccountFromUsernameOrEmail(new_username, "");
+    const existing_acc = await getAccountFromUsernameOrEmailQuery(
+      new_username,
+      "",
+    );
     if (existing_acc) {
       console.error("changeUsername(): username already exists");
       return res.status(409).json({
@@ -115,7 +170,7 @@ async function changeUsername(req, res) {
     }
 
     // Update account to new username
-    const query_status = await updateUsername(user_id, new_username);
+    const query_status = await updateUsernameQuery(user_id, new_username);
     if (query_status) {
       return res.status(200).json({
         message: "Updated username successfully",

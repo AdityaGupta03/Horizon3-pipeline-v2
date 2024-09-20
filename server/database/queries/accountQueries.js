@@ -16,7 +16,22 @@ async function createAccountQuery(username, password, email) {
   }
 }
 
-async function getAccountFromUsernameOrEmail(username, email) {
+async function loginToAccountQuery(username, password) {
+  const query = `
+    SELECT * FROM users
+    WHERE username = $1 AND password = $2
+  `;
+
+  try {
+    const result = await db_pool.query(query, [username, password]);
+    return result.rows[0];
+  } catch (error) {
+    console.error("loginToAccountQuery()", query);
+    throw error;
+  }
+}
+
+async function getAccountFromUsernameOrEmailQuery(username, email) {
   const query = `
     SELECT * FROM users
     WHERE username = $1 OR email = $2
@@ -31,7 +46,7 @@ async function getAccountFromUsernameOrEmail(username, email) {
   }
 }
 
-async function getAccountFromUserID(user_id) {
+async function getAccountFromUserIDQuery(user_id) {
   const query = `
     SELECT * FROM users
     WHERE user_id = $1
@@ -46,7 +61,7 @@ async function getAccountFromUserID(user_id) {
   }
 }
 
-async function updateUsername(user_id, username) {
+async function updateUsernameQuery(user_id, username) {
   const query = `
     UPDATE users
     SET username = $2
@@ -64,7 +79,8 @@ async function updateUsername(user_id, username) {
 
 export {
   createAccountQuery,
-  getAccountFromUsernameOrEmail,
-  updateUsername,
-  getAccountFromUserID,
+  loginToAccountQuery,
+  getAccountFromUsernameOrEmailQuery,
+  getAccountFromUserIDQuery,
+  updateUsernameQuery,
 };
