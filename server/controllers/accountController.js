@@ -11,6 +11,7 @@ import {
   updateUsernameQuery,
   getAccountFromUserIDQuery,
 } from "../database/queries/accountQueries.js";
+import bcrypt from 'bcryptjs';
 
 /**
  * Creates a new user account
@@ -53,7 +54,6 @@ async function createAccount(req, res) {
     // Encrypt the password
     const hash = await encryptPassword(password);
 
-    // Create the new user account
     const newUser = await createAccountQuery(username, hash, email);
     if (newUser) {
       // Create a user verification code
@@ -125,15 +125,21 @@ async function loginToAccount(req, res) {
     }
 
     // Check if login credentials match an account
-    const user_acc = await loginToAccountQuery(username, password);
+    const user_acc = await loginToAccountQuery(username);
     if (!user_acc) {
       console.error("loginToAccount(): Invalid credentials");
       return res.status(401).json({
-        error: "Invalid username or password",
+        error: "Invalid username",
       });
     }
 
     // Check if the account is verified
+    if(!await comparePassword(password, user_acc.password)) {
+      console.error("loginToAccount(): Invalid password");
+      return res.status(401).json({
+        error: "Invalid password",
+      });
+    }
     if (user_acc.verified == 0) {
       console.error("loginToAccount(): Account not verified");
       return res.status(403).json({
@@ -263,6 +269,15 @@ async function deleteAccount(req, res) {
       error: "Error deleting account",
     });
   }
+}
+
+async function encryptPassword(password) {
+  const salt = await bcrypt.genSalt(10);
+  return bcrypt.hash(password, salt);
+} 
+
+async function comparePassword(password, hash) {
+  return bcrypt.compare(password, hash);
 }
 
 export {

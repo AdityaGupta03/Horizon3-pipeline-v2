@@ -32,14 +32,14 @@ async function deleteAccountQuery(user_id) {
   }
 }
 
-async function loginToAccountQuery(username, password) {
+async function loginToAccountQuery(username) {
   const query = `
     SELECT * FROM users
-    WHERE username = $1 AND password = $2
+    WHERE username = $1
   `;
 
   try {
-    const result = await db_pool.query(query, [username, password]);
+    const result = await db_pool.query(query, [username]);
     return result.rows[0];
   } catch (error) {
     console.error("loginToAccountQuery()", error);
