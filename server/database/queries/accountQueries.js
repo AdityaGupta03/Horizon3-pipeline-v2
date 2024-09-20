@@ -31,6 +31,21 @@ async function getAccountFromUsernameOrEmail(username, email) {
   }
 }
 
+async function getAccountFromUserID(user_id) {
+  const query = `
+    SELECT * FROM users
+    WHERE user_id = $1
+  `;
+
+  try {
+    const result = await db_pool.query(query, [user_id]);
+    return result.rows[0];
+  } catch (error) {
+    console.error("Error fetching account: ", error);
+    throw error;
+  }
+}
+
 async function updateUsername(user_id, username) {
   const query = `
     UPDATE users
@@ -40,12 +55,16 @@ async function updateUsername(user_id, username) {
 
   try {
     const result = await db_pool.query(query, [user_id, username]);
-    console.log(result);
-    return result.rows[0];
+    return result;
   } catch (error) {
     console.error("Error updating username:", error);
     throw error;
   }
 }
 
-export { createAccountQuery, getAccountFromUsernameOrEmail, updateUsername };
+export {
+  createAccountQuery,
+  getAccountFromUsernameOrEmail,
+  updateUsername,
+  getAccountFromUserID,
+};

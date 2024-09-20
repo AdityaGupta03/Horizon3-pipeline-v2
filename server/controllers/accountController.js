@@ -2,6 +2,7 @@ import {
   createAccountQuery,
   getAccountFromUsernameOrEmail,
   updateUsername,
+  getAccountFromUserID,
 } from "../database/queries/accountQueries.js";
 
 /**
@@ -95,6 +96,15 @@ async function changeUsername(req, res) {
   }
 
   try {
+    // Check if user specified exists
+    const user_acc = await getAccountFromUserID(user_id);
+    if (!user_acc) {
+      console.error("User account doesn't exist: ", user_id);
+      return res.status(404).json({
+        error: "User account not found",
+      });
+    }
+
     // Check if username already exists
     const existing_acc = await getAccountFromUsernameOrEmail(new_username, "");
     if (existing_acc) {
@@ -110,6 +120,8 @@ async function changeUsername(req, res) {
       return res.status(200).json({
         message: "Updated username successfully",
       });
+    } else {
+      throw Error;
     }
   } catch (error) {
     console.error("Error changing username:", error);
