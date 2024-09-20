@@ -5,6 +5,7 @@ import {
   updateUsernameQuery,
   getAccountFromUserIDQuery,
 } from "../database/queries/accountQueries.js";
+import bcrypt from 'bcryptjs';
 
 /**
  * Creates a new user account with error checking for missing request params or exisiting username/email
@@ -45,15 +46,38 @@ async function createAccount(req, res) {
     }
 
     // Create the new user account
-    const newUser = await createAccountQuery(username, password, email);
-    if (newUser) {
-      return res.status(200).json({
-        message: "Account created successfully",
-        user: newUser,
+    bcrypt.genSalt(10, function(err, salt){
+      if (err) {
+          console.error("Error generating salt:", err);
+          return res.status(500).json({ error: "Error generating salt" });
+      }
+      bcrypt.hash(password, salt, function(err, hash) {
+          if(err) {
+              console.error("Error hashing password:", err);
+              return res.status(500).json({ error: "Error hashing password" });
+          }
+          //store hash in db
+          // console.log(hash);
+          const newUser = createAccountQuery(username, hash, email);
+          if (newUser) {
+            return res.status(200).json({
+              message: "Account created successfully",
+              user: newUser,
+            });
+          } else {
+            throw Error;
+          }
       });
-    } else {
-      throw error;
-    }
+    });
+    // const newUser = await createAccountQuery(username, password, email);
+    // if (newUser) {
+    //   return res.status(200).json({
+    //     message: "Account created successfully",
+    //     user: newUser,
+    //   });
+    // } else {
+    //   throw error;
+    // }
   } catch (error) {
     console.error("Error creating account:", error);
     return res.status(500).json({
