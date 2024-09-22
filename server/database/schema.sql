@@ -30,8 +30,8 @@ CREATE TABLE reports (
   creator_id INT NOT NULL,            -- references user_id in users table
   team_id INT NOT NULL,               -- references team_id in teams table
 
-  FOREIGN KEY (creator_id) REFERENCES users (user_id) ON DELETE CASCADE, -- foreign key to users table with automatic delete
-  FOREIGN KEY (team_id) REFERENCES teams (team_id) ON DELETE CASCADE -- foreign key to teams table with automatic delete
+  FOREIGN KEY (creator_id) REFERENCES users (user_id) ON DELETE CASCADE,  -- foreign key to users table with automatic delete
+  FOREIGN KEY (team_id) REFERENCES teams (team_id) ON DELETE CASCADE      -- foreign key to teams table with automatic delete
 );
 
 -- Create join table between users and teams
@@ -40,7 +40,7 @@ CREATE TABLE team_members (
   team_id INT,
   member_role VARCHAR(255) NOT NULL,
 
-  PRIMARY KEY (member_id, team_id), -- primary key is a combination of team and member
+  PRIMARY KEY (member_id, team_id),   -- primary key is a combination of team and member
   FOREIGN KEY (member_id) REFERENCES users (user_id) ON DELETE CASCADE, -- foreign key to users table with automatic delete
-  FOREIGN KEY (team_id) REFERENCES teams (team_id) ON DELETE CASCADE -- foreign key to teams table with automatic delete
+  FOREIGN KEY (team_id) REFERENCES teams (team_id) ON DELETE CASCADE    -- foreign key to teams table with automatic delete
 );
