@@ -16,17 +16,18 @@ async function createAccountQuery(username, password, email) {
   }
 }
 
-async function loginToAccountQuery(username, password) {
+async function deleteAccountQuery(user_id) {
+  // Delete user and cascade to related tables
   const query = `
-    SELECT * FROM users
-    WHERE username = $1 AND password = $2
+    DELETE FROM users
+    WHERE user_id = $1
   `;
 
   try {
-    const result = await db_pool.query(query, [username, password]);
-    return result.rows[0];
+    const result = await db_pool.query(query, [user_id]);
+    return result;
   } catch (error) {
-    console.error("loginToAccountQuery()", query);
+    console.error("deleteAccountQuery()", error);
     throw error;
   }
 }
@@ -77,10 +78,44 @@ async function updateUsernameQuery(user_id, username) {
   }
 }
 
+async function updatePasswordQuery(user_id, hash_password) {
+  const query = `
+    UPDATE users
+    SET password = $2
+    WHERE user_id = $1
+  `;
+
+  try {
+    const result = await db_pool.query(query, [user_id, hash_password]);
+    return result;
+  } catch (error) {
+    console.error("Error updating username:", error);
+    throw error;
+  }
+}
+
+async function verifyUserAccountQuery(user_id) {
+  const query = `
+    UPDATE users
+    SET verified = 1
+    WHERE user_id = $1
+  `;
+
+  try {
+    const result = await db_pool.query(query, [user_id]);
+    return result;
+  } catch (error) {
+    console.error("Error verifying account:", error);
+    throw error;
+  }
+}
+
 export {
   createAccountQuery,
-  loginToAccountQuery,
+  deleteAccountQuery,
   getAccountFromUsernameOrEmailQuery,
   getAccountFromUserIDQuery,
   updateUsernameQuery,
+  updatePasswordQuery,
+  verifyUserAccountQuery,
 };

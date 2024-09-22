@@ -15,5 +15,7 @@ const userRouter = Router();
 userRouter.post("/create_account", createAccount);
 userRouter.post("/login", loginToAccount);
 userRouter.post("/change_username", changeUsername);
+userRouter.post("/delete_account", deleteAccount);
+userRouter.post("/change_password", changePassword);
 
 export default userRouter;
