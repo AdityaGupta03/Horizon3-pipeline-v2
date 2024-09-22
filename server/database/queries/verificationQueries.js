@@ -16,4 +16,38 @@ async function insertVerificationCodeQuery(user_id, code) {
   }
 }
 
-export { insertVerificationCodeQuery };
+async function getVerificationCodeQuery(user_id) {
+  const query = `
+    SELECT * FROM verification_codes
+    WHERE user_id = $1
+  `;
+
+  try {
+    const result = await db_pool.query(query, [user_id]);
+    return result.rows[0];
+  } catch (error) {
+    console.error("Error fetching verification code:", error);
+    throw error;
+  }
+}
+
+async function deleteVerificationCodeQuery(user_id) {
+  const query = `
+    DELETE FROM verification_codes
+    WHERE user_id = $1
+  `;
+
+  try {
+    const result = await db_pool.query(query, [user_id]);
+    return result;
+  } catch (error) {
+    console.error("Error deleting verification code:", error);
+    throw error;
+  }
+}
+
+export {
+  insertVerificationCodeQuery,
+  getVerificationCodeQuery,
+  deleteVerificationCodeQuery,
+};

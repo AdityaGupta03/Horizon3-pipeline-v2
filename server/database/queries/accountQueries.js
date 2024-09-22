@@ -94,6 +94,22 @@ async function updatePasswordQuery(user_id, hash_password) {
   }
 }
 
+async function verifyUserAccountQuery(user_id) {
+  const query = `
+    UPDATE users
+    SET verified = 1
+    WHERE user_id = $1
+  `;
+
+  try {
+    const result = await db_pool.query(query, [user_id]);
+    return result;
+  } catch (error) {
+    console.error("Error verifying account:", error);
+    throw error;
+  }
+}
+
 export {
   createAccountQuery,
   deleteAccountQuery,
@@ -101,4 +117,5 @@ export {
   getAccountFromUserIDQuery,
   updateUsernameQuery,
   updatePasswordQuery,
+  verifyUserAccountQuery,
 };

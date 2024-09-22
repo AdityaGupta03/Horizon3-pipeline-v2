@@ -1,6 +1,12 @@
 import { encryptPassword, comparePassword } from "../helpers/ecryptionFuncs.js";
+import { emailUser } from "../helpers/emailFuncs.js";
 
-import { insertVerificationCodeQuery } from "../database/queries/verificationQueries.js";
+import {
+  insertVerificationCodeQuery,
+  getVerificationCodeQuery,
+  deleteVerificationCodeQuery,
+} from "../database/queries/verificationQueries.js";
+
 import {
   createAccountQuery,
   deleteAccountQuery,
@@ -8,6 +14,7 @@ import {
   updateUsernameQuery,
   updatePasswordQuery,
   getAccountFromUserIDQuery,
+  verifyUserAccountQuery,
 } from "../database/queries/accountQueries.js";
 
 /**
@@ -61,6 +68,7 @@ async function createAccount(req, res) {
         newUser.user_id,
         verificationCode,
       );
+
       if (!verificationResult) {
         throw new Error("Error creating verification code");
       }
@@ -68,13 +76,22 @@ async function createAccount(req, res) {
       // Send verification code to user's email
       const email_subject = "Verify your H3 Pipeline account!";
       const email_body = `Your verification code is: ${verificationCode}`;
+      const email_status = await emailUser(
+        newUser.email,
+        email_subject,
+        email_body,
+      );
+
+      if (!email_status) {
+        throw new Error("Error sending verification email");
+      }
 
       return res.status(200).json({
         message: "Account created successfully",
         user: newUser,
       });
     } else {
-      throw error;
+      throw Error;
     }
   } catch (error) {
     console.error("Error creating account:", error);
@@ -85,13 +102,61 @@ async function createAccount(req, res) {
 }
 
 /**
- * Verifies email account
- * @param {*} req
- * @param {*} res
+ * Verifies a user's email account
+ * @param {Object} req - The request object containing user_id and verification_code
+ * @param {Object} res - The response object to send back to the client
+ * @returns {Object} A response with a status code and JSON body
  */
 async function verifyAccountEmail(req, res) {
-  console.error("Not implemented...");
-  res.status(501).send("Not implemented");
+  const { user_id, verification_code } = req.body;
+
+  // Check if request json is missing necessary parameters
+  if (!user_id || !verification_code) {
+    console.error("verifyAccountEmail(): Missing user information...");
+    return res.status(400).json({
+      error: "Missing required information.",
+    });
+  }
+
+  try {
+    // Check if user exists
+    const user = await getAccountFromUserIDQuery(user_id);
+    if (!user) {
+      console.error("verifyAccountEmail(): User does not exist");
+      return res.status(404).json({
+        error: "User not found",
+      });
+    }
+
+    // Check if verification code is correct
+    const verification = await getVerificationCodeQuery(user_id);
+    if (verification_code != verification.code) {
+      console.error("verifyAccountEmail(): Invalid verification code");
+      return res.status(401).json({
+        error: "Invalid verification code",
+      });
+    }
+
+    // Update user account to verified
+    const verified = await verifyUserAccountQuery(user_id);
+    if (!verified) {
+      throw new Error("Error verifying account");
+    }
+
+    const deleted = await deleteVerificationCodeQuery(user_id);
+    if (!deleted) {
+      throw new Error("Error deleting verification code");
+    }
+
+    return res.status(200).json({
+      message: "Account verified successfully",
+    });
+  } catch (error) {
+    console.error("Error verifying account:", error);
+    return res.status(500).json({
+      error: "Error verifying account",
+    });
+  }
 }
 
 /**
