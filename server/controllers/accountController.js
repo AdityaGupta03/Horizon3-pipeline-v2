@@ -91,10 +91,22 @@ async function createAccount(req, res) {
         user: newUser,
       });
     } else {
-      throw Error;
+      throw new Error();
     }
   } catch (error) {
     console.error("Error creating account:", error);
+
+    // Rollback account creation
+    let acc_details = await getAccountFromUsernameOrEmailQuery(username, email);
+    if (acc_details) {
+      // Delete the account if it was created
+      await deleteAccountQuery(acc_details.user_id);
+
+      // Delete the verification code if it was created
+      await deleteVerificationCodeQuery(acc_details.user_id);
+    }
+
+    // Return an error response
     return res.status(500).json({
       error: "Error creating account",
     });
