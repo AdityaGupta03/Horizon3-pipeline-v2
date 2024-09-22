@@ -2,7 +2,7 @@ import { db_pool } from "../db.js";
 
 async function insertVerificationCodeQuery(user_id, code) {
   const query = `
-    INSERT INTO verification_codes (user_id, code)
+    INSERT INTO user_verification (user_id, code)
     VALUES ($1, $2)
     RETURNING user_id, code
   `;
@@ -18,7 +18,7 @@ async function insertVerificationCodeQuery(user_id, code) {
 
 async function getVerificationCodeQuery(user_id) {
   const query = `
-    SELECT * FROM verification_codes
+    SELECT * FROM user_verification
     WHERE user_id = $1
   `;
 
@@ -33,7 +33,7 @@ async function getVerificationCodeQuery(user_id) {
 
 async function deleteVerificationCodeQuery(user_id) {
   const query = `
-    DELETE FROM verification_codes
+    DELETE FROM user_verification
     WHERE user_id = $1
   `;
 
