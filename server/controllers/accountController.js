@@ -1,4 +1,7 @@
-import { encryptPassword, comparePassword } from "../helpers/ecryptionFuncs.js";
+import {
+  encryptPassword,
+  comparePassword,
+} from "../helpers/encryptionFuncs.js";
 import { emailUser } from "../helpers/emailFuncs.js";
 
 import {

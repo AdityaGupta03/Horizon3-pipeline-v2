@@ -4,7 +4,7 @@ import app from "../server";
 import * as accountQueries from "../database/queries/accountQueries.js";
 import * as verificationQueries from "../database/queries/verificationQueries.js";
 import * as emailFuncs from "../helpers/emailFuncs.js";
-import * as encryptionFuncs from "../helpers/ecryptionFuncs.js";
+import * as encryptionFuncs from "../helpers/encryptionFuncs.js";
 
 // Mock the helpers/dependencies
 jest.mock("../helpers/ecryptionFuncs.js");
