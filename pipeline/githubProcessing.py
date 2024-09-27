@@ -1,7 +1,7 @@
 import os
 import subprocess
 import shutil
-#import magic
+import requests
 
 def run_command(command, cwd=None):
     try:
@@ -43,35 +43,9 @@ def detect_and_build_c_project(project_dir):
     
     print("No Makefile, CMakeLists.txt, or configure script found in any directory!")
 
-
-    # makefile_path = os.path.join(project_dir, "Makefile")
-    # cmakefile_path = os.path.join(project_dir, 'CMakeLists.txt')
-    # configure_path = os.path.join(project_dir, 'configure')
-
-    # try:
-    #     if os.path.exists(makefile_path):
-    #         print("Makefile found! Building...")
-    #         run_command("make", cwd=project_dir)
-    #     elif os.path.exists(cmakefile_path):
-    #         print("CMakeLists.txt found! Building...")
-    #         build_dir = os.path.join(project_dir, 'build')
-    #         if not os.path.exists(build_dir):
-    #             os.makedirs(build_dir)
-    #         run_command("cmake .. && make", cwd=build_dir)
-    #     elif os.path.exists(configure_path):
-    #         print("configure script found! Building...")
-    #         run_command("./configure && make", cwd=project_dir)
-    #     else:
-    #         print("No Makefile, CMakeLists.txt, or configure script found!")
-    # except Exception as e:
-    #     print(f"Error building project: {e}")
-
 def find_binary_files(project_dir):
     search_paths = [os.path.join(project_dir, "bin"), os.path.join(project_dir, "build"), project_dir]
     binaries = []
-    
-    # def is_executable(file_path):        
-    #     return os.path.isfile(file_path) and os.access(file_path, os.X_OK)
 
     for dir in search_paths:
         if os.path.exists(dir):
@@ -86,6 +60,10 @@ def find_binary_files(project_dir):
 
 def clone_build_and_find_binary(repo_url):
     project_dir = './cloned_project'
+    if os.path.exists(project_dir):
+        shutil.rmtree(project_dir)
+        print("Removed cloned project directory.")
+    
     print(f"Cloning repository: {repo_url}")
     clone_repository(repo_url, project_dir)
     print(f"Building project...")
@@ -99,11 +77,19 @@ def clone_build_and_find_binary(repo_url):
     else:
         print("No binary files found.")
     
-    # if os.path.exists(project_dir):
-    #     shutil.rmtree(project_dir)
-    #     print("Removed cloned project directory.")
+    #logic for retrieving metadata
+    api_url = 'https://api.github.com/repos/SrinjoyDutta1/TestRepo'
+    headers = {'Authorization': 'token TOKEN', 'Accept': 'application/vnd.github+json'}
+    parameters = {'owner': 'SrinjoyDutta1', 'repo': 'TestRepo'}
+    
+    response = requests.get(api_url.format(**parameters), headers=headers)
+    if response.status_code == 200:
+        metadata = response.json()
+        print(metadata)
+    else:
+        print(f"Error: {response.status_code} - {response.text}")
         
     print("Process finished!")
 
-repo_url = 'https://github.com/microsoft/vcpkg.git'
+repo_url = 'https://github.com/SrinjoyDutta1/TestRepo.git'
 clone_build_and_find_binary(repo_url)
