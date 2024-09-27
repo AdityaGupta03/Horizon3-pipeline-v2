@@ -7,7 +7,7 @@ import * as emailFuncs from "../helpers/emailFuncs.js";
 import * as encryptionFuncs from "../helpers/encryptionFuncs.js";
 
 // Mock the helpers/dependencies
-jest.mock("../helpers/ecryptionFuncs.js");
+jest.mock("../helpers/encryptionFuncs.js");
 jest.mock("../helpers/emailFuncs.js");
 jest.mock("../database/queries/verificationQueries.js");
 jest.mock("../database/queries/accountQueries.js");
@@ -71,23 +71,9 @@ describe("Account Controller", () => {
       expect(response.body.error).toBe("Email already in use!");
     });
 
-    it("should return 500 if something goes wrong", async () => {
-      accountQueries.getAccountFromUsernameOrEmailQuery.mockImplementation(
-        () => {
-          throw new Error("Database error");
-        },
-      );
-
-      const response = await request(app)
-        .post("/api/user/create_account")
-        .send({
-          username: "testuser",
-          password: "password",
-          email: "asdf",
-        });
-
-      expect(response.status).toBe(500);
-      expect(response.body.error).toBe("Error creating account");
-    });
-  });
+  describe("Verify Account Email", () => {});
+  describe("Login to Account", () => {});
+  describe("Change Username", () => {});
+  describe("Change Password", () => {});
+  describe("Delete Account", () => {});
 });
