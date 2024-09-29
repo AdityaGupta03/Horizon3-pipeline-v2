@@ -1,4 +1,7 @@
-import { encryptPassword, comparePassword } from "../helpers/ecryptionFuncs.js";
+import {
+  encryptPassword,
+  comparePassword,
+} from "../helpers/encryptionFuncs.js";
 import { emailUser } from "../helpers/emailFuncs.js";
 
 import {
@@ -98,13 +101,20 @@ async function createAccount(req, res) {
     console.error("Error creating account:", error);
 
     // Rollback account creation
-    let acc_details = await getAccountFromUsernameOrEmailQuery(username, email);
-    if (acc_details) {
-      // Delete the account if it was created
-      await deleteAccountQuery(acc_details.user_id);
+    try {
+      let acc_details = await getAccountFromUsernameOrEmailQuery(
+        username,
+        email,
+      );
+      if (acc_details) {
+        // Delete the account if it was created
+        await deleteAccountQuery(acc_details.user_id);
 
-      // Delete the verification code if it was created
-      await deleteVerificationCodeQuery(acc_details.user_id);
+        // Delete the verification code if it was created
+        await deleteVerificationCodeQuery(acc_details.user_id);
+      }
+    } catch (error) {
+      console.error("Error rolling back account creation:", error);
     }
 
     // Return an error response
@@ -314,7 +324,7 @@ async function changePassword(req, res) {
     // Validate old password
     if (!(await comparePassword(old_password, user_acc.password))) {
       console.error("loginToAccount(): Invalid password");
-      return res.status(200).json({
+      return res.status(400).json({
         error: "Old password does not match",
       });
     }
