@@ -517,7 +517,7 @@ describe("Account Controller", () => {
 
       const response = await request(app)
         .post("/api/user/change_username")
-        .send({ username: "testuser", password: "password" });
+        .send({ user_id: 1, new_username: "newusername" });
 
       expect(response.status).toBe(200);
       expect(response.body.message).toBe("Updated username successfully");
@@ -566,7 +566,7 @@ describe("Account Controller", () => {
       accountQueries.updatePasswordQuery.mockResolvedValue(null);
 
       const response = await request(app)
-        .post("/api/user/change_username")
+        .post("/api/user/change_password")
         .send({ user_id: 1, old_password: "pass", new_password: "pass1" });
 
       expect(response.status).toBe(500);
@@ -579,7 +579,7 @@ describe("Account Controller", () => {
       );
 
       const response = await request(app)
-        .post("/api/user/change_username")
+        .post("/api/user/change_password")
         .send({ user_id: 1, old_password: "pass", new_password: "pass1" });
 
       expect(response.status).toBe(500);
@@ -595,7 +595,7 @@ describe("Account Controller", () => {
       );
 
       const response = await request(app)
-        .post("/api/user/change_username")
+        .post("/api/user/change_password")
         .send({ user_id: 1, old_password: "pass", new_password: "pass1" });
 
       expect(response.status).toBe(500);
@@ -613,7 +613,7 @@ describe("Account Controller", () => {
       );
 
       const response = await request(app)
-        .post("/api/user/change_username")
+        .post("/api/user/change_password")
         .send({ user_id: 1, old_password: "pass", new_password: "pass1" });
 
       expect(response.status).toBe(500);
