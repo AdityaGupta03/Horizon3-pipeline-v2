@@ -70,6 +70,7 @@ describe("Account Controller", () => {
       expect(response.status).toBe(409);
       expect(response.body.error).toBe("Email already in use!");
     });
+  });
 
   describe("Verify Account Email", () => {});
   describe("Login to Account", () => {});
