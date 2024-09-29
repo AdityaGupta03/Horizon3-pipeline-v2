@@ -1,36 +1,95 @@
+import React, { FormEvent, useState } from "react";
+import { Link, NavigateFunction, useNavigate } from "react-router-dom";
+
+// Styling
 import "./Login.css";
-import user_icon from "../assets/person.png";
-import email_icon from "../assets/email.png";
-import password_icon from "../assets/password.png";
-const Login = () => {
+
+// Images
+import woodstock from "./background_img.png";
+
+const Login: React.FC = () => {
+  // Define page state
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [errorMsg, setErrorMsg] = useState<string>("");
+
+  // Set navigator for updating page
+  const navigate: NavigateFunction = useNavigate();
+
+  // Handler for login api
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    try {
+      const response: Response = await fetch("/api/user/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      console.log(response);
+      const data = await response.json();
+      console.log(data);
+
+      if (response.ok) {
+        sessionStorage.setItem("isLoggedIn", "true");
+        sessionStorage.setItem("user_id", data.user_id);
+        navigate("/"); // Go to home page on success
+      } else {
+        // TODO handle different types of errors - be more descriptive
+        setErrorMsg(data.error || "An error occurred during login");
+      }
+    } catch (error) {
+      setErrorMsg("An error occurred during login. Please try again.");
+      console.log("Error calling api for account login");
+      console.error(error);
+    }
+  };
+
   return (
-    <div className="container">
-      <div className="header">
-        <div className="text">Sign Up</div>
-        <div className="underline"></div>
-      </div>
-      <div className="inputs">
-        <div className="input">
-          <img src={user_icon} alt="" />
-          <input type="text" placeholder="Name" />
+    <div className="login">
+      <div className="card">
+        <div className="left" style={{ backgroundImage: `url(${woodstock})` }}>
+          <h1>Horizon3 Pipeline</h1>
+          <p>Welcome back! Please login to your account.</p>
+          <span>Don't have an account?</span>
+          <Link to="/register" className="link-gen">
+            <button>Register</button>
+          </Link>
         </div>
-        <div className="input">
-          <img src={email_icon} alt="" />
-          <input type="email" placeholder="Email Id" />
+        <div className="right">
+          <h1>Login</h1>
+          <form onSubmit={handleSubmit}>
+            <input
+              type="text"
+              placeholder="Username"
+              onChange={(e) => setUsername(e.target.value)}
+              value={username}
+              required
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              onChange={(e) => setPassword(e.target.value)}
+              value={password}
+              required
+            />
+            <button type="submit">Login</button>
+          </form>
+          {errorMsg && (
+            <div>
+              <p>{errorMsg}</p>
+            </div>
+          )}
+          <Link to="/forgotpass" className="link-gen">
+            Forgot Password?
+          </Link>
+          <Link to="/forgotusername" className="link-gen">
+            Forgot Username?
+          </Link>
         </div>
-        <div className="input">
-          <img src={password_icon} alt="" />
-          <input type="password" placeholder="Password" />
-        </div>
-      </div>
-      <div className="forgot-password">
-        Lost Password? <span>Click Here!</span>
-      </div>
-      <div className="submit-container">
-        <div className="submit">Sign Up</div>
-        <div className="submit">Login</div>
       </div>
     </div>
   );
 };
+
 export default Login;
