@@ -5,20 +5,19 @@ import {
   Outlet,
   RouterProvider,
 } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Components
-import Login from "./components/login/Login";
+import Login from "./Components/login/Login";
 
 // Styling
 import "./App.css";
 
 function App() {
   sessionStorage.setItem("isLoggedIn", "false");
-  localStorage.setItem("isLoggedIn", "false");
-  localStorage.setItem("user_id", "-1");
+  sessionStorage.setItem("user_id", "-1");
 
-  const currentUser = localStorage.getItem("user_id");
+  const currentUser: string | null = sessionStorage.getItem("user_id");
   const queryClient = new QueryClient();
 
   const Layout = () => {
@@ -35,7 +34,7 @@ function App() {
 
   // If not logged in, route user to login page
   const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-    if (!currentUser) {
+    if (!currentUser || currentUser === "-1") {
       return <Navigate to="/login" />;
     }
     return <>{children}</>;

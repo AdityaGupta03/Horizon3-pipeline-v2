@@ -24,6 +24,7 @@ import {
  * @returns {Object} A response with a status code and JSON body
  */
 async function createAccount(req, res) {
+  console.log("createAccount(): Creating new account...");
   const { username, password, email } = req.body;
 
   // Check if request json is missing necessary parameters
