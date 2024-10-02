@@ -33,8 +33,10 @@ const Signup: React.FC = () => {
       console.log(data);
 
       if (response.ok) {
+        sessionStorage.setItem("isLoggedIn", "true");
         sessionStorage.setItem("username", data.user.username);
         sessionStorage.setItem("email", data.user.email);
+        sessionStorage.setItem("user_id", data.user.user_id);
         navigate("/verify"); // Go to home page on success
       } else {
         // TODO handle different types of errors - be more descriptive

@@ -231,6 +231,7 @@ async function loginToAccount(req, res) {
         message: "Login successful",
         user_id: acc_exists.user_id,
         username: acc_exists.username,
+        email: acc_exists.email,
       });
     }
   } catch (error) {

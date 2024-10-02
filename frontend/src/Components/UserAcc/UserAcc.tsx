@@ -155,7 +155,7 @@ const UserAcc: React.FC = () => {
           />
           <input
             type="text"
-            placeholder="New Username"
+            placeholder="New Password"
             onChange={(e) => setNewPassword(e.target.value)}
             value={new_password}
             required

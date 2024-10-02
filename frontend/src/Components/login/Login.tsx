@@ -35,6 +35,7 @@ const Login: React.FC = () => {
         sessionStorage.setItem("isLoggedIn", "true");
         sessionStorage.setItem("user_id", data.user_id);
         sessionStorage.setItem("username", data.username);
+        sessionStorage.setItem("email", data.email);
         navigate("/dashboard"); // Go to home page on success
       } else {
         // TODO handle different types of errors - be more descriptive

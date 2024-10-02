@@ -34,7 +34,7 @@ const Signup: React.FC = () => {
       console.log(data);
 
       if (response.ok) {
-        navigate("/login"); // Go to home page on success
+        navigate("/dashboard"); // Go to home page on success
       } else {
         // TODO handle different types of errors - be more descriptive
         setErrorMsg(data.error || "An error occurred during login");
