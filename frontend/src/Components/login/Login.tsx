@@ -16,6 +16,10 @@ const Login: React.FC = () => {
   // Set navigator for updating page
   const navigate: NavigateFunction = useNavigate();
 
+  // Delay script
+  const delay = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
+
   // Handler for login api
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -37,6 +41,13 @@ const Login: React.FC = () => {
         sessionStorage.setItem("username", data.username);
         sessionStorage.setItem("email", data.email);
         navigate("/dashboard"); // Go to home page on success
+      } else if (response.status === 403) {
+        setErrorMsg(
+          "Account is not validated... Routing you to verification page!",
+        );
+        sessionStorage.setItem("email", data.email);
+        await delay(3000);
+        navigate("/verify");
       } else {
         // TODO handle different types of errors - be more descriptive
         setErrorMsg(data.error || "An error occurred during login");
