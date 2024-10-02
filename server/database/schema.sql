@@ -19,8 +19,20 @@ CREATE TABLE user_verification (
 -- Create teams table
 CREATE TABLE teams (
   team_id SERIAL PRIMARY KEY,
-  team_name VARCHAR(255) NOT NULL,
-  github_url VARCHAR(255) NOT NULL
+  team_name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE repos (
+  id SERIAL PRIMARY KEY,
+  github_url VARCHAR(255) NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  private INT,  -- Flag for if repo is private (0 = public, 1 = private)
+  token VARCHAR(255),
+  creator_id INT,
+  team_id INT,
+
+  FOREIGN KEY (creator_id) REFERENCES users (user_id) ON DELETE CASCADE,  -- foreign key to users table
+  FOREIGN KEY (team_id) REFERENCES teams (team_id) ON DELETE CASCADE
 );
 
 -- Create reports table
