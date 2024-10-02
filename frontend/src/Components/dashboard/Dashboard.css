@@ -1,0 +1,84 @@
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.dashboard {
+  height: 100%;
+  background-color: rgb(53, 45, 45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.card {
+  width: 90%;
+  max-width: 1200px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  background-color: rgb(41, 35, 35);
+  border-radius: 10px;
+  padding: 40px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  color: white;
+}
+
+h1 {
+  font-size: 36px;
+  margin-bottom: 20px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+
+input {
+  background-color: transparent;
+  color: white;
+  border: none;
+  border-bottom: 1px solid lightgray;
+  padding: 10px 0;
+  margin-top: 10px;
+}
+
+.submit-btn,
+.signout-btn {
+  width: 50%;
+  padding: 10px;
+  border: none;
+  background-color: #ceb888;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.error {
+  color: red;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+  .card {
+    width: 100%;
+    padding: 20px;
+  }
+
+  .submit-btn,
+  .signout-btn {
+    width: 100%;
+  }
+}
