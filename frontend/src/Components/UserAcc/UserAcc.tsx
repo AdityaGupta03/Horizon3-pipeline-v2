@@ -54,11 +54,24 @@ const UserAcc: React.FC = () => {
     }
   };
 
+       // Password validation
+  const validatePassword = (password: string): boolean => {
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+    return passwordRegex.test(password);
+  };
   const handleChangePasswordSubmit = async (
     event: FormEvent<HTMLFormElement>,
   ) => {
     event.preventDefault();
     setPasswordErrorMsg("");
+
+    // Validate password constraints
+    if (!validatePassword(new_password)) {
+      setPasswordErrorMsg(
+        "Password must start with an uppercase letter, contain at least one digit, one special character, and be at least 8 characters long."
+      );
+      return;
+    }
     try {
       const response: Response = await fetch("/api/user/change_password", {
         method: "POST",
@@ -154,7 +167,7 @@ const UserAcc: React.FC = () => {
             required
           />
           <input
-            type="text"
+            type="password"
             placeholder="New Password"
             onChange={(e) => setNewPassword(e.target.value)}
             value={new_password}

@@ -8,19 +8,31 @@ import "./Signup.css";
 import woodstock from "../Assets/background_img.png";
 
 const Signup: React.FC = () => {
-  // Define page state
   const [username, setUsername] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState<string>("");
 
+  // Password validation
+  const validatePassword = (password: string): boolean => {
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+    return passwordRegex.test(password);
+  };
+
   // Set navigator for updating page
   const navigate: NavigateFunction = useNavigate();
 
-  // Handler for login api
+  // Handler for signup api
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setErrorMsg("");
+    // Validate password constraints
+    if (!validatePassword(password)) {
+      setErrorMsg(
+        "Password must start with an uppercase letter, contain at least one digit, one special character, and be at least 8 characters long."
+      );
+      return;
+    }
     try {
       const response: Response = await fetch("/api/user/create_account", {
         method: "POST",
@@ -37,13 +49,12 @@ const Signup: React.FC = () => {
         sessionStorage.setItem("username", data.user.username);
         sessionStorage.setItem("email", data.user.email);
         sessionStorage.setItem("user_id", data.user.user_id);
-        navigate("/verify"); // Go to home page on success
+        navigate("/verify"); // Go to verify page on success
       } else {
-        // TODO handle different types of errors - be more descriptive
-        setErrorMsg(data.error || "An error occurred during login");
+        setErrorMsg(data.error || "An error occurred during signup");
       }
     } catch (error) {
-      setErrorMsg("An error occurred during login. Please try again.");
+      setErrorMsg("An error occurred during signup. Please try again.");
       console.log("Error calling api for account creation");
       console.error(error);
     }
