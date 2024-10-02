@@ -2,6 +2,8 @@ import os
 import subprocess
 import shutil
 import requests
+import boto3
+import json
 
 def run_command(command, cwd=None):
     try:
@@ -82,10 +84,16 @@ def clone_build_and_find_binary(repo_url):
     headers = {'Authorization': 'token TOKEN', 'Accept': 'application/vnd.github+json'}
     parameters = {'owner': 'SrinjoyDutta1', 'repo': 'TestRepo'}
     
+    AWS_ACCESS_KEY = "YOUR_ACCESS_KEY"
+    AWS_SECRET_KEY = "YOUR_SECRET_KEY"
+    
     response = requests.get(api_url.format(**parameters), headers=headers)
     if response.status_code == 200:
         metadata = response.json()
-        print(metadata)
+        s3 = boto3.client('s3', region_name='us-east-1', aws_access_key_id=AWS_ACCESS_KEY, aws_secret_access_key=AWS_SECRET_KEY)
+        bucket_name = "cs407gitmetadata"
+        filename = "metadata.json"
+        s3.put_object(Body=json.dumps(metadata), Bucket=bucket_name, Key=filename)
     else:
         print(f"Error: {response.status_code} - {response.text}")
         
