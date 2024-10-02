@@ -1,0 +1,103 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #35302d;
+    color: white;
+  }
+  
+  h1, h2 {
+    text-align: center;
+    color: #ceb888;
+  }
+  
+  p {
+    text-align: center;
+  }
+  
+  .link-gen button {
+    background-color: #ceb888;
+    color: white;
+    font-weight: bold;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    display: block;
+    margin: 20px auto;
+    max-width: 300px;
+    text-align: center;
+  }
+  
+  .link-gen button:hover {
+    background-color: #a69065;
+  }
+  
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  input {
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    width: 80%;
+    max-width: 400px;
+  }
+  
+  input::placeholder {
+    color: #999;
+  }
+  
+  button[type="submit"] {
+    background-color: #ceb888;
+    color: white;
+    font-weight: bold;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    width: 80%;
+    max-width: 300px;
+  }
+  
+  button[type="submit"]:hover {
+    background-color: #a69065;
+  }
+  
+  p {
+    color: rgb(213, 65, 65);
+    font-weight: bold;
+  }
+  
+  .ChangeUsername, .ChangePassword, .DeleteAccount {
+    background-color: #413b37;
+    padding: 30px;
+    margin: 20px auto;
+    border-radius: 10px;
+    max-width: 600px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  h2 {
+    font-size: 18px;
+    color: #ceb888;
+  }
+  
+  @media (max-width: 768px) {
+    form input,
+    button[type="submit"],
+    .link-gen button {
+      width: 100%;
+      max-width: 100%;
+    }
+  
+    .ChangeUsername, .ChangePassword, .DeleteAccount {
+      width: 90%;
+    }
+  }
+  
