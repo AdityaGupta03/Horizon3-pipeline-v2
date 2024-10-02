@@ -1,17 +1,24 @@
-import bcrypt from "bcryptjs";
-import { encryptPassword } from "../helpers/ecryptionFuncs.js";
+import {
+  encryptPassword,
+  comparePassword,
+} from "../helpers/encryptionFuncs.js";
+import { emailUser } from "../helpers/emailFuncs.js";
 
-import { insertVerificationCodeQuery } from "../database/queries/verificationQueries.js";
+import {
+  insertVerificationCodeQuery,
+  getVerificationCodeQuery,
+  deleteVerificationCodeQuery,
+} from "../database/queries/verificationQueries.js";
 
 import {
   createAccountQuery,
   deleteAccountQuery,
-  loginToAccountQuery,
   getAccountFromUsernameOrEmailQuery,
   updateUsernameQuery,
+  updatePasswordQuery,
   getAccountFromUserIDQuery,
+  verifyUserAccountQuery,
 } from "../database/queries/accountQueries.js";
-import bcrypt from 'bcryptjs';
 
 /**
  * Creates a new user account
@@ -20,6 +27,7 @@ import bcrypt from 'bcryptjs';
  * @returns {Object} A response with a status code and JSON body
  */
 async function createAccount(req, res) {
+  console.log("createAccount(): Creating new account...");
   const { username, password, email } = req.body;
 
   // Check if request json is missing necessary parameters
@@ -64,6 +72,7 @@ async function createAccount(req, res) {
         newUser.user_id,
         verificationCode,
       );
+
       if (!verificationResult) {
         throw new Error("Error creating verification code");
       }
@@ -71,16 +80,44 @@ async function createAccount(req, res) {
       // Send verification code to user's email
       const email_subject = "Verify your H3 Pipeline account!";
       const email_body = `Your verification code is: ${verificationCode}`;
+      const email_status = await emailUser(
+        newUser.email,
+        email_subject,
+        email_body,
+      );
+
+      if (!email_status) {
+        throw new Error("Error sending verification email");
+      }
 
       return res.status(200).json({
         message: "Account created successfully",
         user: newUser,
       });
     } else {
-      throw error;
+      throw new Error();
     }
   } catch (error) {
     console.error("Error creating account:", error);
+
+    // Rollback account creation
+    try {
+      let acc_details = await getAccountFromUsernameOrEmailQuery(
+        username,
+        email,
+      );
+      if (acc_details) {
+        // Delete the account if it was created
+        await deleteAccountQuery(acc_details.user_id);
+
+        // Delete the verification code if it was created
+        await deleteVerificationCodeQuery(acc_details.user_id);
+      }
+    } catch (error) {
+      console.error("Error rolling back account creation:", error);
+    }
+
+    // Return an error response
     return res.status(500).json({
       error: "Error creating account",
     });
@@ -88,13 +125,63 @@ async function createAccount(req, res) {
 }
 
 /**
- * Verifies email account
- * @param {*} req
- * @param {*} res
+ * Verifies a user's email account
+ * @param {Object} req - The request object containing user_id and verification_code
+ * @param {Object} res - The response object to send back to the client
+ * @returns {Object} A response with a status code and JSON body
  */
 async function verifyAccountEmail(req, res) {
-  console.error("Not implemented...");
-  res.status(501).send("Not implemented");
+  const { email, verification_code } = req.body;
+
+  // Check if request json is missing necessary parameters
+  if (!email || !verification_code) {
+    console.error("verifyAccountEmail(): Missing user information...");
+    return res.status(400).json({
+      error: "Missing required information.",
+    });
+  }
+
+  try {
+    // Check if user exists
+    const user = await getAccountFromUsernameOrEmailQuery("", email);
+    if (!user) {
+      console.error("verifyAccountEmail(): User does not exist");
+      return res.status(404).json({
+        error: "User not found",
+      });
+    }
+
+    const user_id = user.user_id;
+
+    // Check if verification code is correct
+    const verification = await getVerificationCodeQuery(user_id);
+    if (verification_code != verification.code) {
+      console.error("verifyAccountEmail(): Invalid verification code");
+      return res.status(401).json({
+        error: "Invalid verification code",
+      });
+    }
+
+    // Update user account to verified
+    const verified = await verifyUserAccountQuery(user_id);
+    if (!verified) {
+      throw new Error("Error verifying account");
+    }
+
+    const deleted = await deleteVerificationCodeQuery(user_id);
+    if (!deleted) {
+      throw new Error("Error deleting verification code");
+    }
+
+    return res.status(200).json({
+      message: "Account verified successfully",
+    });
+  } catch (error) {
+    console.error("Error verifying account:", error);
+    return res.status(500).json({
+      error: "Error verifying account",
+    });
+  }
 }
 
 /**
@@ -124,33 +211,28 @@ async function loginToAccount(req, res) {
       });
     }
 
-    // Check if login credentials match an account
-    const user_acc = await loginToAccountQuery(username);
-    if (!user_acc) {
-      console.error("loginToAccount(): Invalid credentials");
-      return res.status(401).json({
-        error: "Invalid username",
-      });
-    }
-
     // Check if the account is verified
-    if(!await comparePassword(password, user_acc.password)) {
+    if (!(await comparePassword(password, acc_exists.password))) {
       console.error("loginToAccount(): Invalid password");
       return res.status(401).json({
         error: "Invalid password",
       });
     }
-    if (user_acc.verified == 0) {
+
+    if (acc_exists.verified == 0) {
       console.error("loginToAccount(): Account not verified");
       return res.status(403).json({
         error: "Account not verified",
         message: "Please verify your email address to log in",
+        email: acc_exists.email,
       });
     } else {
       console.log("loginToAccount(): Login successful");
       return res.status(200).json({
         message: "Login successful",
-        user_id: user_acc.user_id,
+        user_id: acc_exists.user_id,
+        username: acc_exists.username,
+        email: acc_exists.email,
       });
     }
   } catch (error) {
@@ -218,13 +300,58 @@ async function changeUsername(req, res) {
 }
 
 /**
- *
- * @param {*} req
- * @param {*} res
+ * Changes the password for an existing user account
+ * @param {Object} req - The request object containing user_id, old_password, and new_password
+ * @param {Object} res - The response object to send back to the client
+ * @returns {Object} A response with a status code and JSON body
  */
 async function changePassword(req, res) {
-  console.error("Not implemented...");
-  res.status(501).send("Not implemented");
+  const { user_id, old_password, new_password } = req.body;
+
+  // Check if request json is missing necessary parameters
+  if (!user_id || !old_password || !new_password) {
+    console.error("createAccount(): Missing user information...");
+    return res.status(400).json({
+      error: "Missing required information.",
+    });
+  }
+
+  try {
+    // Check if user specified exists
+    const user_acc = await getAccountFromUserIDQuery(user_id);
+    if (!user_acc) {
+      console.error("User account doesn't exist: ", user_id);
+      return res.status(404).json({
+        error: "User account not found",
+      });
+    }
+
+    // Validate old password
+    if (!(await comparePassword(old_password, user_acc.password))) {
+      console.error("loginToAccount(): Invalid password");
+      return res.status(400).json({
+        error: "Old password does not match",
+      });
+    }
+
+    // Hash new password
+    const hash = await encryptPassword(new_password);
+
+    // Update account to new username
+    const query_status = await updatePasswordQuery(user_id, hash);
+    if (query_status) {
+      return res.status(200).json({
+        message: "Updated password successfully",
+      });
+    } else {
+      throw Error;
+    }
+  } catch (error) {
+    console.error("changePassword():", error);
+    return res.status(500).json({
+      error: "Error changing password",
+    });
+  }
 }
 
 /**
@@ -269,15 +396,6 @@ async function deleteAccount(req, res) {
       error: "Error deleting account",
     });
   }
-}
-
-async function encryptPassword(password) {
-  const salt = await bcrypt.genSalt(10);
-  return bcrypt.hash(password, salt);
-} 
-
-async function comparePassword(password, hash) {
-  return bcrypt.compare(password, hash);
 }
 
 export {

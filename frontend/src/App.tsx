@@ -8,7 +8,7 @@ import {
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Components
-import Login from "./Components/login/Login";
+import Login from "./Components/Login/Login";
 import Signup from "./Components/Signup/Signup";
 import Verify from "./Components/Verify/Verify";
 import UserAcc from "./Components/UserAcc/UserAcc";

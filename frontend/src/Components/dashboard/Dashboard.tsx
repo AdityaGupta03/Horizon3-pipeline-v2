@@ -33,6 +33,7 @@ const Dashboard: React.FC = () => {
     }
   };
 
+
   const handleBinarySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (binary1 && binary2) {
