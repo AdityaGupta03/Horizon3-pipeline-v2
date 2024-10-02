@@ -12,7 +12,7 @@ const Signup: React.FC = () => {
   const [code, setCode] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState<string>("");
 
-  const user_id: string | null = sessionStorage.getItem("user_id");
+  const email: string | null = sessionStorage.getItem("email");
 
   // Set navigator for updating page
   const navigate: NavigateFunction = useNavigate();
@@ -26,7 +26,7 @@ const Signup: React.FC = () => {
       const response: Response = await fetch("/api/user/verify_email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id, verification_code }),
+        body: JSON.stringify({ email, verification_code }),
       });
 
       console.log(response);
@@ -34,9 +34,7 @@ const Signup: React.FC = () => {
       console.log(data);
 
       if (response.ok) {
-        console.log(user_id);
-        console.log(sessionStorage.getItem("user_id"));
-        navigate("/"); // Go to home page on success
+        navigate("/login"); // Go to home page on success
       } else {
         // TODO handle different types of errors - be more descriptive
         setErrorMsg(data.error || "An error occurred during login");
