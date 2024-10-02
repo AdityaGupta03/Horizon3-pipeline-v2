@@ -131,10 +131,10 @@ async function createAccount(req, res) {
  * @returns {Object} A response with a status code and JSON body
  */
 async function verifyAccountEmail(req, res) {
-  const { user_id, verification_code } = req.body;
+  const { email, verification_code } = req.body;
 
   // Check if request json is missing necessary parameters
-  if (!user_id || !verification_code) {
+  if (!email || !verification_code) {
     console.error("verifyAccountEmail(): Missing user information...");
     return res.status(400).json({
       error: "Missing required information.",
@@ -143,13 +143,15 @@ async function verifyAccountEmail(req, res) {
 
   try {
     // Check if user exists
-    const user = await getAccountFromUserIDQuery(user_id);
+    const user = await getAccountFromUsernameOrEmailQuery("", email);
     if (!user) {
       console.error("verifyAccountEmail(): User does not exist");
       return res.status(404).json({
         error: "User not found",
       });
     }
+
+    const user_id = user.user_id;
 
     // Check if verification code is correct
     const verification = await getVerificationCodeQuery(user_id);
@@ -228,6 +230,7 @@ async function loginToAccount(req, res) {
       return res.status(200).json({
         message: "Login successful",
         user_id: acc_exists.user_id,
+        username: acc_exists.username,
       });
     }
   } catch (error) {

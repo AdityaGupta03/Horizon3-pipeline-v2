@@ -11,15 +11,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Login from "./Components/Login/Login";
 import Signup from "./Components/Signup/Signup";
 import Verify from "./Components/Verify/Verify";
+import UserAcc from "./Components/UserAcc/UserAcc";
+import Dashboard from "./Components/dashboard/Dashboard";
 
 // Styling
 import "./App.css";
 
 function App() {
-  sessionStorage.setItem("isLoggedIn", "false");
-  sessionStorage.setItem("user_id", "-1");
-
-  const currentUser: string | null = sessionStorage.getItem("user_id");
   const queryClient = new QueryClient();
 
   const Layout = () => {
@@ -36,6 +34,7 @@ function App() {
 
   // If not logged in, route user to login page
   const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+    const currentUser: string | null = sessionStorage.getItem("user_id");
     if (!currentUser || currentUser === "-1") {
       return <Navigate to="/login" />;
     }
@@ -51,7 +50,16 @@ function App() {
           <Layout />
         </ProtectedRoute>
       ),
-      children: [],
+      children: [
+        {
+          path: "/dashboard",
+          element: <Dashboard />,
+        },
+        {
+          path: "/useracc",
+          element: <UserAcc />,
+        },
+      ],
     },
     {
       path: "/login",
