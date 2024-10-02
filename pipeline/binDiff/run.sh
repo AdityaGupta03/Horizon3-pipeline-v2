@@ -1,0 +1,2 @@
+ghidra_11.1.2_PUBLIC/support/analyzeHeadless . TestProject -import ./binaries -deleteProject -analysisTimeoutPerFile 100 -scriptPath ./ghidraheadless_binexport/ -postScript ./ghidraheadless_binexport/sample_functions_cpy.py
+bindiff temp.BinExport temp2.binExport
