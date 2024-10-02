@@ -224,6 +224,7 @@ async function loginToAccount(req, res) {
       return res.status(403).json({
         error: "Account not verified",
         message: "Please verify your email address to log in",
+        email: acc_exists.email,
       });
     } else {
       console.log("loginToAccount(): Login successful");
