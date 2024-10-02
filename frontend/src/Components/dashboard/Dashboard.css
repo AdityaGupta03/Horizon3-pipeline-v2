@@ -1,4 +1,4 @@
-/* html,
+html,
 body,
 #root {
   height: 100%;
@@ -15,70 +15,126 @@ body,
   padding: 20px;
 }
 
-.card {
+.dashboard .card {
   width: 90%;
-  max-width: 1200px;
-  height: auto;
-  display: flex;
-  flex-direction: column;
+  max-width: 600px;
   background-color: rgb(41, 35, 35);
   border-radius: 10px;
-  padding: 40px;
+  padding: 20px 40px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-h1 {
+.dashboard h1 {
   font-size: 36px;
+  color: rgb(255, 255, 255);
+  text-align: center;
   margin-bottom: 20px;
 }
 
-.form {
+.dashboard .button-container {
   display: flex;
-  flex-direction: column;
-  gap: 20px;
+  justify-content: space-between; 
+  gap: 20px; 
+  margin-bottom: 20px;
 }
 
-.input-group {
-  display: flex;
-  flex-direction: column;
+
+.dashboard .button-container .link-gen button,
+.dashboard .button-container .signout-btn {
+  background-color: #ceb888;
+  color: white;
+  font-weight: bold;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  max-width: 300px;
+  border-radius: 30px;
+  text-align: center;
 }
 
-input {
+.dashboard .button-container .link-gen {
+  display: inline-block;
+  width: 100%;
+  text-decoration: none;
+}
+
+.dashboard .button-container .link-gen button:hover,
+.dashboard .button-container .signout-btn:hover {
+  background-color: #a69065;
+}
+
+.dashboard .form {
+  display: flex;
+  flex-direction: column;
+  gap: 80px;
+  align-items: center;
+  width: 100%;
+}
+
+.dashboard .input-group {
+  width: 100%;
+  max-width: 500px;
+  text-align: left;
+}
+
+.dashboard .input-group label {
+  font-size: 18px;
+  color: lightgray;
+  margin-bottom: 10px;
+}
+
+.dashboard .input-group input {
   background-color: transparent;
   color: white;
   border: none;
   border-bottom: 1px solid lightgray;
   padding: 10px 0;
-  margin-top: 10px;
+  width: 100%;
 }
 
-.submit-btn,
-.signout-btn {
-  width: 50%;
+.dashboard .submit-btn {
+  width: 100%;
+  max-width: 300px;
   padding: 10px;
   border: none;
   background-color: #ceb888;
   color: white;
   font-weight: bold;
   cursor: pointer;
-  margin-top: 20px;
+  border-radius: 30px;
 }
 
-.error {
-  color: red;
+.dashboard .submit-btn:disabled {
+  background-color: #999;
+  cursor: not-allowed;
+}
+
+.dashboard .submit-btn:hover {
+  background-color: #a69065;
+}
+
+.dashboard .error {
+  color: rgb(213, 65, 65);
   font-weight: bold;
-  margin-top: 10px;
+  padding: 10px;
 }
 
 @media (max-width: 768px) {
-  .card {
+  .dashboard .card {
     width: 100%;
     padding: 20px;
   }
 
-  .submit-btn,
-  .signout-btn {
+  .dashboard .button-container .link-gen button,
+  .dashboard .button-container .signout-btn,
+  .dashboard .submit-btn {
     width: 100%;
+    max-width: 100%;
+    border-radius: 20px;
   }
-} */
+}

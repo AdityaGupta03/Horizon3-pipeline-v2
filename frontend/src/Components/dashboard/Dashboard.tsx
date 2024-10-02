@@ -58,13 +58,14 @@ const Dashboard: React.FC = () => {
     <div className="dashboard">
       <div className="card">
         <h1>Dashboard</h1>
-        <Link to="/useracc" className="link-gen">
+       <div className="button-container"> 
+          <Link to="/useracc" className="link-gen">
           <button>User Account</button>
-        </Link>
-        <button onClick={handleSignOut} className="signout-btn">
-          Sign Out
-        </button>
-
+          </Link>
+          <button onClick={handleSignOut} className="signout-btn">
+            Sign Out
+          </button>
+        </div>
         {/* upload binary */}
         <form onSubmit={handleBinarySubmit} className="form">
           <div className="input-group">
@@ -78,10 +79,7 @@ const Dashboard: React.FC = () => {
           <button
             type="submit"
             className="submit-btn"
-            disabled={isBinarySubmitDisabled}
-          >
-            Submit Binaries
-          </button>
+            disabled={isBinarySubmitDisabled}>Submit Binaries</button>
           {binaryError && <p className="error">{binaryError}</p>}
         </form>
 
