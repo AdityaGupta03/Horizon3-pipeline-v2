@@ -63,6 +63,7 @@ body,
   text-decoration: none;
 }
 
+
 .dashboard .button-container .link-gen button:hover,
 .dashboard .button-container .signout-btn:hover {
   background-color: #a69065;

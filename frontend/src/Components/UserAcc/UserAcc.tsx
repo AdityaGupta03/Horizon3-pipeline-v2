@@ -118,9 +118,8 @@ const UserAcc: React.FC = () => {
       console.error(error);
     }
   };
-
   return (
-    <div>
+    <div className="user-acc">
       <div>
         <Link to="/dashboard" className="link-gen">
           <button>Back to Dashboard</button>
@@ -190,6 +189,7 @@ const UserAcc: React.FC = () => {
       </div>
     </div>
   );
+  
 };
 
 export default UserAcc;

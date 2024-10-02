@@ -58,9 +58,11 @@ const Dashboard: React.FC = () => {
     <div className="dashboard">
       <div className="card">
         <h1>Dashboard</h1>
-       <div className="button-container"> 
+       
+       
+        <div className="button-container"> 
           <Link to="/useracc" className="link-gen">
-          <button>User Account</button>
+            <button>User Account</button>
           </Link>
           <button onClick={handleSignOut} className="signout-btn">
             Sign Out
