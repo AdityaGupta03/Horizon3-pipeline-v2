@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Dashboard.css";
+import axios from 'axios';
 
 const Dashboard: React.FC = () => {
   const [binary1, setBinary1] = useState<File | null>(null);
@@ -32,10 +33,52 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleBinarySubmit = (e: React.FormEvent) => {
+
+  const handleBinarySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (binary1 && binary2) {
       setBinaryError("");
+      let folder = '';
+      try {
+        const response: Response = await fetch("/api/user/create_folder", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ }),
+        });
+        const data = await response.json();
+        folder = data.folder;
+      }
+      catch(error) {
+        console.log("Error calling api for creating folder");
+        console.error(error);
+      }
+
+      let formData = new FormData();
+      formData.append("binary", binary1);
+      formData.append("folder", folder);
+
+      axios.post("/api/user/upload", formData, { headers: {}})
+      .then((res) => {
+          if (res.status === 200)
+            console.log('200');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+      formData = new FormData();
+      formData.append("binary", binary2);
+      formData.append("folder", folder);
+      axios.post("/api/user/upload", formData, { headers: {}})
+      .then((res) => {
+          if (res.status === 200)
+            console.log('200');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+      //post request for bindiff to do its thing with folder name
     } else {
       setBinaryError("Both Binary 1 and Binary 2 must be uploaded.");
     }
