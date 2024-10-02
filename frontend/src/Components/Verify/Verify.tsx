@@ -2,16 +2,17 @@ import React, { FormEvent, useState } from "react";
 import { Link, NavigateFunction, useNavigate } from "react-router-dom";
 
 // Styling
-import "./Login.css";
+import "./Verify.css";
 
 // Images
 import woodstock from "../Assets/background_img.png";
 
-const Login: React.FC = () => {
+const Signup: React.FC = () => {
   // Define page state
-  const [username, setUsername] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const [code, setCode] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState<string>("");
+
+  const user_id: string | null = sessionStorage.getItem("user_id");
 
   // Set navigator for updating page
   const navigate: NavigateFunction = useNavigate();
@@ -20,11 +21,12 @@ const Login: React.FC = () => {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setErrorMsg("");
+    const verification_code: string = code;
     try {
-      const response: Response = await fetch("/api/user/login", {
+      const response: Response = await fetch("/api/user/verify_email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ user_id, verification_code }),
       });
 
       console.log(response);
@@ -32,8 +34,8 @@ const Login: React.FC = () => {
       console.log(data);
 
       if (response.ok) {
-        sessionStorage.setItem("isLoggedIn", "true");
-        sessionStorage.setItem("user_id", data.user_id);
+        console.log(user_id);
+        console.log(sessionStorage.getItem("user_id"));
         navigate("/"); // Go to home page on success
       } else {
         // TODO handle different types of errors - be more descriptive
@@ -41,40 +43,35 @@ const Login: React.FC = () => {
       }
     } catch (error) {
       setErrorMsg("An error occurred during login. Please try again.");
-      console.log("Error calling api for account login");
+      console.log("Error calling api for account creation");
       console.error(error);
     }
   };
 
   return (
-    <div className="login">
+    <div className="signup">
       <div className="card">
         <div className="left" style={{ backgroundImage: `url(${woodstock})` }}>
           <h1>Horizon3 Pipeline</h1>
-          <p>Welcome back! Please login to your account.</p>
-          <span>Don't have an account?</span>
-          <Link to="/signup" className="link-gen">
-            <button>Register</button>
+          <p>
+            Welcome! Please verify your account (check your email for a code).
+          </p>
+          <span>Already have an account?</span>
+          <Link to="/login" className="link-gen">
+            <button>Login</button>
           </Link>
         </div>
         <div className="right">
-          <h1>Login</h1>
+          <h1>Verify Account</h1>
           <form onSubmit={handleSubmit}>
             <input
               type="text"
-              placeholder="Username"
-              onChange={(e) => setUsername(e.target.value)}
-              value={username}
+              placeholder="Verification Code"
+              onChange={(e) => setCode(e.target.value)}
+              value={code}
               required
             />
-            <input
-              type="password"
-              placeholder="Password"
-              onChange={(e) => setPassword(e.target.value)}
-              value={password}
-              required
-            />
-            <button type="submit">Login</button>
+            <button type="submit">Verify Account</button>
           </form>
           {errorMsg && (
             <div>
@@ -87,4 +84,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default Signup;

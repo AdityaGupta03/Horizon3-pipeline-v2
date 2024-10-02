@@ -1,0 +1,126 @@
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.signup {
+  height: 100%;
+  background-color: rgb(53, 45, 45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.signup .link-gen {
+  color: whitesmoke;
+  text-decoration: none;
+}
+
+.signup .link-gen:hover {
+  color: whitesmoke;
+  text-decoration: underline;
+}
+
+.signup .card {
+  width: 90%;
+  max-width: 1200px;
+  height: 80vh;
+  max-height: 800px;
+  display: flex;
+  background-color: rgb(41, 35, 35);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.signup .card .left {
+  flex: 1;
+  background:
+    linear-gradient(rgba(7, 2, 16, 0.5), rgba(7, 2, 16, 0.5)),
+    url("./arch.jpeg") center;
+  background-size: cover;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 30px;
+  color: white;
+}
+
+.signup .card .left h1 {
+  font-size: 40px;
+  line-height: 1.2;
+}
+
+.signup .card .left span {
+  font-size: 14px;
+}
+
+.signup .card .left button {
+  width: 50%;
+  padding: 10px;
+  border: none;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.signup .card .right {
+  flex: 1;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  justify-content: center;
+}
+
+.signup .card .right h1 {
+  color: rgb(255, 255, 255);
+}
+
+.signup .card .right form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.signup .card .right form input {
+  background-color: transparent;
+  color: white;
+  border: none;
+  border-bottom: 1px solid lightgray;
+  padding: 10px 0;
+}
+
+.signup .card .right form button {
+  width: 50%;
+  padding: 10px;
+  border: none;
+  background-color: #ceb888;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.signup .card .right div {
+  border: 1px solid red;
+  padding: 10px;
+  color: rgb(213, 65, 65);
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .signup .card {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .signup .card .left,
+  .signup .card .right {
+    padding: 20px;
+  }
+}
