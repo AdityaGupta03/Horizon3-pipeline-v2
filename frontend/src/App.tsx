@@ -8,7 +8,9 @@ import {
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Components
-import Login from "./Components/login/Login";
+import Login from "./Components/Login/Login";
+import Signup from "./Components/Signup/Signup";
+import Verify from "./Components/Verify/Verify";
 
 // Styling
 import "./App.css";
@@ -54,6 +56,14 @@ function App() {
     {
       path: "/login",
       element: <Login />,
+    },
+    {
+      path: "/signup",
+      element: <Signup />,
+    },
+    {
+      path: "/verify",
+      element: <Verify />,
     },
   ]);
 
