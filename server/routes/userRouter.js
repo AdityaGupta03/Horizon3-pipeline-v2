@@ -10,7 +10,7 @@ import {
   changePassword,
   deleteAccount,
 } from "../controllers/accountController.js";
-import { uploadFile, createFolder } from "../controllers/fileController.js";
+import { uploadFile, createFolder, uploadResults } from "../controllers/fileController.js";
 import {runScript} from "../controllers/binDiffController.js";
 const userRouter = Router();
 
@@ -25,5 +25,6 @@ userRouter.post("/upload", upload.single('binary'), uploadFile);
 userRouter.post("/create_folder", createFolder);
 userRouter.post("/change_password", changePassword);
 userRouter.post("/run_script", runScript);
+userRouter.post("/upload_results", uploadResults);
 
 export default userRouter;

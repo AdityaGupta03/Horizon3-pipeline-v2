@@ -7,8 +7,8 @@ import json
 import sys
 import time
 
-AWS_ACCESS_KEY = "YOUR_ACCESS_KEY"
-AWS_SECRET_KEY = "YOUR_SECRET_KEY"
+AWS_ACCESS_KEY = os.getenv("")
+AWS_SECRET_KEY = os.getenv("")
 
 def run_command(command, cwd=None):
     try:

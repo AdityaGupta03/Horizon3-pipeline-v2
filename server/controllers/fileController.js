@@ -44,17 +44,21 @@ async function createFolder(req, res) {
     message: "Folder created successfully",
     folder: date,
   });
-  // s3.upload(params, function (err, data) {
-  //     if (err) {
-  //             return res.status(500).json({
-  //                 message: "error creating folder"
-  //             });
-  //         } else {
-  //             return res.status(200).json({
-  //                 message: "Folder created successfully",
-  //                 folder: date
-  //             });
-  //         }
-  //     });
 }
-export { uploadFile, createFolder };
+
+async function uploadResults(req, res) {
+  const params = {
+    Bucket: 'bindifffiles',
+    Key: req.body.folder + 'binary1_vs_binary2.BinDiff',
+    Body: fs.createReadStream('/Users/mkg/Documents/Horizon3-pipeline 2/pipeline/binDiff/binary1_vs_binary2.BinDiff')
+  };
+  s3.upload(params, (err, data) => {
+    if (err) {
+      console.log(err);
+      return res.status(500).json({message: "Failed to upload file"});
+    }
+    res.status(200).json({message: "File uploaded successfully"});
+});
+
+}
+export { uploadFile, createFolder, uploadResults };

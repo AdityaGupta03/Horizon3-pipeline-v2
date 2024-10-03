@@ -160,7 +160,7 @@ const UserAcc: React.FC = () => {
         <h1>Change Password</h1>
         <form onSubmit={handleChangePasswordSubmit}>
           <input
-            type="text"
+            type="password"
             placeholder="Old Password"
             onChange={(e) => setOldPassword(e.target.value)}
             value={old_password}

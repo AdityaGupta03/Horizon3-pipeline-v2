@@ -74,7 +74,11 @@ const Dashboard: React.FC = () => {
   const handleBinarySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (binary1 && binary2) {
-      setBinaryError("");
+      if(binary1.name === binary2.name) {
+        setBinaryError("Both Binaries must be different.");
+        return;
+      }
+      setBinaryError("loading...");
       let folder = "";
       try {
         const response: Response = await fetch("/api/user/create_folder", {
@@ -85,8 +89,9 @@ const Dashboard: React.FC = () => {
         const data = await response.json();
         folder = data.folder;
       } catch (error) {
-        console.log("Error calling api for creating folder");
+        setBinaryError("Error calling api for creating folder");
         console.error(error);
+        return;
       }
 
       let formData = new FormData();
@@ -99,7 +104,8 @@ const Dashboard: React.FC = () => {
           if (res.status === 200) console.log("200");
         })
         .catch((error) => {
-          console.log(error);
+          setBinaryError(error);
+          return;
         });
 
       formData = new FormData();
@@ -111,7 +117,8 @@ const Dashboard: React.FC = () => {
           if (res.status === 200) console.log("200");
         })
         .catch((error) => {
-          console.log(error);
+          setBinaryError(error);
+          return;
         });
         try {
           const response: Response = await fetch("/api/user/run_script", {
@@ -125,10 +132,26 @@ const Dashboard: React.FC = () => {
           const data = await response.json();
           console.log(data);
         } catch (error) {
-          console.log("Error calling api for running script");
+          setBinaryError("Error calling api for running script");
           console.error(error);
+          return;
         }  
-      //post request for bindiff to do its thing with folder name
+        try {
+          const response: Response = await fetch("/api/user/upload_results", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              folder: folder,
+            }),
+          });
+          const data = await response.json();
+          console.log(data);
+        } catch (error) {
+          setBinaryError("Error calling api for uploading results");
+          console.log(error);
+          return;
+        }
+        setBinaryError("Binaries uploaded successfully!");
     } else {
       setBinaryError("Both Binary 1 and Binary 2 must be uploaded.");
     }
