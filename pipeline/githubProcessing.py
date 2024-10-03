@@ -138,7 +138,7 @@ def clone_build_and_find_binary(repo_url, repo_name, owner, github_token):
     response = requests.get(api_url.format(**parameters), headers=headers)
 
   timestamp = int(time.time())
-  filename = f"metadata_{timestamp}.json"
+  filename = f"{repo_name}_meta_{timestamp}.json"
   if response.status_code == 200:
     metadata = response.json()
     bucket_name = "cs407gitmetadata"
