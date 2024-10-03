@@ -11,7 +11,7 @@ import {
   deleteAccount,
 } from "../controllers/accountController.js";
 import { uploadFile, createFolder } from "../controllers/fileController.js";
-import runScript from "../controllers/binDiffController.js";
+import {runScript} from "../controllers/binDiffController.js";
 const userRouter = Router();
 
 // Define post routes and corresponding controller functions
