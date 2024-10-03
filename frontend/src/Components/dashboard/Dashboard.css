@@ -41,6 +41,28 @@ body,
   gap: 20px; 
   margin-bottom: 20px;
 }
+.dashboard .dropdown {
+  margin-top: 40px; 
+  width: 100%;
+  max-width: 500px;
+  text-align: left;
+}
+
+.dashboard .dropdown label {
+  font-size: 18px;
+  color: lightgray;
+  margin-bottom: 10px;
+}
+
+.dashboard .dropdown select {
+  background-color: transparent;
+  color: white;
+  border: none;
+  border-bottom: 1px solid lightgray;
+  padding: 10px 0;
+  width: 100%;
+}
+
 
 
 .dashboard .button-container .link-gen button,
