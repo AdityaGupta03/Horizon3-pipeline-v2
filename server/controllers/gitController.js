@@ -19,6 +19,7 @@ async function addGithubRepo(req, res) {
     });
   }
 
+  let response;
   try {
     // Check if user specified exists
     const user_acc = await getAccountFromUserIDQuery(user_id);
@@ -47,7 +48,7 @@ async function addGithubRepo(req, res) {
     }
 
     const apiUrl = `https://api.github.com/repos/${owner}/${repo_name}`;
-    const response = await axios.get(apiUrl, config);
+    response = await axios.get(apiUrl, config);
 
     if (response.status === 404) {
       console.log("Repo doesn't exist or is private without proper token");
@@ -80,6 +81,13 @@ async function addGithubRepo(req, res) {
     }
   } catch (error) {
     console.error("Error changing username:", error);
+    console.error(response);
+    if (error.status === 404) {
+      console.log("Repo doesn't exist or is private without proper token");
+      return res.status(412).json({
+        error: "Repo doesn't exist or is private and token doesn't work/exists",
+      });
+    }
     return res.status(500).json({
       error: "Error adding repo",
     });
