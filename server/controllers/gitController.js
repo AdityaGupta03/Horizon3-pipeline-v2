@@ -3,6 +3,7 @@ import {
   createUserRepo,
   getReposFromUserID,
   getRepoFromName,
+  getRepoFromID,
 } from "../database/queries/gitQueries.js";
 import { getAccountFromUserIDQuery } from "../database/queries/accountQueries.js";
 
@@ -124,11 +125,45 @@ async function getGithubReposFromUser(req, res) {
       });
     }
   } catch (error) {
-    console.error("Error changing username:", error);
+    console.error("Error getting repos:", error);
     return res.status(500).json({
-      error: "Error adding repo",
+      error: "Error getting repo",
     });
   }
 }
 
-export { addGithubRepo, getGithubReposFromUser };
+async function analyzeGithubRepo(req, res) {
+  const { repo_id } = req.body;
+
+  if (!repo_id) {
+    console.error("analyzeGithubRepo): Missing user information...");
+    return res.status(400).json({
+      error: "Missing required information.",
+    });
+  }
+
+  try {
+    // Check if user specified exists
+    const repo = await getRepoFromID(repo_id);
+    if (!repo) {
+      console.error("Repo: ", repo_id);
+      return res.status(404).json({
+        error: "Repo not found",
+      });
+    }
+
+    console.log(repo);
+
+    // TODO kickoff pipeline scripts
+    return res.status(200).json({
+      error: "Successfully started pipeline!",
+    });
+  } catch (error) {
+    console.error("Error analyzing repo:", error);
+    return res.status(500).json({
+      error: "Error analyzing repo",
+    });
+  }
+}
+
+export { addGithubRepo, getGithubReposFromUser, analyzeGithubRepo };
