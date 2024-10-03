@@ -60,7 +60,7 @@ def find_binary_files(project_dir):
 
     return binaries
 
-def clone_build_and_find_binary(repo_url):
+def clone_build_and_find_binary(repo_url, github_token):
     project_dir = './cloned_project'
     if os.path.exists(project_dir):
         shutil.rmtree(project_dir)
@@ -81,13 +81,18 @@ def clone_build_and_find_binary(repo_url):
     
     #logic for retrieving metadata
     api_url = 'https://api.github.com/repos/SrinjoyDutta1/TestRepo'
-    headers = {'Authorization': 'token TOKEN', 'Accept': 'application/vnd.github+json'}
+    headers = {'Authorization': f'token {github_token}', 'Accept': 'application/vnd.github+json'}
     parameters = {'owner': 'SrinjoyDutta1', 'repo': 'TestRepo'}
+    
+    if not github_token:
+        response = requests.get(api_url.format(**parameters))
+    else:
+        response = requests.get(api_url.format(**parameters), headers=headers)
     
     AWS_ACCESS_KEY = "YOUR_ACCESS_KEY"
     AWS_SECRET_KEY = "YOUR_SECRET_KEY"
     
-    response = requests.get(api_url.format(**parameters), headers=headers)
+    
     if response.status_code == 200:
         metadata = response.json()
         s3 = boto3.client('s3', region_name='us-east-1', aws_access_key_id=AWS_ACCESS_KEY, aws_secret_access_key=AWS_SECRET_KEY)
@@ -100,4 +105,4 @@ def clone_build_and_find_binary(repo_url):
     print("Process finished!")
 
 repo_url = 'https://github.com/SrinjoyDutta1/TestRepo.git'
-clone_build_and_find_binary(repo_url)
+clone_build_and_find_binary(repo_url, "")
