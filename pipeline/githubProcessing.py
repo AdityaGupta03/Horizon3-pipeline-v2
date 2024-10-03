@@ -155,14 +155,17 @@ def clone_build_and_find_binary(repo_url, repo_name, owner, github_token):
 
 
 def main():
-    if len(sys.argv) != 5:
+    if len(sys.argv) != 5 and len(sys.argv) != 4:
         print("Usage: python githubProcessing.py <repo_url> <repo_name> <owner> <github_token>")
         sys.exit(1)
 
     repo_url = sys.argv[1]
     repo_name = sys.argv[2]
     owner = sys.argv[3]
-    github_token = sys.argv[4]
+    if(len(sys.argv) == 5):
+        github_token = sys.argv[4]
+    else:
+        github_token = None
 
     clone_build_and_find_binary(repo_url, repo_name, owner, github_token)
 

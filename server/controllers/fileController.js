@@ -57,8 +57,17 @@ async function uploadResults(req, res) {
       console.log(err);
       return res.status(500).json({message: "Failed to upload file"});
     }
-    res.status(200).json({message: "File uploaded successfully"});
+    fs.unlink('/Users/mkg/Documents/Horizon3-pipeline2/pipeline/binDiff/binary1_vs_binary2.BinDiff', (err, results) => {
+      if(err) {
+        console.log(err);
+        return res.status(500).json({message: "Failed to delete file"});
+      }
+      return res.status(200).json({message: "File deleted successfully"});
+    });
+    
+
 });
+
 
 }
 export { uploadFile, createFolder, uploadResults };
