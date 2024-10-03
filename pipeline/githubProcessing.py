@@ -5,6 +5,10 @@ import requests
 import boto3
 import json
 import sys
+import time
+
+AWS_ACCESS_KEY = "YOUR_ACCESS_KEY"
+AWS_SECRET_KEY = "YOUR_SECRET_KEY"
 
 def run_command(command, cwd=None):
     try:
@@ -21,6 +25,7 @@ def clone_repository(repo_url, dest_dir):
         print("Repository cloned successfully!")
     except Exception as e:
         print(f"Error cloning repository: {e}")
+        sys.exit(1)
 
 def detect_and_build_c_project(project_dir):
     # Let's modify the `detect_and_build_c_project` function to search all directories recursively for build files.
@@ -43,7 +48,8 @@ def detect_and_build_c_project(project_dir):
                 return
         except Exception as e:
             print(f"Error building project in {root}: {e}")
-    
+            sys.exit(1)
+
     print("No Makefile, CMakeLists.txt, or configure script found in any directory!")
 
 def find_binary_files(project_dir):
@@ -61,12 +67,21 @@ def find_binary_files(project_dir):
 
     return binaries
 
-def clone_build_and_find_binary(repo_url, github_token):
+def start_static_analysis(filename):
+  print("Running static analysis")
+  s3 = boto3.client('s3', region_name='us-east-1', aws_access_key_id=AWS_ACCESS_KEY, aws_secret_access_key=AWS_SECRET_KEY)
+  bucket_name = "cs407gitmetadata"
+  response = s3.get_object(Bucket=bucket_name, Key=filename)
+  object_content = response['Body'].read().decode('utf-8')
+  print(object_content)
+  print("Starting")
+
+def clone_build_and_find_binary(repo_url, repo_name, owner, github_token):
     project_dir = './cloned_project'
     if os.path.exists(project_dir):
         shutil.rmtree(project_dir)
         print("Removed cloned project directory.")
-    
+
     print(f"Cloning repository: {repo_url}")
     clone_repository(repo_url, project_dir)
     print(f"Building project...")
@@ -79,41 +94,41 @@ def clone_build_and_find_binary(repo_url, github_token):
             print(binary)
     else:
         print("No binary files found.")
-    
+
     #logic for retrieving metadata
     api_url = 'https://api.github.com/repos/SrinjoyDutta1/TestRepo'
     headers = {'Authorization': f'token {github_token}', 'Accept': 'application/vnd.github+json'}
-    parameters = {'owner': 'SrinjoyDutta1', 'repo': 'TestRepo'}
-    
+    parameters = {'owner': f'{owner}', 'repo': f'{repo_name}'}
+
     if not github_token:
         response = requests.get(api_url.format(**parameters))
     else:
         response = requests.get(api_url.format(**parameters), headers=headers)
-    
-    AWS_ACCESS_KEY = "YOUR_ACCESS_KEY"
-    AWS_SECRET_KEY = "YOUR_SECRET_KEY"
-    
-    
+
+    timestamp = int(time.time())
+    filename = f"metadata_{timestamp}.json"
     if response.status_code == 200:
         metadata = response.json()
         s3 = boto3.client('s3', region_name='us-east-1', aws_access_key_id=AWS_ACCESS_KEY, aws_secret_access_key=AWS_SECRET_KEY)
         bucket_name = "cs407gitmetadata"
-        filename = "metadata.json"
         s3.put_object(Body=json.dumps(metadata), Bucket=bucket_name, Key=filename)
     else:
         print(f"Error: {response.status_code} - {response.text}")
-        
+
     print("Process finished!")
 
+
 def main():
-    if len(sys.argv) != 3:
-        print("Usage: python githubProcessing.py <repo_url> <github_token>")
+    if len(sys.argv) != 5:
+        print("Usage: python githubProcessing.py <repo_url> <repo_name> <owner> <github_token>")
         sys.exit(1)
-    
+
     repo_url = sys.argv[1]
-    github_token = sys.argv[2]
-    
-    clone_build_and_find_binary(repo_url, github_token)
+    repo_name = sys.argv[2]
+    owner = sys.argv[3]
+    github_token = sys.argv[4]
+
+    clone_build_and_find_binary(repo_url, repo_name, owner, github_token)
 
 
 if __name__ == "__main__":

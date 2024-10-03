@@ -71,6 +71,7 @@ async function addGithubRepo(req, res) {
       private_flag,
       token,
       repo_name,
+      owner,
     );
     if (!query_res) {
       console.error("addGithubRepo(): Error creating repo");
@@ -166,21 +167,26 @@ async function analyzeGithubRepo(req, res) {
     // TODO kickoff pipeline scripts
     const repo_url = repo.url;
     const token = repo.token;
-    const pythonScriptPath = "./pipeline/githubProcessing.py";
+    const pythonScriptPath =
+      "/Users/aditya/Programming/Horizon3-pipeline/pipeline/githubProcessing.py";
 
-    execFile('python', [pythonScriptPath, repo_url, token], (error, stdout, stderr) => {
-      if (error) {
-        console.error("Error executing script: ", error);
-        return res.status(500).json({
-          error: "Error executing script",
+    execFile(
+      "python",
+      [pythonScriptPath, repo.github_url, repo.name, repo.owner, repo.token],
+      (error, stdout, stderr) => {
+        if (error) {
+          console.error("Error executing script: ", error);
+          return res.status(500).json({
+            error: "Error executing script",
+          });
+        }
+        console.log("Python script output: ", stdout);
+        return res.status(200).json({
+          message: "Successfully started pipeline!",
+          output: stdout,
         });
-      }
-      console.log("Python script output: ", stdout);
-      return res.status(200).json({
-        message: "Successfully started pipeline!",
-        output: stdout,
-      });
-    });
+      },
+    );
   } catch (error) {
     console.error("Error analyzing repo:", error);
     return res.status(500).json({

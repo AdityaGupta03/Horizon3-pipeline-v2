@@ -26,6 +26,7 @@ CREATE TABLE repos (
   id SERIAL PRIMARY KEY,
   github_url VARCHAR(255) NOT NULL,
   name VARCHAR(255) NOT NULL,
+  owner VARCHAR(255) NOT NULL,
   private INT,  -- Flag for if repo is private (0 = public, 1 = private)
   token VARCHAR(255),
   creator_id INT,

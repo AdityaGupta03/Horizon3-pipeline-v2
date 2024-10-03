@@ -1,9 +1,9 @@
 import { db_pool } from "../db.js";
 
-async function createUserRepo(user_id, url, priv_flag, token, name) {
+async function createUserRepo(user_id, url, priv_flag, token, name, owner) {
   const query = `
-    INSERT INTO repos (github_url, token, creator_id, private, name)
-    VALUES ($1, $2, $3, $4, $5)
+    INSERT INTO repos (github_url, token, creator_id, private, name, owner)
+    VALUES ($1, $2, $3, $4, $5, $6)
     RETURNING id
   `;
 
@@ -14,6 +14,7 @@ async function createUserRepo(user_id, url, priv_flag, token, name) {
       user_id,
       priv_flag,
       name,
+      owner,
     ]);
     return result.rows[0];
   } catch (error) {

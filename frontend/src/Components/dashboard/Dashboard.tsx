@@ -206,7 +206,7 @@ const Dashboard: React.FC = () => {
           // Get new github repo data for dropdown
           // Say yay that worked
           setGithubAnalyzeError("Started analysis pipeline!");
-          await delay(2000);
+          await delay(5000);
           setGithubAnalyzeError("");
         } else {
           // TODO handle different types of errors - be more descriptive
