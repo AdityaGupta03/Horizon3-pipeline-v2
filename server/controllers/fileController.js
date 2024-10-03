@@ -50,7 +50,7 @@ async function uploadResults(req, res) {
   const params = {
     Bucket: 'bindifffiles',
     Key: req.body.folder + 'binary1_vs_binary2.BinDiff',
-    Body: fs.createReadStream('/Users/mkg/Documents/Horizon3-pipeline 2/pipeline/binDiff/binary1_vs_binary2.BinDiff')
+    Body: fs.createReadStream('/Users/mkg/Documents/Horizon3-pipeline2/pipeline/binDiff/binary1_vs_binary2.BinDiff')
   };
   s3.upload(params, (err, data) => {
     if (err) {

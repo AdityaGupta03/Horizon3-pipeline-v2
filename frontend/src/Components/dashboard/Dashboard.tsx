@@ -211,7 +211,7 @@ const Dashboard: React.FC = () => {
   const handleExistingGithubSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedGithubLink) {
-      setGithubAnalyzeError("");
+      setGithubAnalyzeError("loading...");
       console.log("Selected Github Link: ", selectedGithubLink); //for now this should go to ish
       try {
         const repo_id = selectedGithubLink;

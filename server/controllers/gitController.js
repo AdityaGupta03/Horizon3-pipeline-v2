@@ -168,10 +168,10 @@ async function analyzeGithubRepo(req, res) {
     const repo_url = repo.url;
     const token = repo.token;
     const pythonScriptPath =
-      "/Users/aditya/Programming/Horizon3-pipeline/pipeline/githubProcessing.py";
+      `/Users/mkg/Documents/Horizon3-pipeline2/pipeline/githubProcessing.py`;
 
     execFile(
-      "python",
+      "python3.11",
       [pythonScriptPath, repo.github_url, repo.name, repo.owner, repo.token],
       (error, stdout, stderr) => {
         if (error) {
