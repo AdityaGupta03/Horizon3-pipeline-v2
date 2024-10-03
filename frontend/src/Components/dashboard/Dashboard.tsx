@@ -12,6 +12,9 @@ const Dashboard: React.FC = () => {
   const [binaryError, setBinaryError] = useState<string>("");
   const [githubError, setGithubError] = useState<string>("");
 
+  const[githubLinks, setGithubLinks] = useState<string[]>([]);
+  const[selectedGithubLink, setSelectedGithubLink] = useState<string>("");
+
   const navigate = useNavigate();
 
   const handleSignOut = () => {
@@ -84,15 +87,40 @@ const Dashboard: React.FC = () => {
     }
   };
 
+
+
   const handleGithubSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (githubLink && githubKey) {
-      setGithubError("");
-      //submit to ish here
-    } else {
-      setGithubError("Both GitHub link and API key must be provided.");
+  
+    const githubUrlRegex = /^https:\/\/github\.com\/([^\/]+)\/([^\/]+)$/;
+    const match = githubLink.match(githubUrlRegex);
+  
+    if (!match) {
+      setGithubError("Invalid GitHub link format. Please enter a valid GitHub repository URL.");
+      return;
     }
+  
+    const repositoryName = match[2]; 
+    setGithubError(""); 
+  
+    console.log("Repository Name: ", repositoryName);
+  
+
   };
+  
+
+
+
+  const handleExistingGithubSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (selectedGithubLink) {
+      setGithubError("");
+      console.log("Selected Github Link: ", selectedGithubLink);//for now this should go to ish
+    } else {
+      setGithubError("Please select a GitHub link.");
+    }
+
+  }
 
   const isBinarySubmitDisabled = !(binary1 && binary2);
   const isGithubSubmitDisabled = !(githubLink && githubKey);
@@ -128,7 +156,7 @@ const Dashboard: React.FC = () => {
           {binaryError && <p className="error">{binaryError}</p>}
         </form>
 
-        {/* upload github stuff for ish*/}
+        {/* new  github stuff for ish*/}
         <form onSubmit={handleGithubSubmit} className="form">
           <div className="input-group">
             <label>GitHub Link:</label>
@@ -157,6 +185,35 @@ const Dashboard: React.FC = () => {
           </button>
           {githubError && <p className="error">{githubError}</p>}
         </form>
+        
+
+      {/* Existing GitHub Repo Submit */}
+      <form onSubmit={handleExistingGithubSubmit} className="form dropdown-form">
+        <div className="dropdown">
+          <label>Existing GitHub Link:</label>
+          <select
+            value={selectedGithubLink}
+            onChange={(e) => setSelectedGithubLink(e.target.value)}
+          >
+            <option value="">Select a GitHub link</option>
+            {githubLinks.map((link, index) => (
+              <option key={index} value={link}>
+                {link}
+              </option>
+            ))}
+          </select>
+        </div>
+        <button
+          type="submit"
+          className="submit-btn"
+        >
+          Submit Pre-Existing Github Repo
+        </button>
+        {githubError && <p className="error">{githubError}</p>}
+      </form>
+
+
+
       </div>
     </div>
   );
