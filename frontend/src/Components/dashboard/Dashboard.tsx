@@ -113,7 +113,21 @@ const Dashboard: React.FC = () => {
         .catch((error) => {
           console.log(error);
         });
-
+        try {
+          const response: Response = await fetch("/api/user/run_script", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              path1: folder + binary1.name,
+              path2: folder + binary2.name,
+            }),
+          });
+          const data = await response.json();
+          console.log(data);
+        } catch (error) {
+          console.log("Error calling api for running script");
+          console.error(error);
+        }  
       //post request for bindiff to do its thing with folder name
     } else {
       setBinaryError("Both Binary 1 and Binary 2 must be uploaded.");
