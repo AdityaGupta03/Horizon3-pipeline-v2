@@ -4,6 +4,7 @@ import shutil
 import requests
 import boto3
 import json
+import sys
 
 def run_command(command, cwd=None):
     try:
@@ -104,5 +105,16 @@ def clone_build_and_find_binary(repo_url, github_token):
         
     print("Process finished!")
 
-repo_url = 'https://github.com/SrinjoyDutta1/TestRepo.git'
-clone_build_and_find_binary(repo_url, "")
+def main():
+    if len(sys.argv) != 3:
+        print("Usage: python githubProcessing.py <repo_url> <github_token>")
+        sys.exit(1)
+    
+    repo_url = sys.argv[1]
+    github_token = sys.argv[2]
+    
+    clone_build_and_find_binary(repo_url, github_token)
+
+
+if __name__ == "__main__":
+    main()
