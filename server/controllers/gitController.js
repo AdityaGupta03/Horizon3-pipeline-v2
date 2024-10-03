@@ -1,4 +1,5 @@
 import axios from "axios";
+import { execFile } from "child_process";
 import {
   createUserRepo,
   getReposFromUserID,
@@ -155,8 +156,22 @@ async function analyzeGithubRepo(req, res) {
     console.log(repo);
 
     // TODO kickoff pipeline scripts
-    return res.status(200).json({
-      error: "Successfully started pipeline!",
+    const repo_url = repo.url;
+    const token = repo.token;
+    const pythonScriptPath = "./pipeline/githubProcessing.py";
+
+    execFile('python', [pythonScriptPath, repo_url, token], (error, stdout, stderr) => {
+      if (error) {
+        console.error("Error executing script: ", error);
+        return res.status(500).json({
+          error: "Error executing script",
+        });
+      }
+      console.log("Python script output: ", stdout);
+      return res.status(200).json({
+        message: "Successfully started pipeline!",
+        output: stdout,
+      });
     });
   } catch (error) {
     console.error("Error analyzing repo:", error);
