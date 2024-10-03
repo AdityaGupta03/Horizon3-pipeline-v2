@@ -50,4 +50,18 @@ async function getRepoFromName(name) {
   }
 }
 
-export { createUserRepo, getReposFromUserID, getRepoFromName };
+async function getRepoFromID(id) {
+  const query = `
+    SELECT * FROM repos WHERE id=$1;
+  `;
+
+  try {
+    const result = await db_pool.query(query, [id]);
+    return result.rows[0];
+  } catch (error) {
+    console.error("Error getting repos:", error);
+    throw error;
+  }
+}
+
+export { createUserRepo, getReposFromUserID, getRepoFromName, getRepoFromID };
