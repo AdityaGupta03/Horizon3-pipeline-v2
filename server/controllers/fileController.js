@@ -34,7 +34,19 @@ async function uploadFile(req, res) {
 }
 
 async function createFolder(req, res) {
-  const date = new Date() + "/";
+  var now = new Date();
+  const date = ((now.getUTCMonth() + 1) + '-' +
+            (now.getUTCDate()) + '-' +
+             now.getUTCFullYear() + "(" +
+             ((now.getUTCHours() < 10)
+                 ? ("0" + now.getUTCHours())
+                 : (now.getUTCHours())) + ':' +
+             ((now.getUTCMinutes() < 10)
+                 ? ("0" + now.getUTCMinutes())
+                 : (now.getUTCMinutes())) + ':' +
+             ((now.getUTCSeconds() < 10)
+                 ? ("0" + now.getUTCSeconds())
+                 : (now.getUTCSeconds()))) + ')/';
   const params = {
     Bucket: "bindifffiles",
     Key: date,
@@ -45,29 +57,4 @@ async function createFolder(req, res) {
     folder: date,
   });
 }
-
-async function uploadResults(req, res) {
-  const params = {
-    Bucket: 'bindifffiles',
-    Key: req.body.folder + 'binary1_vs_binary2.BinDiff',
-    Body: fs.createReadStream('/Users/mkg/Documents/Horizon3-pipeline2/pipeline/binDiff/binary1_vs_binary2.BinDiff')
-  };
-  s3.upload(params, (err, data) => {
-    if (err) {
-      console.log(err);
-      return res.status(500).json({message: "Failed to upload file"});
-    }
-    fs.unlink('/Users/mkg/Documents/Horizon3-pipeline2/pipeline/binDiff/binary1_vs_binary2.BinDiff', (err, results) => {
-      if(err) {
-        console.log(err);
-        return res.status(500).json({message: "Failed to delete file"});
-      }
-      return res.status(200).json({message: "File deleted successfully"});
-    });
-    
-
-});
-
-
-}
-export { uploadFile, createFolder, uploadResults };
+export { uploadFile, createFolder };

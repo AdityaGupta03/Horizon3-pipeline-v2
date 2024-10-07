@@ -121,12 +121,13 @@ const Dashboard: React.FC = () => {
           return;
         });
         try {
-          const response: Response = await fetch("/api/user/run_script", {
+          const response: Response = await fetch("/api/user/run_docker", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              path1: folder + binary1.name,
-              path2: folder + binary2.name,
+              folder: folder,
+              path1: binary1.name,
+              path2: binary2.name,
             }),
           });
           const data = await response.json();
@@ -135,22 +136,7 @@ const Dashboard: React.FC = () => {
           setBinaryError("Error calling api for running script");
           console.error(error);
           return;
-        }  
-        try {
-          const response: Response = await fetch("/api/user/upload_results", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              folder: folder,
-            }),
-          });
-          const data = await response.json();
-          console.log(data);
-        } catch (error) {
-          setBinaryError("Error calling api for uploading results");
-          console.log(error);
-          return;
-        }
+        } 
         setBinaryError("Binaries uploaded successfully!");
     } else {
       setBinaryError("Both Binary 1 and Binary 2 must be uploaded.");
