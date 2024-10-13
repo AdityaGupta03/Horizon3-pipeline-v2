@@ -243,14 +243,14 @@ describe("Account Controller", () => {
 
       const response = await request(app)
         .post("/api/user/verify_email")
-        .send({ verification_code: "1234", user_id: "-1" });
+        .send({ verification_code: "1234", email: "-1" });
 
       expect(response.status).toBe(404);
       expect(response.body.error).toBe("User not found");
     });
 
     it("should return 401 if code is not correct", async () => {
-      accountQueries.getAccountFromUserIDQuery.mockResolvedValue({
+      accountQueries.getAccountFromUsernameOrEmailQuery.mockResolvedValue({
         user_id: 1,
       });
       verificationQueries.getVerificationCodeQuery.mockResolvedValue({
@@ -259,20 +259,20 @@ describe("Account Controller", () => {
 
       const response = await request(app)
         .post("/api/user/verify_email")
-        .send({ verification_code: "4321", user_id: "1" });
+        .send({ verification_code: "4321", email: "1" });
 
       expect(response.status).toBe(401);
       expect(response.body.error).toBe("Invalid verification code");
     });
 
     it("should return 500 for get acc query error", async () => {
-      accountQueries.getAccountFromUserIDQuery.mockRejectedValue(
+      accountQueries.getAccountFromUsernameOrEmailQuery.mockRejectedValue(
         new Error("Database error"),
       );
 
       const response = await request(app)
         .post("/api/user/verify_email")
-        .send({ verification_code: "1234", user_id: "1" });
+        .send({ verification_code: "1234", email: "1" });
 
       expect(response.status).toBe(500);
       expect(response.body.error).toBe("Error verifying account");
@@ -281,7 +281,7 @@ describe("Account Controller", () => {
     it("should return 500 for verify user acc query error", async () => {
       accountQueries.verifyUserAccountQuery.mockRejectedValue(false);
       verificationQueries.deleteVerificationCodeQuery.mockResolvedValue(true);
-      accountQueries.getAccountFromUserIDQuery.mockResolvedValue({
+      accountQueries.getAccountFromUsernameOrEmailQuery.mockResolvedValue({
         user_id: 1,
       });
       verificationQueries.getVerificationCodeQuery.mockResolvedValue({
@@ -290,7 +290,7 @@ describe("Account Controller", () => {
 
       const response = await request(app)
         .post("/api/user/verify_email")
-        .send({ verification_code: "1234", user_id: "1" });
+        .send({ verification_code: "1234", email: "1" });
 
       expect(response.status).toBe(500);
       expect(response.body.error).toBe("Error verifying account");
@@ -299,7 +299,7 @@ describe("Account Controller", () => {
     it("should return 500 for delete verify query error", async () => {
       accountQueries.verifyUserAccountQuery.mockRejectedValue(false);
       verificationQueries.deleteVerificationCodeQuery.mockRejectedValue(false);
-      accountQueries.getAccountFromUserIDQuery.mockResolvedValue({
+      accountQueries.getAccountFromUsernameOrEmailQuery.mockResolvedValue({
         user_id: 1,
       });
       verificationQueries.getVerificationCodeQuery.mockResolvedValue({
@@ -308,7 +308,7 @@ describe("Account Controller", () => {
 
       const response = await request(app)
         .post("/api/user/verify_email")
-        .send({ verification_code: "1234", user_id: "1" });
+        .send({ verification_code: "1234", email: "1" });
 
       expect(response.status).toBe(500);
       expect(response.body.error).toBe("Error verifying account");
@@ -317,7 +317,7 @@ describe("Account Controller", () => {
     it("should return 200 if verification successful", async () => {
       accountQueries.verifyUserAccountQuery.mockResolvedValue(true);
       verificationQueries.deleteVerificationCodeQuery.mockResolvedValue(true);
-      accountQueries.getAccountFromUserIDQuery.mockResolvedValue({
+      accountQueries.getAccountFromUsernameOrEmailQuery.mockResolvedValue({
         user_id: 1,
       });
       verificationQueries.getVerificationCodeQuery.mockResolvedValue({
@@ -326,7 +326,7 @@ describe("Account Controller", () => {
 
       const response = await request(app)
         .post("/api/user/verify_email")
-        .send({ verification_code: "1234", user_id: "1" });
+        .send({ verification_code: "1234", email: "1" });
 
       expect(response.status).toBe(200);
       expect(response.body.message).toBe("Account verified successfully");
