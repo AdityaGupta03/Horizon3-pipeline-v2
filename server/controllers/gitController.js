@@ -167,8 +167,9 @@ async function analyzeGithubRepo(req, res) {
     // TODO kickoff pipeline scripts
     const repo_url = repo.url;
     const token = repo.token;
+    const path = process.env.INSTALL_DIR;
     const pythonScriptPath =
-      `/Users/mkg/Documents/Horizon3-pipeline2/pipeline/githubProcessing.py`;
+      `${path}/pipeline/githubProcessing.py`;
 
     execFile(
       "python3.11",
