@@ -6,7 +6,7 @@ VENV_DIR="pipeline_venv"
 # Check if the virtual environment directory exists
 if [ ! -d "$VENV_DIR" ]; then
   echo "Virtual environment not found. Creating one..."
-  python3 -m venv $VENV_DIR
+  python3.11 -m venv $VENV_DIR
   echo "Virtual environment created."
 fi
 
