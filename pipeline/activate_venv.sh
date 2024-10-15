@@ -12,7 +12,9 @@ fi
 
 # Activate the virtual environment
 source $VENV_DIR/bin/activate
+echo
 echo "Virtual environment activated."
+pip install --upgrade pip
 
 # Check if requirements.txt exists
 if [ -f "requirements.txt" ]; then
@@ -20,10 +22,12 @@ if [ -f "requirements.txt" ]; then
 
     # Install/update packages from requirements.txt
     pip install -r requirements.txt
+    echo
     echo "Packages installed."
 else
     echo "requirements.txt not found."
 fi
 
+echo
 echo "Script completed. To activate the virtual environment, run:"
 echo "source $VENV_DIR/bin/activate"
