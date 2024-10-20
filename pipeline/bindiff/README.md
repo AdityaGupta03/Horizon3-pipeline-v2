@@ -11,7 +11,7 @@ The main components of this folder are:
 
 ## Usage
 
-Below are some notes on running the system. The code has been designed to run in the docker image from: `./Dockerfile`
+Below are some notes on running the system. The code has been designed to run in the docker image from: `./Dockerfile`.
 
 ### Docker
 
@@ -22,3 +22,20 @@ docker buildx build --platform linux/amd64 --load -t <your-tag-here> .
 ```
 
 Note we use the ``--load`` flag to run store and run the image locally, so it is optional.
+
+### Environment - .env
+
+The following is an initial layout of the expected .env file.
+
+#### AWS S3 Configuration
+```
+AWS_ACCESS_KEY_ID=your_aws_access_key_id
+AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key
+```
+
+#### Kafka Configuration
+```
+KAFKA_BROKER=your_kafka_broker:9092
+KAFKA_SUCCESS_TOPIC=success_topic
+KAFKA_ERROR_TOPIC=error_topic
+```
