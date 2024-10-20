@@ -7,6 +7,7 @@ import {
   getRepoFromID,
 } from "../database/queries/gitQueries.js";
 import { getAccountFromUserIDQuery } from "../database/queries/accountQueries.js";
+import { sendKafkaEvent } from "../helpers/kafkaFuncs.js";
 
 async function addGithubRepo(req, res) {
   const { user_id, url, token, owner, repo_name } = req.body;
@@ -164,30 +165,38 @@ async function analyzeGithubRepo(req, res) {
 
     console.log(repo);
 
-    // TODO kickoff pipeline scripts
-    const repo_url = repo.url;
-    const token = repo.token;
-    const path = process.env.INSTALL_DIR;
-    const pythonScriptPath =
-      `${path}/pipeline/githubProcessing.py`;
+    const metadata = {
+      url: repo.github_url,
+      repo_name: repo.name,
+      repo_owner: repo.owner,
+      repo_token: repo.token,
+    };
 
-    execFile(
-      "python3.11",
-      [pythonScriptPath, repo.github_url, repo.name, repo.owner, repo.token],
-      (error, stdout, stderr) => {
-        if (error) {
-          console.error("Error executing script: ", error);
-          return res.status(500).json({
-            error: "Error executing script",
-          });
-        }
-        console.log("Python script output: ", stdout);
-        return res.status(200).json({
-          message: "Successfully started pipeline!",
-          output: stdout,
-        });
-      },
-    );
+    await sendKafkaEvent("start_analyis", metadata);
+    // const path = process.env.INSTALL_DIR;
+    // const pythonScriptPath = `${path}/pipeline/githubProcessing.py`;
+
+    // execFile(
+    //   "python3.11",
+    //   [pythonScriptPath, repo.github_url, repo.name, repo.owner, repo.token],
+    //   (error, stdout, stderr) => {
+    //     if (error) {
+    //       console.error("Error executing script: ", error);
+    //       return res.status(500).json({
+    //         error: "Error executing script",
+    //       });
+    //     }
+    //     console.log("Python script output: ", stdout);
+    //     return res.status(200).json({
+    //       message: "Successfully started pipeline!",
+    //       output: stdout,
+    //     });
+    //   },
+    // );
+    return res.status(200).json({
+      message: "Successfully started pipeline!",
+      output: "Queued event!",
+    });
   } catch (error) {
     console.error("Error analyzing repo:", error);
     return res.status(500).json({

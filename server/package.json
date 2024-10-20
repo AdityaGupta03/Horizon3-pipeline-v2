@@ -21,6 +21,7 @@
     "dockerode": "^4.0.2",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
+    "kafkajs": "^2.2.4",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.15",
     "pg": "^8.13.0"
