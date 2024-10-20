@@ -15,7 +15,7 @@ Below are some notes on running the system. The code has been designed to run in
 
 ### Docker
 
-The docker image requires an AMD64 version of ubuntu. This is due to the dependencies (and possible versions) of the script, specifically Ghidra and BinDiff. To ensure this you can use the following docker command(s):
+The docker image requires an AMD64 version of ubuntu. This is due to the dependencies (and possible versions) of the script, specifically Ghidra and BinDiff. To ensure this you can use the following docker command(s) (using buildx for arm64 machines):
 
 ```sh
 docker buildx build --platform linux/amd64 --load -t <your-tag-here> .
