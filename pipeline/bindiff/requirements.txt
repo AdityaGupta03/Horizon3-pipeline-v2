@@ -1,4 +1,2 @@
-requests==2.31.0
-GitPython==3.1.40
 boto3==1.35.32
 kafka-python==2.0.2
