@@ -172,7 +172,7 @@ async function analyzeGithubRepo(req, res) {
       repo_token: repo.token,
     };
 
-    await sendKafkaEvent("start_analyis", metadata);
+    await sendKafkaEvent("github_analysis", metadata);
     // const path = process.env.INSTALL_DIR;
     // const pythonScriptPath = `${path}/pipeline/githubProcessing.py`;
 

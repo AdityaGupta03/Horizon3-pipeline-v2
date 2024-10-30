@@ -9,12 +9,13 @@ import time
 import git
 from git import Repo
 from urllib.parse import urlparse
-
-from bindiff_git import *
+from kafka import KafkaProducer
+from kafka.errors import NoBrokersAvailable
 
 AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 
+# Setup S3 bucket connection
 s3 = boto3.client(
   's3',
   region_name='us-east-1',
@@ -22,19 +23,42 @@ s3 = boto3.client(
   aws_secret_access_key=AWS_SECRET_KEY
 )
 
+def create_kafka_producer(bootstrap_servers):
+  while True:
+    try:
+      producer = KafkaProducer(
+        bootstrap_servers=bootstrap_servers,
+        value_serializer=lambda v: json.dumps(v).encode('utf-8')
+      )
+      print("Kafka producer created successfully.")
+      return producer  # Return the producer if successful
+    except NoBrokersAvailable:
+      print("No brokers available. Retrying in 5 seconds...")
+      time.sleep(5)  # Wait before retrying
+    except Exception as e:
+      print(f"Failed to create Kafka producer: {e}. Retrying in 5 seconds...")
+      time.sleep(5)  # Wait before retrying
+
+# Setup kafka connection and standard failure event
+kafka_failure = "git_analysis_failed"
+producer = create_kafka_producer(['192.168.4.63:9092'])
+
+def send_kafka_msg(event_type, msg):
+  metadata = {
+    "event_type": event_type,
+    "metadata": msg
+  }
+  producer.send(topic="pipeline-analysis", value=metadata)
+  producer.flush()
+
 def run_command(command, cwd=None):
   try:
     result = subprocess.run(command, shell=True, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     result.check_returncode()
     return result.stdout
   except subprocess.CalledProcessError as e:
-    print(f"Error running command: {e.stderr}")
-    raise
-
-def get_recent_commits(repo_path, num_commits=2):
-  repo = Repo(repo_path)
-  commits = list(repo.iter_commits('main', max_count=num_commits))
-  return [commit.hexsha for commit in commits]
+    send_kafka_msg(kafka_failure, f"Error running command: {e.stderr}")
+    sys.exit()
 
 def clone_repository(repo_url, dest_dir, access_token):
   try:
@@ -45,36 +69,31 @@ def clone_repository(repo_url, dest_dir, access_token):
     auth_url = f"https://{access_token}@{parsed_url.netloc}{parsed_url.path}"
 
     # Clone the repository
-    Repo.clone_from(auth_url, dest_dir)
-    print("Repository cloned successfully!")
+    repo = Repo.clone_from(auth_url, dest_dir)
+    return repo
   except git.GitCommandError as e:
-    print(f"Error cloning repository: {e}")
-    sys.exit(1)
+    send_kafka_msg(kafka_failure, f"Error cloning repository: {e.stderr}")
+    sys.exit()
 
 def detect_and_build_c_project(project_dir):
   # Let's modify the `detect_and_build_c_project` function to search all directories recursively for build files.
   for root, dirs, files in os.walk(project_dir):
     try:
       if "Makefile" in files:
-        print(f"Makefile found in {root}! Building...")
         run_command("make", cwd=root)
         return
       elif "CMakeLists.txt" in files:
-        print(f"CMakeLists.txt found in {root}! Building...")
         build_dir = os.path.join(root, 'build')
         if not os.path.exists(build_dir):
           os.makedirs(build_dir)
         run_command("cmake .. && make", cwd=build_dir)
         return
       elif "configure" in files:
-        print(f"configure script found in {root}! Building...")
         run_command("./configure && make", cwd=root)
         return
     except Exception as e:
-      print(f"Error building project in {root}: {e}")
-      sys.exit(1)
-
-  print("No Makefile, CMakeLists.txt, or configure script found in any directory!")
+      send_kafka_msg(kafka_failure, f"Error building repository...")
+      sys.exit()
 
 def find_binary_files(project_dir):
   search_paths = [os.path.join(project_dir, "bin"), os.path.join(project_dir, "build"), project_dir]
@@ -91,88 +110,96 @@ def find_binary_files(project_dir):
 
   return binaries
 
-def start_static_analysis(filename):
-  print("Running static analysis")
-  bucket_name = "cs407gitmetadata"
-  response = s3.get_object(Bucket=bucket_name, Key=filename)
-  object_content = response['Body'].read().decode('utf-8')
+def build_and_push_binaries(repo, project_dir, commit):
+  repo.git.checkout(commit)
+  detect_and_build_c_project(project_dir)
+  binaries = find_binary_files(project_dir)
+  pushed_binaries = []
+  if binaries:
+    for binary in binaries:
+      try:
+        file_name = os.path.basename(binary) + '_' + commit[:7]
+        s3.upload_file(binary, 'cs407gitmetadata', os.path.basename(binary) + '_' + commit[:7])
+        pushed_binaries.append(file_name)
+      except Exception as e:
+        send_kafka_msg(kafka_failure, f"Error pushing to S3 bucket...")
+        sys.exit()
+  else:
+    send_kafka_msg(kafka_failure, f"Error building and pushing binaries...")
+    sys.exit()
 
-def clone_build_and_find_binary(repo_url, repo_name, owner, github_token):
+  return pushed_binaries
+
+def clone_build_and_find_binary(repo_url, repo_name, owner, github_token) -> dict:
+  # Clone the repositories
   project_dir = './cloned_project'
+  repo = clone_repository(repo_url, project_dir, github_token)
 
-  if os.path.exists(project_dir):
-    shutil.rmtree(project_dir)
-    print("Removed cloned project directory.")
+  # Get commit information
+  try:
+    commits = list(repo.iter_commits('main', max_count=50))
+  except Exception as e:
+    send_kafka_msg(kafka_failure, f"Failed to get commit info...")
+    sys.exit()
 
-  print(f"Cloning repository: {repo_url}")
-  clone_repository(repo_url, project_dir, github_token)
-  commits = get_recent_commits(project_dir, num_commits=2)
+  # Build the projects and upload binaries to S3 bucket
+  bins1 = build_and_push_binaries(repo, project_dir, commits[0].hexsha)
+  bins2 = build_and_push_binaries(repo, project_dir, commits[1].hexsha)
 
-  print(f"Building project...")
-  detect_and_build_c_project(project_dir)
-  print("Searching for binary files...")
-  binaries = find_binary_files(project_dir)
-  if binaries:
-    print("Binaries found:")
-    for binary in binaries:
-      s3.upload_file(binary, 'cs407gitmetadata', os.path.basename(binary) + '_' + commits[0][:7])
-  else:
-    print("No binary files found.")
-
-  repo = Repo(project_dir)
-  repo.git.checkout(commits[1])
-  detect_and_build_c_project(project_dir)
-  print("Searching for binary files...")
-  binaries = find_binary_files(project_dir)
-  if binaries:
-    print("Binaries found:")
-    for binary in binaries:
-      s3.upload_file(binary, 'cs407gitmetadata', os.path.basename(binary) + "_" + commits[1][:7])
-  else:
-    print("No binary files found.")
-
-  #logic for retrieving metadata
+  # Get git metadata from API
   api_url = f'https://api.github.com/repos/{owner}/{repo_name}'
-  headers = {'Authorization': f'Bearer {github_token}', 'Accept': 'application/vnd.github+json'}
   parameters = {'owner': f'{owner}', 'repo': f'{repo_name}'}
-
-  if not github_token:
-    response = requests.get(api_url.format(**parameters))
+  if github_token:
+    headers = {'Authorization': f'Bearer {github_token}', 'Accept': 'application/vnd.github+json'}
   else:
-    response = requests.get(api_url.format(**parameters), headers=headers)
+    headers = None
 
-  timestamp = int(time.time())
-  filename = f"{repo_name}_meta_{timestamp}.json"
+  try:
+    response = requests.get(api_url.format(**parameters), headers=headers)
+  except Exception as e:
+    send_kafka_msg(kafka_failure, f"Error getting git metadata...")
+    sys.exit()
+
+  # Push metadata to S3 bucket
+  filename = f"{repo_name}_meta_{commits[0].hexsha[:7]}.json"
   if response.status_code == 200:
     metadata = response.json()
-    bucket_name = "cs407gitmetadata"
-    s3.put_object(Body=json.dumps(metadata), Bucket=bucket_name, Key=filename)
-  else:
-      print(f"Error: {response.status_code} - {response.text}")
+    try:
+      s3.put_object(Body=json.dumps(metadata), Bucket="cs407gitmetadata", Key=filename)
+    except Exception as e:
+      send_kafka_msg(kafka_failure, f"Error pushing to S3 bucket...")
+      sys.exit()
 
-  if os.path.exists(project_dir):
-    shutil.rmtree(project_dir)
-    print("Removed cloned project directory.")
+  # Delete the cloned project
+  try:
+    if os.path.exists(project_dir):
+      shutil.rmtree(project_dir)
+  except Exception as e:
+    send_kafka_msg(kafka_failure, f"Error running python script...")
+    sys.exit()
 
-  print("Process finished!")
-  start_static_analysis(filename)
-
+  return {"bin1": bins1, "bin2": bins2, "git_meta_file": filename}
 
 def main():
-  if len(sys.argv) != 5 and len(sys.argv) != 4:
-    print("Usage: python githubProcessing.py <repo_url> <repo_name> <owner> <github_token>")
-    sys.exit(1)
+  try:
+    if len(sys.argv) != 5 and len(sys.argv) != 4:
+      print("Usage: python githubProcessing.py <repo_url> <repo_name> <owner> <github_token>")
+      send_kafka_msg(kafka_failure, f"Invalid usage...")
+      sys.exit()
 
-  repo_url = sys.argv[1]
-  repo_name = sys.argv[2]
-  owner = sys.argv[3]
-  if(len(sys.argv) == 5):
+    repo_url = sys.argv[1]
+    repo_name = sys.argv[2]
+    owner = sys.argv[3]
+    if(len(sys.argv) == 5):
       github_token = sys.argv[4]
-  else:
+    else:
       github_token = None
 
-  clone_build_and_find_binary(repo_url, repo_name, owner, github_token)
-
+    files = clone_build_and_find_binary(repo_url, repo_name, owner, github_token)
+    send_kafka_msg("finished_git_analysis", files)
+  except Exception as e:
+    send_kafka_msg(kafka_failure, f"Error running python script...")
+    sys.exit()
 
 if __name__ == "__main__":
-    main()
+  main()

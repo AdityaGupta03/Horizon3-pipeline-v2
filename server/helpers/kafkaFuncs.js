@@ -2,7 +2,7 @@ import { Kafka } from "kafkajs";
 
 const kafka = new Kafka({
   clientId: "my-backend",
-  brokers: ["localhost:9092"], // Kafka broker URL
+  brokers: ["192.168.64.1:9092"], // Kafka broker URL
 });
 
 const producer = kafka.producer();

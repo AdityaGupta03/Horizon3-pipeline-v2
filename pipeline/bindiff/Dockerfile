@@ -68,12 +68,16 @@ RUN apt --fix-broken install
 RUN sed -i 's/^\(.*systemctl.*\)$/#\1/g' /var/lib/dpkg/info/bindiff.postinst
 
 # Copy your Python automation script into the container
+WORKDIR /opt
 COPY export_binexport.py /opt/scripts/export_binexport.py
-COPY exec_bindiff.sh /opt/scripts/exec_bindiff.sh
-RUN chmod +x /opt/scripts/exec_bindiff.sh
+COPY exec_bindiff.py /opt/exec_bindiff.py
+COPY requirements.txt /opt/requirements.txt
+
+RUN pip install --no-cache-dir -r requirements.txt
+RUN chmod +x /opt/exec_bindiff.py
 
 # Make a working directory for binaries and results
 RUN mkdir -p /opt/binaries /opt/results
 
 # Entry point for running the automated Ghidra + BinDiff comparison
-ENTRYPOINT [ "/opt/scripts/exec_bindiff.sh $file_1 $file_2" ]
+ENTRYPOINT [ "python3", "/opt/exec_bindiff.py" ]
