@@ -1,4 +1,4 @@
-// File: /Users/mkg/Documents/Horizon3-pipeline/sprint2frontend/src/app/layout.tsx
+// File: /Users/srinjoydutta/Desktop/Fall2025/407/HorizonStuff/Horizon3-pipeline/sprint2frontend/src/app/layout.tsx
 import * as entry from '../../../src/app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

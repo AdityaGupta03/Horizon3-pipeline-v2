@@ -39,7 +39,7 @@ const Verify: React.FC = () => {
       <h1>Horizon3 Pipeline</h1>
       <p>Welcome! Please verify your account using the code sent to your email.</p>
       <span>Already have an account?</span>
-      <a href="/login" className="link-gen">
+      <a href="/" className="link-gen">
         <button>Login</button>
       </a>
       <div className="verify-form">
