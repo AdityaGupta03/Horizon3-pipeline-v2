@@ -1,16 +1,16 @@
 "use client";
 import "./reports.css";
 import axios from "axios";
-import React, {FormEvent, useEffect, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 
 const Reports = () => {
-  
-
   const user_id = sessionStorage.getItem("user_id");
   useEffect(() => {
     getReports();
   }, []);
-  const [reports, setReports] = useState<{ id: string; name: string }[]>([]);
+  const [reports, setReports] = useState<
+    { id: string; name: string; vuln: Number }[]
+  >([]);
   const [selectedReport, setSelectedReport] = useState<string>("");
 
   const getReports = async () => {
@@ -35,7 +35,7 @@ const Reports = () => {
     e.preventDefault();
     console.log(selectedReport);
     try {
-      const response = await axios.get('/api/user/download_file', {
+      const response = await axios.get("/api/user/download_file", {
         params: { url: selectedReport },
         responseType: "blob", // Important for handling binary data
       });
@@ -57,21 +57,24 @@ const Reports = () => {
     <div className="reports-container">
       <div className="reports-form-container">
         <h1 className="reports-title">Report Download</h1>
-          <form onSubmit={handleSubmit}>
-            <select
-                value={selectedReport}
-                onChange={(e) => setSelectedReport(e.target.value)}
-                className="reports-select"
-            >
-                <option value="">Select Report</option>
-                {reports.map((report) => (
-                    <option key={report.id} value={report.name}>
-                    {report.name}
-                    </option>
-                ))}
-            </select>
-            <button type="submit" className="reports-submit">Download</button>
-          </form>
+        <form onSubmit={handleSubmit}>
+          <select
+            value={selectedReport}
+            onChange={(e) => setSelectedReport(e.target.value)}
+            className="reports-select"
+          >
+            <option value="">Select Report</option>
+            {reports.map((report) => (
+              <option key={report.id} value={report.name}>
+                {report.vuln === 1 && "(High Prio) "}
+                {report.name}
+              </option>
+            ))}
+          </select>
+          <button type="submit" className="reports-submit">
+            Download
+          </button>
+        </form>
       </div>
     </div>
 

@@ -112,15 +112,14 @@ async function verifyUserAccountQuery(user_id) {
 
 async function getReportsQuery(user_id) {
   const query = `
-    SELECT report_id, report_url FROM reports
+    SELECT report_id, report_url, high_prob_flag FROM reports
     WHERE creator_id = $1
   `;
 
   try {
     const result = await db_pool.query(query, [user_id]);
     return result.rows;
-  }
-  catch(error) {
+  } catch (error) {
     console.error("Error fetching reports:", error);
     throw error;
   }
@@ -134,5 +133,5 @@ export {
   updateUsernameQuery,
   updatePasswordQuery,
   verifyUserAccountQuery,
-  getReportsQuery
+  getReportsQuery,
 };

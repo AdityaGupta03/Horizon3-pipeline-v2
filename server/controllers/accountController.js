@@ -18,7 +18,7 @@ import {
   updatePasswordQuery,
   getAccountFromUserIDQuery,
   verifyUserAccountQuery,
-  getReportsQuery
+  getReportsQuery,
 } from "../database/queries/accountQueries.js";
 
 /**
@@ -426,7 +426,8 @@ async function getReports(req, res) {
       console.log(query_res);
       const reportList = query_res.map((report) => ({
         id: report.report_id.toString(),
-        name: report.report_url
+        name: report.report_url,
+        vuln: report.high_prob_flag,
       }));
       return res.status(200).json({
         message: "Success adding repo!",
@@ -448,5 +449,5 @@ export {
   changeUsername,
   changePassword,
   deleteAccount,
-  getReports
+  getReports,
 };
