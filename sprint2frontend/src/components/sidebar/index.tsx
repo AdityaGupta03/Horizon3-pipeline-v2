@@ -4,6 +4,7 @@
 
 import { LogOutIcon, GitFork, LayoutDashboard, Binary, CircleUserRound, } from "lucide-react";
 import SidebarItem from "./item";
+import path from "path";
 
 const items = [
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
@@ -11,6 +12,7 @@ const items = [
   { name: "Binaries", path: "/binaries", icon: Binary },
   { name: "Account", path: "/accounts", icon: CircleUserRound },
   { name: "Reports", path: "/reports", icon: CircleUserRound }, 
+  {name: "Actions", path: "/actions", icon: CircleUserRound},
 ];
 
 const Sidebar = ({ onLogout }: { onLogout: () => void }) => {
