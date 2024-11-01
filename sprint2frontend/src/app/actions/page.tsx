@@ -1,7 +1,7 @@
 "use client";
 import "./actions.css";
 import React, { useState, FormEvent, useEffect } from "react";
-import yaml from 'js-yaml';
+import yaml from "js-yaml";
 const yamlContent = `
 name: H3-Pipeline-Analysis
 
@@ -18,18 +18,20 @@ jobs:
       - name: Make API call to local server
         run: |
           # Use curl to call the API endpoint, for example:
-          curl -X POST "https://19e3-128-210-106-54.ngrok-free.app/api/git/analyze_repo" -H "Content-Type: application/json" -d '{"repo_id": "hash_goes_here"}'
+          curl -X POST "https://c93a-195-252-220-98.ngrok-free.app/api/git/analyze_repo" -H "Content-Type: application/json" -d '{"repo_id": "<your_hash>"}'
 `;
 
-
 const actions = () => {
-    type YamlData = Record<string, any> | null;
-    const [data, setData] = useState<YamlData>(null);
-  const [githubLink, setGithubLink] = useState<string>("");
-  const [githubKey, setGithubKey] = useState<string>("");
-  const [githubLinks, setGithubLinks] = useState<{ id: string; name: string }[]>([]);
+  type YamlData = Record<string, any> | null;
+  const [data, setData] = useState<YamlData>(null);
+
+  type GithubLink = {
+    id: string;
+    name: string;
+  };
+
+  const [githubLinks, setGithubLinks] = useState<GithubLink[]>([]);
   const [selectedGithubLink, setSelectedGithubLink] = useState<string>("");
-  const [githubError, setGithubError] = useState<string>("");
   const [githubAnalyzeError, setGithubAnalyzeError] = useState<string>("");
 
   const user_id = sessionStorage.getItem("user_id");
@@ -56,14 +58,25 @@ const actions = () => {
     }
   };
 
-  const handleExistingGithubSubmit = async (e: FormEvent) => {
-    
+  const updateYamlContent = async (e: FormEvent) => {
+    e.preventDefault();
+    console.log(selectedGithubLink);
+    if (selectedGithubLink) {
+      setGithubAnalyzeError(
+        "Please update <your_hash> to: " + selectedGithubLink,
+      );
+    }
   };
 
   return (
     <div className="github-container">
-      
-        <form onSubmit={handleExistingGithubSubmit}>
+      <div>
+        <p>
+          Please insert the yaml file into a directory .github/actions in your
+          git repo. If you already have a github actions configuration, please
+          refer to the sample below to update your current config.
+        </p>
+        <form onSubmit={updateYamlContent}>
           <select
             value={selectedGithubLink}
             onChange={(e) => setSelectedGithubLink(e.target.value)}
@@ -76,11 +89,18 @@ const actions = () => {
               </option>
             ))}
           </select>
-          <button type="submit" className="github-submit">Get .yml file</button>
-          {githubAnalyzeError && <p className="error-message">{githubAnalyzeError}</p>}
+          <button type="submit" className="github-submit">
+            Get .yml file
+          </button>
+          {githubAnalyzeError && (
+            <p className="error-message">{githubAnalyzeError}</p>
+          )}
         </form>
+      </div>
+      <div>
         <pre>{data ? JSON.stringify(data, null, 2) : "Loading..."}</pre>
       </div>
+    </div>
   );
 };
 export default actions;
