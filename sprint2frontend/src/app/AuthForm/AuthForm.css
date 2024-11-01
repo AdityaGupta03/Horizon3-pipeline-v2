@@ -17,40 +17,40 @@ body {
   margin: -20px 0 50px;
 }
 
-input[type="text"],
+/* input[type="text"],
 input[type="password"],
 input[type="email"] {
   background-color: #f9f9f9;
   border: 1px solid #ddd;
   border-radius: 8px;
-  padding: 12px 16px; /* Adds padding for a spacious look */
+  padding: 12px 16px; 
   width: 100%;
-  font-size: 16px; /* Slightly larger font for better readability */
+  font-size: 16px; 
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
   color: #333;
-  margin: 10px 0; /* Adds spacing between inputs */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle shadow */
-}
+  margin: 10px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); 
+} */
 
-input[type="text"]::placeholder,
+/* input[type="text"]::placeholder,
 input[type="password"]::placeholder,
 input[type="email"]::placeholder {
-  color: #999; /* Lighter color for placeholder text */
-}
+  color: #999; 
+} */
 
-input[type="text"]:hover,
+/* input[type="text"]:hover,
 input[type="password"]:hover,
 input[type="email"]:hover {
   border-color: #FF4B2B;
-}
+} */
 
-input[type="text"]:focus,
+/* input[type="text"]:focus,
 input[type="password"]:focus,
 input[type="email"]:focus {
   border-color: #FF4B2B;
   outline: none;
-  box-shadow: 0 0 8px rgba(255, 75, 43, 0.3); /* Emphasized shadow on focus */
-}
+  box-shadow: 0 0 8px rgba(255, 75, 43, 0.3);
+} */
 
 
 h1 {
@@ -68,8 +68,8 @@ p {
 
 button {
   border-radius: 20px;
-  border: 1px solid #FF4B2B;
-  background-color: #FF4B2B;
+  border: 1px solid #776BCC;
+  background-color: #776BCC;
   color: #FFFFFF;
   font-size: 12px;
   font-weight: bold;
@@ -77,6 +77,7 @@ button {
   letter-spacing: 1px;
   text-transform: uppercase;
   transition: transform 80ms ease-in;
+  margin-top: 5%;
 }
 
 button.ghost {
@@ -92,31 +93,32 @@ button.ghost {
   color: #FFFFFF; /* Light/White text */
 }
 
-input[type="text"],
+/* input[type="text"],
 input[type="password"],
 input[type="email"] {
   background-color: #f2f2f2;
   border: 1px solid #ddd;
   border-radius: 5px;
   padding: 12px;
-  width: 100%;
+  width: 70%;
   font-size: 14px;
   transition: border-color 0.3s ease;
-  color: #333; /* Text color inside input */
-}
+  color: #333; 
+  margin-top: 5%;
+} */
 
-input[type="text"]:hover,
+/* input[type="text"]:hover,
 input[type="password"]:hover,
 input[type="email"]:hover {
-  border-color: #FF4B2B; /* Highlight border on hover */
-}
+  border-color: #FF4B2B; 
+} */
 
-input[type="text"]:focus,
+/* input[type="text"]:focus,
 input[type="password"]:focus,
 input[type="email"]:focus {
   border-color: #FF4B2B;
-  outline: none; /* Removes the default outline */
-}
+  outline: none; 
+} */
 
 
 .container {
@@ -138,7 +140,8 @@ input[type="email"]:focus {
 }
 
 .sign-in-container {
-  left: 0;
+  left: 3%;
+  top: 3%;
   width: 50%;
   z-index: 2;
 }
@@ -148,7 +151,8 @@ input[type="email"]:focus {
 }
 
 .sign-up-container {
-  left: 0;
+  left: 3%;
+  top: 3%;
   width: 50%;
   opacity: 0;
   z-index: 1;
@@ -189,9 +193,9 @@ input[type="email"]:focus {
 }
 
 .overlay {
-  background: #FF416C;
-  background: -webkit-linear-gradient(to right, #FF4B2B, #FF416C);
-  background: linear-gradient(to right, #FF4B2B, #FF416C);
+  background: #776BCC;
+  /* background: -webkit-linear-gradient(to right, #FF4B2B, #FF416C);
+  background: linear-gradient(to right, #FF4B2B, #FF416C); */
   color: #FFFFFF;
   position: relative;
   left: -100%;
@@ -236,3 +240,89 @@ input[type="email"]:focus {
 .container.right-panel-active .overlay-right {
   transform: translateX(20%);
 }
+
+.vertical-center {
+  /* margin: 0;
+  position: absolute;
+  top: 50%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%); */
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+
+
+.form__group {
+  position: relative;
+  padding: 15px 0 0;
+  margin-top: 10px;
+  width: 50%;
+}
+
+.form__field {
+  font-family: inherit;
+  width: 65%;
+  border: 0;
+  border-bottom: 2px solid #9b9b9b;
+  outline: 0;
+  font-size: 1.0rem;
+  color: #000;
+  padding: 7px 0;
+  background: transparent;
+  transition: border-color 0.2s;
+  margin-top: 5%;
+
+  &::placeholder {
+    color: transparent;
+  }
+
+  &:placeholder-shown ~ .form__label {
+    font-size: 1.3rem;
+    cursor: text;
+    top: 20px;
+  }
+}
+
+.form__label {
+  position: absolute;
+  top: 0;
+  display: block;
+  transition: 0.2s;
+  font-size: 1rem;
+  color: #9b9b9b;
+}
+
+.form__field:focus {
+  ~ .form__label {
+    position: absolute;
+    top: 0;
+    display: block;
+    transition: 0.2s;
+    font-size: 1rem;
+    color: #C7C5F4;
+    font-weight:700;    
+  }
+  padding-bottom: 6px;  
+  font-weight: 700;
+  border-width: 3px;
+  border-image: linear-gradient(to right, #776BCC, #C7C5F4);
+  border-image-slice: 1;
+}
+/* reset input */
+.form__field{
+  &:required,&:invalid { box-shadow:none; }
+}
+/* demo */
+/* body {
+  font-family: 'Poppins', sans-serif; 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-size: 1.5rem;
+  background-color:#222222;
+} */

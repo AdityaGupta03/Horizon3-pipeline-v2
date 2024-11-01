@@ -78,57 +78,77 @@ const AuthForm: React.FC = () => {
   };
 
   return (
+  <div className="vertical-center">
     <div className={`container ${isSignUp ? "right-panel-active" : ""}`} id="container">
       <div className="form-container sign-up-container">
         <form onSubmit={handleSignup}>
           <h1>Create Account</h1>
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
+          <div>
+            <input
+              type="text"
+              className="form__field"
+              placeholder="Username"
+              id="username"
+              name="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+            {/* <label htmlFor="username" className="form__label">Username</label> */}
+          </div>
+          <div>
           <input
             type="email"
+            className="form__field"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
+          </div>
+          <div>
           <input
             type="password"
+            className="form__field"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+          </div>
           <button type="submit">Sign Up</button>
           {errorMsg && <p className="error">{errorMsg}</p>}
         </form>
       </div>
 
-      <div className="form-container sign-in-container">
+    {isSignUp ? (<div></div>) : (<div className="form-container sign-in-container">
         <form onSubmit={handleLogin}>
           <h1>Sign in</h1>
+          <div>
           <input
             type="text"
+            className="form__field"
             placeholder="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
           />
+          </div>
+          <div>
           <input
             type="password"
+            className="form__field"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+          </div>
           <button type="submit">Sign In</button>
           {errorMsg && <p className="error">{errorMsg}</p>}
         </form>
-      </div>
+      </div>)}
+      
 
       <div className="overlay-container">
         <div className="overlay">
@@ -145,6 +165,7 @@ const AuthForm: React.FC = () => {
         </div>
       </div>
     </div>
+  </div>
   );
 };
 
