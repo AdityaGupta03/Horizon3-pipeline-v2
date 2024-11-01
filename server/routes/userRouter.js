@@ -9,9 +9,10 @@ import {
   changeUsername,
   changePassword,
   deleteAccount,
-  getReports
+  getReports,
+  removeReport
 } from "../controllers/accountController.js";
-import { uploadFile, createFolder, downloadFile } from "../controllers/fileController.js";
+import { uploadFile, createFolder, downloadFile, delete_file } from "../controllers/fileController.js";
 import {runDocker} from "../controllers/binDiffController.js";
 const userRouter = Router();
 
@@ -28,5 +29,7 @@ userRouter.post("/change_password", changePassword);
 userRouter.post("/run_docker", runDocker);
 userRouter.get("/download_file", downloadFile);
 userRouter.post("/get_reports", getReports);
+userRouter.post("/delete_file", delete_file);
+userRouter.post("/remove_report", removeReport);
 
 export default userRouter;

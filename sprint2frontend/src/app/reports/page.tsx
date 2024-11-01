@@ -1,6 +1,7 @@
 "use client";
 import "./reports.css";
 import axios from "axios";
+import { get } from "http";
 import React, {FormEvent, useEffect, useState } from "react";
 
 const Reports = () => {
@@ -53,11 +54,43 @@ const Reports = () => {
     }
   };
 
+  const handleDelete = async (e: FormEvent) => { 
+    e.preventDefault();
+    console.log(selectedReport);
+    try {
+      const response = await fetch("/api/user/delete_file", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: selectedReport }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        console.log(data);
+        try {
+          const response = await fetch("/api/user/remove_report", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url: selectedReport }),
+          });
+          const data = await response.json();
+          if (response.ok) {
+            console.log(data);
+            getReports();
+          }
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   return (
     <div className="reports-container">
       <div className="reports-form-container">
         <h1 className="reports-title">Report Download</h1>
-          <form onSubmit={handleSubmit}>
+          <div>
             <select
                 value={selectedReport}
                 onChange={(e) => setSelectedReport(e.target.value)}
@@ -70,8 +103,11 @@ const Reports = () => {
                     </option>
                 ))}
             </select>
-            <button type="submit" className="reports-submit">Download</button>
-          </form>
+            <div>
+            <button onClick={handleSubmit} className="reports-submit">Download</button>
+            <button onClick={handleDelete} className="reports-submit">Delete</button>
+            </div>
+          </div>
       </div>
     </div>
 
