@@ -18,7 +18,7 @@ const Verify: React.FC = () => {
       const response = await fetch("/api/user/verify_email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, verification_code: code }),
+        body: JSON.stringify({ email: email, verification_code: code }),
       });
 
       const data = await response.json();

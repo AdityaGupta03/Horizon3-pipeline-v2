@@ -99,11 +99,6 @@ const UserAcc: React.FC = () => {
   return (
     <div className="user-acc-container">
       <div className="user-acc">
-        <div className="button-container">
-          <Link href="/dashboard">
-            <button>Back to Dashboard</button>
-          </Link>
-        </div>
         <div className="ChangeUsername">
           <h1 className="accounts">Change Username</h1>
           <form onSubmit={handleChangeUsernameSubmit}>

@@ -67,9 +67,9 @@ const AuthForm: React.FC = () => {
       const data = await response.json();
       if (response.ok) {
         sessionStorage.setItem("isLoggedIn", "true");
-        sessionStorage.setItem("user_id", data.user_id);
-        sessionStorage.setItem("username", data.username);
-        sessionStorage.setItem("email", data.email);
+        sessionStorage.setItem("user_id", data.user.user_id);
+        sessionStorage.setItem("username", data.user.username);
+        sessionStorage.setItem("email", data.user.email);
         router.replace("/verify");
       } else {
         setErrorMsg(data.error || "Signup failed. Try again.");

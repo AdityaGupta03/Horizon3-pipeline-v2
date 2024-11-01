@@ -29,13 +29,25 @@ body {
   text-align: center;
 }
 
-h1.github-form-container {
+h1.github-title {
   font-size: 1.5rem;
   margin-bottom: 20px;
   color: #fff;
 }
 
-.github-input.github-container {
+input.github-input {
+  width: 100%;
+  padding: 10px;
+  /* margin: 10px 0; */
+  border: none;
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  font-size: 14px;
+  color: #333;
+  margin-top: 3%;
+}
+
+.github-select {
   width: 100%;
   padding: 10px;
   margin: 10px 0;
@@ -46,18 +58,7 @@ h1.github-form-container {
   color: #333;
 }
 
-.github-select.github-container {
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
-  border: none;
-  border-radius: 5px;
-  background-color: #f2f2f2;
-  font-size: 14px;
-  color: #333;
-}
-
-.github-submit.github-container {
+.github-submit {
   background-color: #fff;
   color: #4C489D;
   padding: 12px 20px;

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, FormEvent, useEffect } from "react";
-import "./Github.css";
+import "./github.css";
 
 const Github = () => {
   const [githubLink, setGithubLink] = useState<string>("");
@@ -81,8 +81,9 @@ const Github = () => {
   return (
     <div className="github-container">
       <div className="github-form-container">
-        <h1>GitHub Integration</h1>
+        <h1 className="github-title">GitHub Integration</h1>
         <form onSubmit={handleGithubSubmit}>
+          <div>
           <input
             type="url"
             className="github-input"
@@ -90,6 +91,8 @@ const Github = () => {
             value={githubLink}
             onChange={(e) => setGithubLink(e.target.value)}
           />
+          </div>
+          <div>
           <input
             type="text"
             className="github-input"
@@ -97,6 +100,7 @@ const Github = () => {
             value={githubKey}
             onChange={(e) => setGithubKey(e.target.value)}
           />
+          </div>
           <button type="submit" className="github-submit">Add Repository</button>
           {githubError && <p className="error-message">{githubError}</p>}
         </form>
