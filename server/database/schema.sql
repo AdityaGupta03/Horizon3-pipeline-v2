@@ -24,6 +24,7 @@ CREATE TABLE teams (
 
 CREATE TABLE repos (
   id SERIAL PRIMARY KEY,
+  hash VARCHAR(255) UNIQUE NOT NULL,
   github_url VARCHAR(255) NOT NULL,
   name VARCHAR(255) NOT NULL,
   owner VARCHAR(255) NOT NULL,
@@ -31,9 +32,11 @@ CREATE TABLE repos (
   token VARCHAR(255),
   creator_id INT,
   team_id INT,
+  sonar_qube_proj VARCHAR(255),
+  sonar_token VARCHAR(255),
 
   FOREIGN KEY (creator_id) REFERENCES users (user_id) ON DELETE CASCADE,  -- foreign key to users table
-  FOREIGN KEY (team_id) REFERENCES teams (team_id) ON DELETE CASCADE
+  FOREIGN KEY (team_id) REFERENCES teams (team_id) ON DELETE CASCADE      -- foreign key to team table
 );
 
 -- Create reports table
@@ -41,10 +44,13 @@ CREATE TABLE reports (
   report_id SERIAL PRIMARY KEY,
   report_url VARCHAR(255) NOT NULL,   -- URL to S3 report object
   creator_id INT NOT NULL,            -- references user_id in users table
-  team_id INT NOT NULL,               -- references team_id in teams table
+  team_id INT,                        -- references team_id in teams table
+  repo_id INT NOT NULL,               -- references id in repo table
+  high_prob_flag INT DEFAULT 0,       -- Flag if high chance of vulnerability (0 no, 1 yes)
 
   FOREIGN KEY (creator_id) REFERENCES users (user_id) ON DELETE CASCADE,  -- foreign key to users table with automatic delete
-  FOREIGN KEY (team_id) REFERENCES teams (team_id) ON DELETE CASCADE      -- foreign key to teams table with automatic delete
+  FOREIGN KEY (team_id) REFERENCES teams (team_id) ON DELETE CASCADE,     -- foreign key to teams table with automatic delete
+  FOREIGN KEY (repo_id) REFERENCES repos (id) ON DELETE CASCADE           -- foreign key to repo related to the report
 );
 
 -- Create join table between users and teams

@@ -1,0 +1,2 @@
+boto3==1.35.32
+kafka-python==2.0.2

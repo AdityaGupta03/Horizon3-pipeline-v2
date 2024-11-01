@@ -1,3 +1,0 @@
-[submodule "pipeline/binDiff/ghidraheadless_binexport"]
-	path = pipeline/binDiff/ghidraheadless_binexport
-	url = https://github.com/BiSECT-Temp/ghidraheadless_binexport.git

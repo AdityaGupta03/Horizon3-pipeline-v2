@@ -1,5 +1,6 @@
 # Environment
 .env
+pipeline_venv/
 
 # JS specific
 package-lock.json

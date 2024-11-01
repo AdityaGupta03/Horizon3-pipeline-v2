@@ -1,0 +1,16 @@
+name: H3-Pipeline-Analysis
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  call-local-api:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Make API call to local server
+        run: |
+          # Use curl to call the API endpoint, for example:
+          curl -X POST "https://19e3-128-210-106-54.ngrok-free.app/api/git/analyze_repo" -H "Content-Type: application/json" -d '{"repo_id": "hash_goes_here"}'

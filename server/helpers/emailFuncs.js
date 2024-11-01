@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 // Extract database connection details from environment variables
-// const { MAIL_USER, MAIL_PASS } = process.env;
+const { MAIL_USER, MAIL_PASS } = process.env;
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -13,8 +13,8 @@ const transporter = nodemailer.createTransport({
   // port: MAIL_PORT,
   // secure: false,
   auth: {
-    user: 'h3.pipeline.poc@gmail.com',
-    pass: 'wfug jwja jrvq uhoj',
+    user: "h3.pipeline.poc@gmail.com",
+    pass: "wfug jwja jrvq uhoj",
   },
 });
 
@@ -32,7 +32,7 @@ async function emailUser(userEmail, email_subject, email_body) {
 
   // Sent email
   const mailer_status = await transporter.sendMail({
-    from: 'h3.pipeline.poc@gmail.com',
+    from: "h3.pipeline.poc@gmail.com",
     to: userEmail,
     subject: email_subject,
     text: email_body,

@@ -1,9 +1,17 @@
 import { db_pool } from "../db.js";
 
-async function createUserRepo(user_id, url, priv_flag, token, name, owner) {
+async function createUserRepo(
+  user_id,
+  url,
+  priv_flag,
+  token,
+  name,
+  owner,
+  repo_hash,
+) {
   const query = `
-    INSERT INTO repos (github_url, token, creator_id, private, name, owner)
-    VALUES ($1, $2, $3, $4, $5, $6)
+    INSERT INTO repos (github_url, token, creator_id, private, name, owner, hash)
+    VALUES ($1, $2, $3, $4, $5, $6, $7)
     RETURNING id
   `;
 
@@ -15,6 +23,7 @@ async function createUserRepo(user_id, url, priv_flag, token, name, owner) {
       priv_flag,
       name,
       owner,
+      repo_hash,
     ]);
     return result.rows[0];
   } catch (error) {
@@ -65,4 +74,24 @@ async function getRepoFromID(id) {
   }
 }
 
-export { createUserRepo, getReposFromUserID, getRepoFromName, getRepoFromID };
+async function getRepoFromHash(hash) {
+  const query = `
+    SELECT * FROM repos WHERE hash=$1;
+  `;
+
+  try {
+    const result = await db_pool.query(query, [hash]);
+    return result.rows[0];
+  } catch (error) {
+    console.error("Error getting repos:", error);
+    throw error;
+  }
+}
+
+export {
+  createUserRepo,
+  getReposFromUserID,
+  getRepoFromName,
+  getRepoFromID,
+  getRepoFromHash,
+};
