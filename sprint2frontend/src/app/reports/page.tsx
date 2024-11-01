@@ -2,6 +2,7 @@
 import "./reports.css";
 import axios from "axios";
 import React, { FormEvent, useEffect, useState } from "react";
+import { get } from "http";
 
 const Reports = () => {
   const user_id = sessionStorage.getItem("user_id");
@@ -53,6 +54,38 @@ const Reports = () => {
     }
   };
 
+  const handleDelete = async (e: FormEvent) => { 
+    e.preventDefault();
+    console.log(selectedReport);
+    try {
+      const response = await fetch("/api/user/delete_file", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: selectedReport }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        console.log(data);
+        try {
+          const response = await fetch("/api/user/remove_report", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url: selectedReport }),
+          });
+          const data = await response.json();
+          if (response.ok) {
+            console.log(data);
+            getReports();
+          }
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   return (
     <div className="reports-container">
       <div className="reports-form-container">
@@ -71,9 +104,8 @@ const Reports = () => {
               </option>
             ))}
           </select>
-          <button type="submit" className="reports-submit">
-            Download
-          </button>
+          <button onClick={handleSubmit} className="reports-submit">Download</button>
+           <button onClick={handleDelete} className="reports-submit">Delete</button>
         </form>
       </div>
     </div>

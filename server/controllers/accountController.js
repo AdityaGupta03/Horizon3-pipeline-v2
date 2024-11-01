@@ -19,6 +19,7 @@ import {
   getAccountFromUserIDQuery,
   verifyUserAccountQuery,
   getReportsQuery,
+  remove_report
 } from "../database/queries/accountQueries.js";
 
 /**
@@ -442,6 +443,23 @@ async function getReports(req, res) {
   }
 }
 
+async function removeReport(req, res) {
+  console.log('wifejapoifejewa');
+  console.log(req.body.url);
+  const query = await remove_report(req.body.url);
+  if(!query) {
+    console.error("Error deleting report:", error);
+    return res.status(500).json({
+      error: "Error deleting report",
+    });
+  }
+  else {
+    return res.status(200).json({
+      message: "Report deleted successfully",
+    });
+  }
+}
+
 export {
   createAccount,
   verifyAccountEmail,
@@ -450,4 +468,5 @@ export {
   changePassword,
   deleteAccount,
   getReports,
+  removeReport
 };

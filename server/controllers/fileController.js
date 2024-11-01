@@ -76,4 +76,16 @@ async function downloadFile(req, res) {
     }
   })
 }
-export { uploadFile, createFolder, downloadFile };
+
+async function delete_file(req, res) {
+  console.log(req.body)
+  const params = {
+    Bucket: "reports407",
+    Key: req.body.url,
+  };
+  s3.deleteObject(params, function(err, data) {
+    if (err) console.log(err, err.stack);  // error
+    else     console.log();                 // deleted
+  });
+}
+export { uploadFile, createFolder, downloadFile, delete_file };

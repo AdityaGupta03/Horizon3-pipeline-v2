@@ -124,6 +124,21 @@ async function getReportsQuery(user_id) {
     throw error;
   }
 }
+async function remove_report(report_id) {
+  const query = `
+    DELETE FROM reports
+    WHERE report_url = $1
+  `;
+
+  try {
+    const result = await db_pool.query(query, [report_id]);
+    return result;
+  }
+  catch(error) {
+    console.error("Error deleting report:", error);
+    throw error;
+  }
+}
 
 export {
   createAccountQuery,
@@ -134,4 +149,5 @@ export {
   updatePasswordQuery,
   verifyUserAccountQuery,
   getReportsQuery,
+  remove_report
 };
