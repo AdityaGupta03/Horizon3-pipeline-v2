@@ -18,6 +18,7 @@ import {
   updatePasswordQuery,
   getAccountFromUserIDQuery,
   verifyUserAccountQuery,
+  getReportsQuery
 } from "../database/queries/accountQueries.js";
 
 /**
@@ -398,6 +399,48 @@ async function deleteAccount(req, res) {
   }
 }
 
+async function getReports(req, res) {
+  const { user_id } = req.body;
+  if (!user_id) {
+    console.error("getReports(): Missing user information...");
+    return res.status(400).json({
+      error: "Missing required information.",
+    });
+  }
+  try {
+    // Check if user specified exists
+    const user_acc = await getAccountFromUserIDQuery(user_id);
+    if (!user_acc) {
+      console.error("User account doesn't exist: ", user_id);
+      return res.status(404).json({
+        error: "User account not found",
+      });
+    }
+
+    // Delete the specified user account (cascade deletes all associated data - check schema)
+    const query_res = await getReportsQuery(user_id);
+    if (!query_res) {
+      console.error("getReports(): Error getting repos");
+      throw Error;
+    } else {
+      console.log(query_res);
+      const reportList = query_res.map((report) => ({
+        id: report.report_id.toString(),
+        name: report.report_url
+      }));
+      return res.status(200).json({
+        message: "Success adding repo!",
+        reports: reportList,
+      });
+    }
+  } catch (error) {
+    console.error("Error deleting account:", error);
+    return res.status(500).json({
+      error: "Error deleting account",
+    });
+  }
+}
+
 export {
   createAccount,
   verifyAccountEmail,
@@ -405,4 +448,5 @@ export {
   changeUsername,
   changePassword,
   deleteAccount,
+  getReports
 };

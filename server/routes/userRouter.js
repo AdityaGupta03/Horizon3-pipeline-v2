@@ -9,8 +9,9 @@ import {
   changeUsername,
   changePassword,
   deleteAccount,
+  getReports
 } from "../controllers/accountController.js";
-import { uploadFile, createFolder } from "../controllers/fileController.js";
+import { uploadFile, createFolder, downloadFile } from "../controllers/fileController.js";
 import {runDocker} from "../controllers/binDiffController.js";
 const userRouter = Router();
 
@@ -25,5 +26,7 @@ userRouter.post("/upload", upload.single('binary'), uploadFile);
 userRouter.post("/create_folder", createFolder);
 userRouter.post("/change_password", changePassword);
 userRouter.post("/run_docker", runDocker);
+userRouter.get("/download_file", downloadFile);
+userRouter.post("/get_reports", getReports);
 
 export default userRouter;

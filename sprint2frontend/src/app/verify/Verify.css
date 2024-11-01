@@ -1,0 +1,110 @@
+@import url('https://fonts.googleapis.com/css?family=Raleway:400,700');
+
+* {
+  box-sizing: border-box;
+  font-family: 'Raleway', sans-serif;
+}
+
+body {
+  background: linear-gradient(90deg, #C7C5F4, #776BCC);
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px; /* Add padding for more breathing room */
+}
+
+.verify {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 500px;
+  width: 100%;
+  padding: 50px; /* Increase padding for a spacious feel */
+  background: linear-gradient(90deg, #5D54A4, #7C78B8);
+  border-radius: 12px; /* Slightly more rounded corners */
+  box-shadow: 0px 4px 30px rgba(92, 86, 150, 0.5); /* Softer shadow for depth */
+  color: #fff;
+  text-align: center;
+  margin: 20px 0; /* Center form with vertical space */
+}
+
+.verify h1 {
+  font-size: 2rem; /* Larger title */
+  color: #fff;
+  margin-bottom: 25px; /* More space below title */
+}
+
+.verify p {
+  margin-bottom: 20px; /* Increased space for readability */
+  font-size: 1.1rem;
+}
+
+.link-gen {
+  margin-top: 10px; /* Space above the login button */
+}
+
+.link-gen button {
+  background-color: #fff;
+  color: #4C489D;
+  padding: 12px 24px; /* Wider padding for button */
+  border-radius: 26px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 15px; /* Add space below for balanced look */
+}
+
+.link-gen button:hover {
+  background-color: #e0e0e0;
+}
+
+.verify-form {
+  width: 100%;
+  margin-top: 30px; /* Space above form for separation */
+}
+
+.verify-form h1 {
+  font-size: 1.5rem;
+  color: #fff;
+  margin-bottom: 25px; /* Increase space below form title */
+}
+
+.verify-form input {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px; /* Slightly more rounded */
+  background-color: #f2f2f2;
+  font-size: 15px; /* Slightly larger font */
+  color: #333;
+  margin-top: 12px;
+  margin-bottom: 20px; /* Increased margin for breathing room */
+}
+
+.verify-form button[type="submit"] {
+  background-color: #fff;
+  color: #4C489D;
+  padding: 14px 24px; /* Larger button for emphasis */
+  border-radius: 26px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 100%;
+  margin-top: 25px; /* Space between input and button */
+  text-transform: uppercase;
+}
+
+.verify-form button[type="submit"]:hover {
+  background-color: #e0e0e0;
+}
+
+.error {
+  color: #ff4c4c;
+  font-size: 13px; /* Slightly larger font */
+  margin-top: 15px; /* Extra space above error message */
+  font-weight: 600; /* Bold for emphasis */
+}

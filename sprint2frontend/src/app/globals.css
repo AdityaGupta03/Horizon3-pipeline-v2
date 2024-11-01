@@ -1,0 +1,57 @@
+/* globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+
+
+body {
+  background: linear-gradient(90deg, #C7C5F4, #776BCC);
+  margin: 0;
+}
+
+
+/* Additional global styles */
+.layout-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+}
+
+.layout-container {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+}
+
+.sidebar {
+  width: 16rem; /* Equivalent to ml-64 */
+  flex-shrink: 0;
+  background-color: white;
+}
+
+.main-content {
+  flex-grow: 1;
+  padding: 1rem;
+  overflow-y: auto;
+}
