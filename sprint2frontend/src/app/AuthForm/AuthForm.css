@@ -53,7 +53,7 @@ input[type="email"]:focus {
 } */
 
 
-h1 {
+h1.authform {
   font-weight: bold;
   margin: 0;
 }
@@ -66,7 +66,7 @@ p {
   margin: 20px 0 30px;
 }
 
-button {
+button.authbutton {
   border-radius: 20px;
   border: 1px solid #776BCC;
   background-color: #776BCC;
@@ -81,6 +81,16 @@ button {
 }
 
 button.ghost {
+  border-radius: 20px;
+  border: 1px solid #776BCC;
+  color: #FFFFFF;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 12px 45px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: transform 80ms ease-in;
+  margin-top: 5%;
   background-color: transparent;
   border-color: #FFFFFF;
 }

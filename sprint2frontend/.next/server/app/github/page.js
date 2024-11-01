@@ -243,7 +243,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 var __webpack_require__ = require("../../webpack-runtime.js");
 __webpack_require__.C(exports);
 var __webpack_exec__ = (moduleId) => (__webpack_require__(__webpack_require__.s = moduleId))
-var __webpack_exports__ = __webpack_require__.X(0, ["vendor-chunks/next","vendor-chunks/@swc","vendor-chunks/lucide-react"], () => (__webpack_exec__("(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader.js?name=app%2Fgithub%2Fpage&page=%2Fgithub%2Fpage&appPaths=%2Fgithub%2Fpage&pagePath=private-next-app-dir%2Fgithub%2Fpage.tsx&appDir=%2FUsers%2Fmkg%2FDocuments%2FHorizon3-pipeline%2Fsprint2frontend%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fmkg%2FDocuments%2FHorizon3-pipeline%2Fsprint2frontend&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D!")));
+var __webpack_exports__ = __webpack_require__.X(0, ["vendor-chunks/next","vendor-chunks/lucide-react","vendor-chunks/@swc"], () => (__webpack_exec__("(rsc)/./node_modules/next/dist/build/webpack/loaders/next-app-loader.js?name=app%2Fgithub%2Fpage&page=%2Fgithub%2Fpage&appPaths=%2Fgithub%2Fpage&pagePath=private-next-app-dir%2Fgithub%2Fpage.tsx&appDir=%2FUsers%2Fmkg%2FDocuments%2FHorizon3-pipeline%2Fsprint2frontend%2Fsrc%2Fapp&pageExtensions=tsx&pageExtensions=ts&pageExtensions=jsx&pageExtensions=js&rootDir=%2FUsers%2Fmkg%2FDocuments%2FHorizon3-pipeline%2Fsprint2frontend&isDev=true&tsconfigPath=tsconfig.json&basePath=&assetPrefix=&nextConfigOutput=&preferredRegion=&middlewareConfig=e30%3D!")));
 module.exports = __webpack_exports__;
 
 })();

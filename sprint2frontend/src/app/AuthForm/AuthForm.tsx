@@ -82,7 +82,7 @@ const AuthForm: React.FC = () => {
     <div className={`container ${isSignUp ? "right-panel-active" : ""}`} id="container">
       <div className="form-container sign-up-container">
         <form onSubmit={handleSignup}>
-          <h1>Create Account</h1>
+          <h1 className="authform">Create Account</h1>
           <div>
             <input
               type="text"
@@ -116,14 +116,14 @@ const AuthForm: React.FC = () => {
             required
           />
           </div>
-          <button type="submit">Sign Up</button>
+          <button className="authbutton" type="submit">Sign Up</button>
           {errorMsg && <p className="error">{errorMsg}</p>}
         </form>
       </div>
 
     {isSignUp ? (<div></div>) : (<div className="form-container sign-in-container">
         <form onSubmit={handleLogin}>
-          <h1>Sign in</h1>
+          <h1 className="authform">Sign in</h1>
           <div>
           <input
             type="text"
@@ -144,7 +144,7 @@ const AuthForm: React.FC = () => {
             required
           />
           </div>
-          <button type="submit">Sign In</button>
+          <button className="authbutton" type="submit">Sign In</button>
           {errorMsg && <p className="error">{errorMsg}</p>}
         </form>
       </div>)}
@@ -153,12 +153,12 @@ const AuthForm: React.FC = () => {
       <div className="overlay-container">
         <div className="overlay">
           <div className="overlay-panel overlay-left">
-            <h1>Welcome</h1>
+            <h1 className="authform">Welcome</h1>
             <p>Have an account? Sign in!</p>
             <button className="ghost" onClick={togglePanel}>Sign In</button>
           </div>
           <div className="overlay-panel overlay-right">
-            <h1>Welcome</h1>
+            <h1 className="authform">Welcome</h1>
             <p>Don't have an account? Sign Up</p>
             <button className="ghost" onClick={togglePanel}>Sign Up</button>
           </div>

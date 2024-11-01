@@ -105,7 +105,7 @@ const UserAcc: React.FC = () => {
           </Link>
         </div>
         <div className="ChangeUsername">
-          <h1>Change Username</h1>
+          <h1 className="accounts">Change Username</h1>
           <form onSubmit={handleChangeUsernameSubmit}>
             <input
               type="text"
@@ -119,7 +119,7 @@ const UserAcc: React.FC = () => {
           {userErrorMsg && <p className="error-message">{userErrorMsg}</p>}
         </div>
         <div className="ChangePassword">
-          <h1>Change Password</h1>
+          <h1 className="accounts">Change Password</h1>
           <form onSubmit={handleChangePasswordSubmit}>
             <input
               type="password"
@@ -140,7 +140,7 @@ const UserAcc: React.FC = () => {
           {passwordErrorMsg && <p className="error-message">{passwordErrorMsg}</p>}
         </div>
         <div className="DeleteAccount">
-          <h1>Delete Account</h1>
+          <h1 className="accounts">Delete Account</h1>
           <h2>Insert your username below to confirm deletion!</h2>
           <form onSubmit={handleDeleteAccountSubmit}>
             <input
