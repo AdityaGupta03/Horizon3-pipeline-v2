@@ -1,5 +1,8 @@
-const DashboardPage = () => {
-  return <div>Dashboard Page</div>;
-};
+// src/app/page.tsx
+"use client";
 
-export default DashboardPage;
+import AuthForm from "@/app/AuthForm/AuthForm"; // Adjust the path if needed
+
+export default function HomePage() {
+  return <AuthForm />;
+}

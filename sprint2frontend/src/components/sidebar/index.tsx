@@ -1,77 +1,31 @@
+// src/components/sidebar/index.tsx
+
 "use client";
-import {
-  GitFork,
-  LayoutDashboard,
-  BadgeDollarSign,
-  CircleUserRound,
-  Settings,
-  BinaryIcon,
-} from "lucide-react";
+
+import { LogOutIcon, GitFork, LayoutDashboard, Binary, CircleUserRound } from "lucide-react";
 import SidebarItem from "./item";
 
-interface ISidebarItem {
-  name: string;
-  path: string;
-  icon: LucideIcon;
-  items?: ISubItem[];
-}
-
-interface ISubItem {
-  name: string;
-  path: string;
-}
-
-const items: ISidebarItem[] = [
-  {
-    name: "Dashboard",
-    path: "/",
-    icon: LayoutDashboard,
-  },
-  {
-    name: "Github",
-    path: "/transaction",
-    icon: GitFork,
-  },
-  {
-    name: "BinaryDiff",
-    path: "/payment",
-    icon: BinaryIcon,
-  },
-  {
-    name: "Accounts",
-    path: "/accounts",
-    icon: CircleUserRound,
-  },
-  {
-    name: "Settings",
-    path: "/settings",
-    icon: Settings,
-    items: [
-      {
-        name: "General",
-        path: "/settings",
-      },
-      {
-        name: "Security",
-        path: "/settings/security",
-      },
-      {
-        name: "Notifications",
-        path: "/settings/notifications",
-      },
-    ],
-  },
+const items = [
+  { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+  { name: "Github", path: "/github", icon: GitFork },
+  { name: "Binaries", path: "/binaries", icon: Binary },
+  { name: "Account", path: "/accounts", icon: CircleUserRound },
 ];
 
-const Sidebar = () => {
+const Sidebar = ({ onLogout }: { onLogout: () => void }) => {
   return (
-    <div className="fixed top-0 left-0 h-screen w-64 bg-white shadow-lg z-10 p-4">
-      <div className="flex flex-col space-y-10 w-full">
-      <img src="/logo-expanded.png"alt="Logo" style={{ height: '80px', width: 'auto', margin: '0 auto' }}/>
-        <div className="flex flex-col space-y-2">
-          {items.map((item, index) => (
-            <SidebarItem key={index} item={item} />
-          ))}
+    <div className="sidebar fixed top-0 left-0 h-screen w-64 bg-white shadow-lg p-6">
+      <img className="h-20 w-auto mx-auto mb-8" src="/logo-expanded.png" alt="Logo" />
+      <div className="flex flex-col space-y-4 text-gray-800">
+        {items.map((item, index) => (
+          <SidebarItem key={index} item={item} />
+        ))}
+        <div
+          onClick={onLogout}
+          className="flex items-center p-3 rounded-md cursor-pointer hover:bg-gray-200 transition-colors"
+        >
+          <LogOutIcon size={20} className="text-gray-700" />
+          <span className="ml-2 text-sm font-medium text-gray-700">Logout</span>
         </div>
       </div>
     </div>

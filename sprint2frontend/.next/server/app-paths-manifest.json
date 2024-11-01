@@ -1,9 +1,6 @@
 {
+  "/_not-found/page": "app/_not-found/page.js",
   "/page": "app/page.js",
-  "/settings/notifications/page": "app/settings/notifications/page.js",
-  "/accounts/page": "app/accounts/page.js",
-  "/transaction/page": "app/transaction/page.js",
-  "/settings/page": "app/settings/page.js",
-  "/payment/page": "app/payment/page.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js"
+  "/github/page": "app/github/page.js",
+  "/accounts/page": "app/accounts/page.js"
 }
