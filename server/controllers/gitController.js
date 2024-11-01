@@ -1,5 +1,4 @@
 import axios from "axios";
-import { execFile } from "child_process";
 
 import { getAccountFromUserIDQuery } from "../database/queries/accountQueries.js";
 import {
@@ -12,6 +11,7 @@ import {
 
 import { sendKafkaEvent } from "../helpers/kafkaFuncs.js";
 import { encryptPassword } from "../helpers/encryptionFuncs.js";
+import { emailUser } from "../helpers/emailFuncs.js";
 
 async function addGithubRepo(req, res) {
   const { user_id, url, token, owner, repo_name } = req.body;
@@ -174,6 +174,27 @@ async function analyzeGithubRepo(req, res) {
 
     console.log(repo);
 
+    const user_id = repo.creator_id;
+    const user_acc = await getAccountFromUserIDQuery(user_id);
+    if (!user_acc) {
+      console.error("User account doesn't exist: ", user_id);
+      return res.status(404).json({
+        error: "User account not found",
+      });
+    }
+
+    const email_subject = `Started analysis pipeline on ${repo.name}`;
+    const email_body = `We have started running the analysis pipeline on your ${repo.name} repository. If you think this is a mistake, please contact us.\n\n We will notify you when your report is ready.`;
+    const email_status = await emailUser(
+      user_acc.email,
+      email_subject,
+      email_body,
+    );
+
+    if (!email_status) {
+      throw new Error("Error sending verification email");
+    }
+
     const metadata = {
       url: repo.github_url,
       repo_name: repo.name,
@@ -182,7 +203,10 @@ async function analyzeGithubRepo(req, res) {
       repo_hash: repo_id,
     };
 
-    await sendKafkaEvent("github_analysis", metadata);
+    let status = await sendKafkaEvent("github_analysis", metadata);
+    if (!status) {
+      throw new Error("Failed to run pipeline");
+    }
 
     return res.status(200).json({
       message: "Successfully started pipeline!",

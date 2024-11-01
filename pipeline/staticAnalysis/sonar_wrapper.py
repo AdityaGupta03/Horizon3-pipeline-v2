@@ -121,9 +121,25 @@ def main():
 
       pg_cursor.execute("SELECT sonar_qube_proj FROM repos WHERE github_url = %s", (repo_url,))
       result = pg_cursor.fetchone()
+      sonar_token_qube = SONAR_QUBE_TOKEN
 
       if result and result[0] is None:
         print("Creating project")
+
+        # response = requests.post(
+        #   "http://192.168.4.63:9000/api/user_tokens/generate",
+        #   auth=('admin', 'admin'),
+        #   params={
+        #     'name': repo_name
+        #   }
+        # )
+
+        # if not response.ok:
+        #   send_kafka_msg(kafka_failure, f"Error creating SonarQube token: {response}")
+        #   sys.exit()
+
+        # token_data = response.json()
+        # sonar_token_qube = token_data.get('token')
 
         response = requests.post(
           "http://192.168.4.63:9000/api/projects/create",
@@ -138,10 +154,26 @@ def main():
           send_kafka_msg(kafka_failure, f"Error creating SonarQube project: {response}")
           sys.exit()
 
+        # pg_cursor.execute("UPDATE repos SET sonar_token = %s WHERE github_url = %s", (sonar_token_qube, repo_url))
+        # pg_conn.commit()
+
         pg_cursor.execute("UPDATE repos SET sonar_qube_proj = %s WHERE github_url = %s", (repo_name, repo_url))
         pg_conn.commit()
 
         time.sleep(20)
+      # elif result and result[0]:
+      #   print("Getting sonar token")
+      #   pg_cursor.execute("SELECT sonar_token FROM repos WHERE github_url = %s", (repo_url,))
+      #   sonar_token = pg_cursor.fetchone()
+
+      #   if sonar_token and sonar_token[0]:
+      #     sonar_token_qube = sonar_token[0]
+      #   else:
+      #     print("No sonar token found")
+      #     send_kafka_msg(kafka_failure, f"Error running static analysis")
+      #     sys.exit()
+
+      #   print("Found sonar token...")
       elif not result:
         print("No repository found in database")
         send_kafka_msg(kafka_failure, f"Error running static analysis")

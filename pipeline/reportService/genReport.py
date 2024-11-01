@@ -106,6 +106,19 @@ def main():
       report_filename
     )
 
+    vuln_prob_flag = 0
+    for line in llm_text.split('\n'):
+      if vuln_prob_flag:
+        break
+      if "Confidence Score" in line:
+        words = line.split(' ')
+        for word in words:
+          if word[0].isdigit():
+            score = float(word)
+            if score > 0.8:
+              vuln_prob_flag = 1
+            break
+
     try:
       pg_conn = psycopg2.connect(
         host=POSTGRES_HOST,
@@ -129,7 +142,10 @@ def main():
         sys.exit()
 
       report_url = report_filename
-      pg_cursor.execute("INSERT INTO reports (report_url, creator_id, repo_id) VALUES (%s, %s, %s)", (report_url, creator_id, repo_id))
+      if vuln_prob_flag:
+        pg_cursor.execute("INSERT INTO reports (report_url, creator_id, repo_id, high_prob_flag) VALUES (%s, %s, %s, 1)", (report_url, creator_id, repo_id))
+      else:
+        pg_cursor.execute("INSERT INTO reports (report_url, creator_id, repo_id) VALUES (%s, %s, %s)", (report_url, creator_id, repo_id))
       pg_conn.commit()
 
       pg_cursor.execute("SELECT email FROM users WHERE user_id = %s", (creator_id,))
@@ -146,7 +162,10 @@ def main():
         msg = MIMEMultipart()
         msg['From'] = sender_email
         msg['To'] = email
-        msg['Subject'] = f"Analysis Report for {repo_name}"
+        if vuln_prob_flag:
+          msg['Subject'] = f"Analysis Report for {repo_name}! High Vulnerability Probability!"
+        else:
+          msg['Subject'] = f"Analysis Report for {repo_name}"
 
         body = f"Your analysis report for repository {repo_name} is ready. Please check your reports on our website!\n Report: {report_filename}"
         msg.attach(MIMEText(body, 'plain'))

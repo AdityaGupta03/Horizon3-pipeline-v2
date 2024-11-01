@@ -9,8 +9,11 @@ const producer = kafka.producer();
 
 async function sendKafkaEvent(eventType, metadata) {
   console.log("sendKafkaEvent()...");
+  let status;
 
   try {
+    // throw new Error();
+
     await producer.connect();
     console.log("Connected to Kafka");
 
@@ -29,11 +32,15 @@ async function sendKafkaEvent(eventType, metadata) {
     });
 
     console.log("Posted event: ", eventData);
+    status = true;
   } catch (error) {
     console.error("Error posting Kafka event: ", error);
+    status = false;
   } finally {
     await producer.disconnect();
   }
+
+  return status;
 }
 
 export { sendKafkaEvent };

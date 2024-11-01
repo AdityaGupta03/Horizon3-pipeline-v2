@@ -33,6 +33,7 @@ CREATE TABLE repos (
   creator_id INT,
   team_id INT,
   sonar_qube_proj VARCHAR(255),
+  sonar_token VARCHAR(255),
 
   FOREIGN KEY (creator_id) REFERENCES users (user_id) ON DELETE CASCADE,  -- foreign key to users table
   FOREIGN KEY (team_id) REFERENCES teams (team_id) ON DELETE CASCADE
@@ -45,6 +46,7 @@ CREATE TABLE reports (
   creator_id INT NOT NULL,            -- references user_id in users table
   team_id INT,               -- references team_id in teams table
   repo_id INT NOT NULL,
+  high_prob_flag INT DEFAULT 0,       -- Flag if high chance of vulnerability (0 no, 1 yes)
 
   FOREIGN KEY (creator_id) REFERENCES users (user_id) ON DELETE CASCADE,  -- foreign key to users table with automatic delete
   FOREIGN KEY (team_id) REFERENCES teams (team_id) ON DELETE CASCADE,     -- foreign key to teams table with automatic delete
