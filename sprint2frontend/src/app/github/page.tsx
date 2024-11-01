@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, FormEvent, useEffect } from "react";
-// import "./Github.css"; // Create relevant styles if needed
+import "./Github.css";
 
 const Github = () => {
   const [githubLink, setGithubLink] = useState<string>("");
@@ -79,39 +79,45 @@ const Github = () => {
   };
 
   return (
-    <div>
-      <h1>GitHub Integration</h1>
-      <form onSubmit={handleGithubSubmit}>
-        <input
-          type="url"
-          placeholder="GitHub Repository Link"
-          value={githubLink}
-          onChange={(e) => setGithubLink(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="GitHub API Key"
-          value={githubKey}
-          onChange={(e) => setGithubKey(e.target.value)}
-        />
-        <button type="submit">Add Repository</button>
-        {githubError && <p>{githubError}</p>}
-      </form>
-      <form onSubmit={handleExistingGithubSubmit}>
-        <select
-          value={selectedGithubLink}
-          onChange={(e) => setSelectedGithubLink(e.target.value)}
-        >
-          <option value="">Select Repository</option>
-          {githubLinks.map((link) => (
-            <option key={link.id} value={link.id}>
-              {link.name}
-            </option>
-          ))}
-        </select>
-        <button type="submit">Analyze Repository</button>
-        {githubAnalyzeError && <p>{githubAnalyzeError}</p>}
-      </form>
+    <div className="github-container">
+      <div className="github-form-container">
+        <h1>GitHub Integration</h1>
+        <form onSubmit={handleGithubSubmit}>
+          <input
+            type="url"
+            className="github-input"
+            placeholder="GitHub Repository Link"
+            value={githubLink}
+            onChange={(e) => setGithubLink(e.target.value)}
+          />
+          <input
+            type="text"
+            className="github-input"
+            placeholder="GitHub API Key"
+            value={githubKey}
+            onChange={(e) => setGithubKey(e.target.value)}
+          />
+          <button type="submit" className="github-submit">Add Repository</button>
+          {githubError && <p className="error-message">{githubError}</p>}
+        </form>
+
+        <form onSubmit={handleExistingGithubSubmit}>
+          <select
+            value={selectedGithubLink}
+            onChange={(e) => setSelectedGithubLink(e.target.value)}
+            className="github-select"
+          >
+            <option value="">Select Repository</option>
+            {githubLinks.map((link) => (
+              <option key={link.id} value={link.id}>
+                {link.name}
+              </option>
+            ))}
+          </select>
+          <button type="submit" className="github-submit">Analyze Repository</button>
+          {githubAnalyzeError && <p className="error-message">{githubAnalyzeError}</p>}
+        </form>
+      </div>
     </div>
   );
 };

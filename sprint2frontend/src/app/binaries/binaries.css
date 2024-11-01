@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css?family=Raleway:400,700');
+
+* {
+  box-sizing: border-box;
+  font-family: 'Raleway', sans-serif;
+}
+
+body {
+  background: linear-gradient(90deg, #C7C5F4, #776BCC);
+  margin: 0;
+}
+
+.binary-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding-left: 16rem; /* Avoids collision with sidebar */
+}
+
+.binary-form {
+  background: linear-gradient(90deg, #5D54A4, #7C78B8);
+  width: 100%;
+  max-width: 400px;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0px 0px 24px #5C5696;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.binary-field {
+  width: 100%;
+  margin: 15px 0;
+}
+
+.binary-field label {
+  display: block;
+  font-size: 1rem;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.binary-input {
+  width: 100%;
+  background-color: #f2f2f2;
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 14px;
+}
+
+.binary-input:focus {
+  outline: none;
+  border: 1px solid #5D54A4;
+}
+
+.binary-submit {
+  background-color: #fff;
+  color: #4C489D;
+  padding: 12px 20px;
+  border-radius: 26px;
+  border: none;
+  text-transform: uppercase;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: 20px;
+  width: 80%;
+  max-width: 300px;
+}
+
+.binary-submit:hover {
+  background-color: #e0e0e0;
+}
+
+.error-message {
+  color: #ff4c4c;
+  font-size: 12px;
+  text-align: center;
+  margin-top: 10px;
+}

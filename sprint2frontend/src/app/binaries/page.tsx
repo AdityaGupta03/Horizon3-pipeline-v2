@@ -1,7 +1,9 @@
+// src/app/binaries/page.tsx
 "use client";
+
 import React, { useState, FormEvent, ChangeEvent } from "react";
 import axios from "axios";
-// import "./Binary.css"; // Create relevant styles if needed
+import "./binaries.css";
 
 const Binary = () => {
   const [binary1, setBinary1] = useState<File | null>(null);
@@ -73,20 +75,22 @@ const Binary = () => {
   };
 
   return (
-    <div>
-      <h1>Binary Upload</h1>
-      <form onSubmit={handleBinarySubmit}>
-        <div>
-          <label>Upload Binary 1:</label>
-          <input type="file" onChange={handleFileChange1} />
-        </div>
-        <div>
-          <label>Upload Binary 2:</label>
-          <input type="file" onChange={handleFileChange2} />
-        </div>
-        <button type="submit">Submit Binaries</button>
-        {binaryError && <p>{binaryError}</p>}
-      </form>
+    <div className="binary-container">
+      <div className="binary-form">
+        <h1>Binary Upload</h1>
+        <form onSubmit={handleBinarySubmit}>
+          <div className="binary-field">
+            <label>Upload Binary 1:</label>
+            <input className="binary-input" type="file" onChange={handleFileChange1} />
+          </div>
+          <div className="binary-field">
+            <label>Upload Binary 2:</label>
+            <input className="binary-input" type="file" onChange={handleFileChange2} />
+          </div>
+          <button className="binary-submit" type="submit">Submit Binaries</button>
+          {binaryError && <p className="error-message">{binaryError}</p>}
+        </form>
+      </div>
     </div>
   );
 };

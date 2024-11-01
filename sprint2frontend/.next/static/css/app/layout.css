@@ -598,6 +598,15 @@ video {
   }
 }
 
+
+
+body {
+  background: linear-gradient(90deg, #C7C5F4, #776BCC);
+  margin: 0;
+}
+
+
+/* Additional global styles */
 .layout-container {
   display: flex;
   height: 100vh;

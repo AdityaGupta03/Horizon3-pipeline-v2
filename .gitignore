@@ -4,6 +4,7 @@
 # JS specific
 package-lock.json
 node_modules/
+.next/
 
 # Editor specific
 .zed
