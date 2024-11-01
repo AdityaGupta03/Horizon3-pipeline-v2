@@ -10,7 +10,7 @@ const items = [
   { name: "Github", path: "/github", icon: GitFork },
   { name: "Binaries", path: "/binaries", icon: Binary },
   { name: "Account", path: "/accounts", icon: CircleUserRound },
-  { name: "Reports", path: "/reports", icon: CircleUserRound },
+  { name: "Reports", path: "/reports", icon: CircleUserRound }, 
 ];
 
 const Sidebar = ({ onLogout }: { onLogout: () => void }) => {
