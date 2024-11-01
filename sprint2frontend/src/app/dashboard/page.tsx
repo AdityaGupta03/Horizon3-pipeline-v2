@@ -22,8 +22,8 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
-        <h1>Welcome to the dashboard, {email}.</h1>
-        <h1>Upload a GitHub link or upload binaries.</h1>
+        <h1 className="dashboard-title">Welcome to the dashboard, {email}.</h1>
+        <h1 className="dashboard-title">Upload a GitHub link or upload binaries.</h1>
       </div>
     </div>
   );

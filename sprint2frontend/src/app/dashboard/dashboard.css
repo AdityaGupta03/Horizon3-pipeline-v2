@@ -101,3 +101,8 @@
   cursor: pointer;
   border-radius: 5px;
 }
+
+h1.dashboard-title {
+  font-size: 1.5rem;
+  color: #fff;
+}

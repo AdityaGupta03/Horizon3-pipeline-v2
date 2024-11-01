@@ -18,28 +18,17 @@
       "static/css/app/dashboard/page.css",
       "static/chunks/app/dashboard/page.js"
     ],
-    "/github/page": [
+    "/reports/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/app/github/page.css",
-      "static/chunks/app/github/page.js"
-    ],
-    "/binaries/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/binaries/page.css",
-      "static/chunks/app/binaries/page.js"
+      "static/css/app/reports/page.css",
+      "static/chunks/app/reports/page.js"
     ],
     "/accounts/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/css/app/accounts/page.css",
       "static/chunks/app/accounts/page.js"
-    ],
-    "/_not-found/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/_not-found/page.js"
     ]
   }
 }
