@@ -1,4 +1,83 @@
+@import url('https://fonts.googleapis.com/css?family=Raleway:400,700');
+
+* {
+  box-sizing: border-box;
+  font-family: 'Raleway', sans-serif;
+}
+
 body {
-    background: linear-gradient(90deg, #C7C5F4, #776BCC);
-    margin: 0;
-  }
+  background: linear-gradient(90deg, #C7C5F4, #776BCC);
+  margin: 0;
+}
+
+.reports-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding-left: 16rem; /* To avoid overlap with sidebar */
+}
+
+.reports-form-container {
+  background: linear-gradient(90deg, #5D54A4, #7C78B8);
+  width: 100%;
+  max-width: 500px;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0px 0px 24px #5C5696;
+  color: #fff;
+  text-align: center;
+}
+
+h1.reports-title {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  color: #fff;
+}
+
+input.reports-input {
+  width: 100%;
+  padding: 10px;
+  /* margin: 10px 0; */
+  border: none;
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  font-size: 14px;
+  color: #333;
+  margin-top: 3%;
+}
+
+.reports-select {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  font-size: 14px;
+  color: #333;
+}
+
+.reports-submit {
+  background-color: #fff;
+  color: #4C489D;
+  padding: 12px 20px;
+  border-radius: 26px;
+  border: none;
+  text-transform: uppercase;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.3s;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.reports-submit:hover.github-container {
+  background-color: #e0e0e0;
+}
+
+.error-message.reports-container {
+  color: #ff4c4c;
+  font-size: 12px;
+  margin-top: 10px;
+}

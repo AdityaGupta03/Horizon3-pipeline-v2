@@ -1,5 +1,5 @@
 import aws from "aws-sdk";
-import fs from "fs";
+import fs, { write } from "fs";
 
 const s3 = new aws.S3({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -57,4 +57,23 @@ async function createFolder(req, res) {
     folder: date,
   });
 }
-export { uploadFile, createFolder };
+
+async function downloadFile(req, res) {
+  console.log(req.body);
+  const params = {
+    Bucket: "reports407",
+    Key: req.query.url,
+  };
+  s3.getObject(params, function(err, data) {
+    if (err) {
+      console.error(err);
+      res.status(500).send(err);
+    }
+    else {
+      res.setHeader('Content-disposition', `attachment; filename=${req.body.url}`)
+      res.setHeader('Content-type', 'application/pdf')
+      res.send(data.Body);
+    }
+  })
+}
+export { uploadFile, createFolder, downloadFile };
