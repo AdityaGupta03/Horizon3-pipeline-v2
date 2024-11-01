@@ -75,50 +75,70 @@ def clone_repository(repo_url, dest_dir, access_token):
     send_kafka_msg(kafka_failure, f"Error cloning repository: {e.stderr}")
     sys.exit()
 
-def detect_and_build_c_project(project_dir):
-  # Let's modify the `detect_and_build_c_project` function to search all directories recursively for build files.
+def detect_and_build_java_project(project_dir):
   for root, dirs, files in os.walk(project_dir):
     try:
-      if "Makefile" in files:
-        run_command("make", cwd=root)
+      # Check for Maven project
+      if "pom.xml" in files:
+        run_command("mvn clean install", cwd=root)
         return
-      elif "CMakeLists.txt" in files:
-        build_dir = os.path.join(root, 'build')
-        if not os.path.exists(build_dir):
-          os.makedirs(build_dir)
-        run_command("cmake .. && make", cwd=build_dir)
+
+      # Check for Gradle project
+      elif "build.gradle" in files:
+        run_command("gradle build", cwd=root)
         return
-      elif "configure" in files:
-        run_command("./configure && make", cwd=root)
+
+      # Check for standalone Java files (basic structure with `src` directory)
+      elif "src" in dirs:
+        # Look for Java files in src
+        java_files = [os.path.join(dp, f) for dp, dn, fn in os.walk(os.path.join(root, "src")) for f in fn if f.endswith(".java")]
+        if java_files:
+          bin_dir = os.path.join(root, "bin")
+          if not os.path.exists(bin_dir):
+            os.makedirs(bin_dir)
+          javac_command = f"javac -d {bin_dir} " + " ".join(java_files)
+          run_command(javac_command, cwd=root)
         return
     except Exception as e:
-      send_kafka_msg(kafka_failure, f"Error building repository...")
-      sys.exit()
+      send_kafka_msg(kafka_failure, f"Error building Java project in {root}: {str(e)}")
+      sys.exit(1)
 
 def find_binary_files(project_dir):
-  search_paths = [os.path.join(project_dir, "bin"), os.path.join(project_dir, "build"), project_dir]
+  search_paths = [
+    os.path.join(project_dir, "bin"),
+    os.path.join(project_dir, "build"),
+    os.path.join(project_dir, "target"),  # Common for Maven builds
+    os.path.join(project_dir, "out"),     # Common for general Java output
+    project_dir  # Also search the root project directory
+  ]
   binaries = []
 
   for dir in search_paths:
     if os.path.exists(dir):
       for file in os.listdir(dir):
         file_path = os.path.join(dir, file)
-        if os.path.isfile(file_path) and os.access(file_path, os.X_OK):
+        if file_path.__contains__(".jar"):
           file_type = subprocess.run(['file', '--mime-type', '-b', file_path], stdout=subprocess.PIPE, text=True).stdout.strip()
-          if file_type.startswith("application/"):
-            binaries.append(os.path.abspath(file_path))
+          run_command(f'unzip {file_path} -d ./extracted_binary')
+          find_result = run_command('find . -name "*.class"')
+          file_path = os.path.abspath(find_result.split("\n")[0]).strip()
+          print("adding binary: ", file_path)
+          binaries.append(file_path)
+
+  print("Binaries: ", binaries)
 
   return binaries
 
 def build_and_push_binaries(repo, project_dir, commit):
   repo.git.checkout(commit)
-  detect_and_build_c_project(project_dir)
+  detect_and_build_java_project(project_dir)
   binaries = find_binary_files(project_dir)
   pushed_binaries = []
   if binaries:
     for binary in binaries:
       try:
         file_name = os.path.basename(binary) + '_' + commit[:7]
+        print(file_name)
         s3.upload_file(binary, 'cs407gitmetadata', os.path.basename(binary) + '_' + commit[:7])
         pushed_binaries.append(file_name)
       except Exception as e:
@@ -144,6 +164,15 @@ def clone_build_and_find_binary(repo_url, repo_name, owner, github_token) -> dic
 
   # Build the projects and upload binaries to S3 bucket
   bins1 = build_and_push_binaries(repo, project_dir, commits[0].hexsha)
+
+  # Delete the cloned project
+  try:
+    if os.path.exists("./extracted_binary"):
+      shutil.rmtree("./extracted_binary")
+  except Exception as e:
+    send_kafka_msg(kafka_failure, f"Error running python script...")
+    sys.exit()
+
   bins2 = build_and_push_binaries(repo, project_dir, commits[1].hexsha)
 
   # Get git metadata from API
