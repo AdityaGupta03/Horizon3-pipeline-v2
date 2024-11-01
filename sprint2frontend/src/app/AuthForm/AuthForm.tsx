@@ -14,6 +14,8 @@ const AuthForm: React.FC = () => {
   const router = useRouter();
 
   const togglePanel = () => {
+    setUsername("");
+    setPassword("");
     setIsSignUp(!isSignUp);
     setErrorMsg(""); // Clear error message when toggling
   };
