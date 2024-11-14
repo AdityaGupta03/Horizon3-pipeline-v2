@@ -9,11 +9,12 @@ import {
   getRepoFromHash,
 } from "../database/queries/gitQueries.js";
 
-import { sendKafkaEvent } from "../helpers/kafkaFuncs.js";
-import { encryptPassword } from "../helpers/encryptionFuncs.js";
-import { emailUser } from "../helpers/emailFuncs.js";
+import { sendKafkaEvent } from "../utils/kafkaFuncs.js";
+import { encryptPassword } from "../utils/encryptionFuncs.js";
+import { emailUser } from "../utils/emailFuncs.js";
+import { GitAnalysisMeta } from "../types/kafkameta.type.js";
 
-async function addGithubRepo(req, res) {
+async function addGithubRepo(req: any, res: any) {
   const { user_id, url, token, owner, repo_name } = req.body;
 
   // Check if request json is missing necessary parameters
@@ -91,7 +92,7 @@ async function addGithubRepo(req, res) {
         message: "Success adding repo!",
       });
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error changing username:", error);
     console.error(response);
     if (error.status === 404) {
@@ -106,7 +107,7 @@ async function addGithubRepo(req, res) {
   }
 }
 
-async function getGithubReposFromUser(req, res) {
+async function getGithubReposFromUser(req: any, res: any) {
   const { user_id } = req.body;
 
   // Check if request json is missing necessary parameters
@@ -152,7 +153,7 @@ async function getGithubReposFromUser(req, res) {
   }
 }
 
-async function analyzeGithubRepo(req, res) {
+async function analyzeGithubRepo(req: any, res: any) {
   const { repo_id } = req.body;
 
   if (!repo_id) {
@@ -185,7 +186,7 @@ async function analyzeGithubRepo(req, res) {
 
     const email_subject = `Started analysis pipeline on ${repo.name}`;
     const email_body = `We have started running the analysis pipeline on your ${repo.name} repository. If you think this is a mistake, please contact us.\n\n We will notify you when your report is ready.`;
-    const email_status = await emailUser(
+    const email_status: boolean = await emailUser(
       user_acc.email,
       email_subject,
       email_body,
@@ -195,7 +196,7 @@ async function analyzeGithubRepo(req, res) {
       throw new Error("Error sending verification email");
     }
 
-    const metadata = {
+    const metadata: GitAnalysisMeta = {
       url: repo.github_url,
       repo_name: repo.name,
       repo_owner: repo.owner,
@@ -203,7 +204,7 @@ async function analyzeGithubRepo(req, res) {
       repo_hash: repo_id,
     };
 
-    let status = await sendKafkaEvent("github_analysis", metadata);
+    let status: boolean = await sendKafkaEvent("github_analysis", metadata);
     if (!status) {
       throw new Error("Failed to run pipeline");
     }
@@ -212,7 +213,7 @@ async function analyzeGithubRepo(req, res) {
       message: "Successfully started pipeline!",
       output: "Queued event!",
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error analyzing repo:", error);
     return res.status(500).json({
       error: "Error analyzing repo",
