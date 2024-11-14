@@ -5,6 +5,9 @@ import React, { FormEvent, useEffect, useState } from "react";
 import { get } from "http";
 
 const Reports = () => {
+  const delay = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
+
   const user_id = sessionStorage.getItem("user_id");
   useEffect(() => {
     getReports();
@@ -13,6 +16,7 @@ const Reports = () => {
     { id: string; name: string; vuln: Number }[]
   >([]);
   const [selectedReport, setSelectedReport] = useState<string>("");
+  const [actionMsg, setActionMsg] = useState<string>("");
 
   const getReports = async () => {
     try {
@@ -40,7 +44,6 @@ const Reports = () => {
         params: { url: selectedReport },
         responseType: "blob", // Important for handling binary data
       });
-
       // Create a URL for the downloaded file
       console.log(response.data);
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -54,7 +57,7 @@ const Reports = () => {
     }
   };
 
-  const handleDelete = async (e: FormEvent) => { 
+  const handleDelete = async (e: FormEvent) => {
     e.preventDefault();
     console.log(selectedReport);
     try {
@@ -65,6 +68,10 @@ const Reports = () => {
       });
       const data = await response.json();
       if (response.ok) {
+        setActionMsg("Delete report: " + selectedReport);
+        delay(2000).then(() => {
+          setActionMsg("");
+        });
         console.log(data);
         try {
           const response = await fetch("/api/user/remove_report", {
@@ -104,8 +111,13 @@ const Reports = () => {
               </option>
             ))}
           </select>
-          <button onClick={handleSubmit} className="reports-submit">Download</button>
-           <button onClick={handleDelete} className="reports-submit">Delete</button>
+          <button onClick={handleSubmit} className="reports-submit">
+            Download
+          </button>
+          <button onClick={handleDelete} className="reports-submit">
+            Delete
+          </button>
+          {actionMsg && <p className="action-message">{actionMsg}</p>}
         </form>
       </div>
     </div>

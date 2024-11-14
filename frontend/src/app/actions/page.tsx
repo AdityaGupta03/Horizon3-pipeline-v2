@@ -2,8 +2,7 @@
 import "./actions.css";
 import React, { useState, FormEvent, useEffect } from "react";
 import yaml from "js-yaml";
-const yamlContent = `
-name: H3-Pipeline-Analysis
+const yamlContent = `name: H3-Pipeline-Analysis
 
 on:
   push:
@@ -18,7 +17,7 @@ jobs:
       - name: Make API call to local server
         run: |
           # Use curl to call the API endpoint, for example:
-          curl -X POST "https://c93a-195-252-220-98.ngrok-free.app/api/git/analyze_repo" -H "Content-Type: application/json" -d '{"repo_id": "<your_hash>"}'
+          curl -X POST "https://718a-195-252-220-98.ngrok-free.app/api/git/analyze_repo" -H "Content-Type: application/json" -d '{"repo_id": "<your_hash>"}'
 `;
 
 const actions = () => {
@@ -71,6 +70,7 @@ const actions = () => {
   return (
     <div className="github-container">
       <div>
+        <h2>GitHub Actions Configuration</h2>
         <p>
           Please insert the yaml file into a directory .github/actions in your
           git repo. If you already have a github actions configuration, please
@@ -93,12 +93,13 @@ const actions = () => {
             Get .yml file
           </button>
           {githubAnalyzeError && (
-            <p className="error-message">{githubAnalyzeError}</p>
+            <p className="hash_codes_mezzy">{githubAnalyzeError}</p>
           )}
         </form>
       </div>
       <div>
-        <pre>{data ? JSON.stringify(data, null, 2) : "Loading..."}</pre>
+        <h3>YAML Configuration</h3>
+        <pre>{yamlContent}</pre>
       </div>
     </div>
   );
