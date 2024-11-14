@@ -4,9 +4,9 @@ import {
   addGithubRepo,
   getGithubReposFromUser,
   analyzeGithubRepo,
-} from "../controllers/gitController.js";
+} from "../controllers/gitController";
 
-const gitRouter = Router();
+const gitRouter: Router = Router();
 
 // Define post routes and corresponding controller functions
 gitRouter.post("/create_git_repo", addGithubRepo);
