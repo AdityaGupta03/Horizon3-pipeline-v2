@@ -7,6 +7,7 @@ import {
   approveTeamRequest,
   removeTeamMember,
   leaveTeam,
+  getPendingMemberApprovals,
 } from "../controllers/teamController.js";
 
 const teamRouter: Router = Router();
@@ -18,5 +19,6 @@ teamRouter.post("/request_join_team", requestToJoinTeam);
 teamRouter.post("/approve_team_request", approveTeamRequest);
 teamRouter.post("/kick_member", removeTeamMember);
 teamRouter.post("/leave_team", leaveTeam);
+teamRouter.post("/get_pending_requests", getPendingMemberApprovals);
 
 export default teamRouter;

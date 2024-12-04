@@ -6,7 +6,11 @@ import {
   getTeamFromIDQuery,
   removeTeamMemberQuery,
   leaveTeamQuery,
+  getPendingMemberApprovalsQuery,
+  approveMemberRequest,
 } from "../database/queries/teamQueries.js";
+
+import { getAccountFromUserIDQuery } from "../database/queries/accountQueries.js";
 
 import { emailUser } from "../utils/emailFuncs.js";
 
@@ -132,7 +136,95 @@ async function requestToJoinTeam(req: any, res: any) {
   }
 }
 
-async function approveTeamRequest(req: any, res: any) {}
+async function approveTeamRequest(req: any, res: any) {
+  let { team_id, user_id, approve } = req.body;
+
+  if (!team_id || !user_id || approve === undefined) {
+    console.error("Missing request fields.");
+    return res.status(400).json({
+      error: "Missing request fields.",
+    });
+  }
+
+  try {
+    // Get user information
+    const user = await getAccountFromUserIDQuery(user_id);
+    if (!user) {
+      console.error("User account doesn't exist: ", user_id);
+      return res.status(404).json({
+        error: "User account not found",
+      });
+    }
+
+    if (approve) {
+      const query_result = await approveMemberRequest(team_id, user_id);
+      if (!query_result) {
+        throw Error("approveMemberRequest() failed");
+      }
+
+      // Email user that their request was approved
+      const email_status = await emailUser(
+        user.email,
+        "Team Request Approved",
+        `Your request to join team ${team_id} has been approved.`,
+      );
+
+      if (!email_status) {
+        throw Error("Error sending approval email");
+      }
+
+      return res.status(200).json({
+        message: "Successfully approved team request.",
+      });
+    } else {
+      // Email user that their request was denied
+      const email_status = await emailUser(
+        user.email,
+        "Team Request Denied",
+        `Your request to join team ${team_id} has been denied.`,
+      );
+
+      if (!email_status) {
+        throw Error("Error sending denial email");
+      }
+
+      return res.status(200).json({
+        message: "Successfully denied team request.",
+      });
+    }
+  } catch (error) {
+    console.log("Failed: ", error);
+    return res.status(500).json({
+      error: "Error approving team request.",
+    });
+  }
+}
+
+async function getPendingMemberApprovals(req: any, res: any) {
+  let { team_id } = req.body;
+  if (!team_id) {
+    console.error("Missing request fields.");
+    return res.status(400).json({
+      error: "Missing request fields.",
+    });
+  }
+
+  try {
+    const query_res = await getPendingMemberApprovalsQuery(team_id);
+    if (!query_res) {
+      throw Error("getPendingMemberApprovals() failed");
+    }
+
+    return res.status(200).json({
+      pending_approvals: query_res,
+    });
+  } catch (error) {
+    console.log("Failed: ", error);
+    return res.status(500).json({
+      error: "Error fetching pending member approvals.",
+    });
+  }
+}
 
 async function leaveTeam(req: any, res: any) {
   let { team_id, user_id } = req.body;
@@ -201,4 +293,5 @@ export {
   approveTeamRequest,
   removeTeamMember,
   leaveTeam,
+  getPendingMemberApprovals,
 };

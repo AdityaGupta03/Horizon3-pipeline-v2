@@ -3,7 +3,7 @@ import { TeamMemberPosition } from "../../types/teamMembers.type.js";
 
 async function addTeamMemberFunc(
   team_id: number,
-  creator_id: number,
+  member_id: number,
   member_role: TeamMemberPosition,
 ): Promise<boolean> {
   const query = `
@@ -12,7 +12,7 @@ async function addTeamMemberFunc(
   `;
 
   try {
-    await db_pool.query(query, [creator_id, team_id, member_role]);
+    await db_pool.query(query, [member_id, team_id, member_role]);
     return true;
   } catch (error) {
     console.error("addTeamMemberFunc(): ", error);
@@ -54,7 +54,7 @@ async function createTeamAndAddCreator(team_name: string, creator_id: number) {
   }
 }
 
-async function getTeamFromIDQuery(team_id: Number) {
+async function getTeamFromIDQuery(team_id: number) {
   const query = `
     SELECT team_id, team_name
     FROM teams
@@ -90,26 +90,20 @@ async function getTeamsFromUserIDQuery(user_id: string) {
   }
 }
 
-async function requestToJoinTeamQuery(team_id: Number, user_id: Number) {
-  const query = `
-    INSERT INTO team_members (member_id, team_id, member_role)
-    VALUES ($1, $2, $3)
-  `;
-
+async function requestToJoinTeamQuery(team_id: number, user_id: number) {
   try {
-    await db_pool.query(query, [
-      user_id,
+    return await addTeamMemberFunc(
       team_id,
+      user_id,
       TeamMemberPosition.Requested,
-    ]);
-    return true;
+    );
   } catch (error) {
     console.error("requestToJoinTeamQuery(): ", error);
     return false;
   }
 }
 
-async function getTeamAdminsAndCreatorsQuery(team_id: Number) {
+async function getTeamAdminsAndCreatorsQuery(team_id: number) {
   const query = `
     SELECT member_id, u.username, u.email
     FROM team_members tm
@@ -131,9 +125,9 @@ async function getTeamAdminsAndCreatorsQuery(team_id: Number) {
 }
 
 async function removeTeamMemberQuery(
-  team_id: Number,
-  user_id: Number,
-  member_id: Number,
+  team_id: number,
+  user_id: number,
+  member_id: number,
 ) {
   const query = `
     DELETE FROM team_members
@@ -157,7 +151,7 @@ async function removeTeamMemberQuery(
   }
 }
 
-async function leaveTeamQuery(team_id: Number, user_id: Number) {
+async function leaveTeamQuery(team_id: number, user_id: number) {
   const query = `
     DELETE FROM team_members
     WHERE member_id = $1 AND team_id = $2
@@ -172,6 +166,39 @@ async function leaveTeamQuery(team_id: Number, user_id: Number) {
   }
 }
 
+async function getPendingMemberApprovalsQuery(team_id: number) {
+  const query = `
+    SELECT member_id, u.username, u.email
+    FROM team_members tm
+    JOIN users u ON tm.member_id = u.user_id
+    WHERE team_id = $1 AND member_role = 'requested'
+  `;
+
+  try {
+    const res = await db_pool.query(query, [team_id]);
+    return res.rows;
+  } catch (error) {
+    console.error("getPendingMemberApprovalsQuery(): ", error);
+    return null;
+  }
+}
+
+async function approveMemberRequest(team_id: number, member_id: number) {
+  const query = `
+    UPDATE team_members
+    SET member_role = 'member'
+    WHERE team_id = $1 AND member_id = $2
+  `;
+
+  try {
+    await db_pool.query(query, [team_id, member_id]);
+    return true;
+  } catch (error) {
+    console.error("approveMemberRequest(): ", error);
+    return false;
+  }
+}
+
 export {
   createTeamAndAddCreator,
   getTeamsFromUserIDQuery,
@@ -180,4 +207,6 @@ export {
   getTeamFromIDQuery,
   removeTeamMemberQuery,
   leaveTeamQuery,
+  getPendingMemberApprovalsQuery,
+  approveMemberRequest,
 };
