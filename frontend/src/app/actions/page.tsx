@@ -3,6 +3,8 @@ import "./actions.css";
 import React, { useState, FormEvent, useEffect } from "react";
 import yaml from "js-yaml";
 const yamlContent = `name: H3-Pipeline-Analysis
+const yamlContent = `
+name: H3-Pipeline-Analysis
 
 on:
   push:
@@ -70,7 +72,6 @@ const actions = () => {
   return (
     <div className="github-container">
       <div>
-        <h2>GitHub Actions Configuration</h2>
         <p>
           Please insert the yaml file into a directory .github/actions in your
           git repo. If you already have a github actions configuration, please
@@ -93,13 +94,12 @@ const actions = () => {
             Get .yml file
           </button>
           {githubAnalyzeError && (
-            <p className="hash_codes_mezzy">{githubAnalyzeError}</p>
+            <p className="error-message">{githubAnalyzeError}</p>
           )}
         </form>
       </div>
       <div>
-        <h3>YAML Configuration</h3>
-        <pre>{yamlContent}</pre>
+        <pre>{data ? JSON.stringify(data, null, 2) : "Loading..."}</pre>
       </div>
     </div>
   );
