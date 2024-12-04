@@ -25,7 +25,7 @@ import {
  * @param {Object} res - The response object to send back to the client
  * @returns {Object} A response with a status code and JSON body
  */
-async function createAccount(req, res) {
+async function createAccount(req: any, res: any) {
   console.log("createAccount(): Creating new account...");
   const { username, password, email } = req.body;
 
@@ -129,7 +129,7 @@ async function createAccount(req, res) {
  * @param {Object} res - The response object to send back to the client
  * @returns {Object} A response with a status code and JSON body
  */
-async function verifyAccountEmail(req, res) {
+async function verifyAccountEmail(req: any, res: any) {
   const { email, verification_code } = req.body;
 
   // Check if request json is missing necessary parameters
@@ -189,7 +189,7 @@ async function verifyAccountEmail(req, res) {
  * @param {Object} res - The response object to send back to the client
  * @returns {Object} A response with a status code and JSON body
  */
-async function loginToAccount(req, res) {
+async function loginToAccount(req: any, res: any) {
   const { username, password } = req.body;
 
   // Check if request json is missing necessary parameters
@@ -248,7 +248,7 @@ async function loginToAccount(req, res) {
  * @param {Object} res - The response object to send back to the client
  * @returns {Object} A response with a status code and JSON body
  */
-async function changeUsername(req, res) {
+async function changeUsername(req: any, res: any) {
   const { user_id, new_username } = req.body;
 
   // Check if request json is missing necessary parameters
@@ -304,7 +304,7 @@ async function changeUsername(req, res) {
  * @param {Object} res - The response object to send back to the client
  * @returns {Object} A response with a status code and JSON body
  */
-async function changePassword(req, res) {
+async function changePassword(req: any, res: any) {
   const { user_id, old_password, new_password } = req.body;
 
   // Check if request json is missing necessary parameters
@@ -359,7 +359,7 @@ async function changePassword(req, res) {
  * @param {Object} res - The response object to send back to the client
  * @returns {Object} A response with a status code and JSON body
  */
-async function deleteAccount(req, res) {
+async function deleteAccount(req: any, res: any) {
   const { user_id } = req.body;
 
   // Check if request json is missing necessary parameters
@@ -397,65 +397,6 @@ async function deleteAccount(req, res) {
   }
 }
 
-async function getReports(req, res) {
-  const { user_id } = req.body;
-  if (!user_id) {
-    console.error("getReports(): Missing user information...");
-    return res.status(400).json({
-      error: "Missing required information.",
-    });
-  }
-  try {
-    // Check if user specified exists
-    const user_acc = await getAccountFromUserIDQuery(user_id);
-    if (!user_acc) {
-      console.error("User account doesn't exist: ", user_id);
-      return res.status(404).json({
-        error: "User account not found",
-      });
-    }
-
-    // Delete the specified user account (cascade deletes all associated data - check schema)
-    const query_res = await getReportsQuery(user_id);
-    if (!query_res) {
-      console.error("getReports(): Error getting repos");
-      throw Error;
-    } else {
-      console.log(query_res);
-      const reportList = query_res.map((report) => ({
-        id: report.report_id.toString(),
-        name: report.report_url,
-        vuln: report.high_prob_flag,
-      }));
-      return res.status(200).json({
-        message: "Success adding repo!",
-        reports: reportList,
-      });
-    }
-  } catch (error) {
-    console.error("Error deleting account:", error);
-    return res.status(500).json({
-      error: "Error deleting account",
-    });
-  }
-}
-
-async function removeReport(req, res) {
-  console.log("wifejapoifejewa");
-  console.log(req.body.url);
-  const query = await remove_report(req.body.url);
-  if (!query) {
-    console.error("Error deleting report:", error);
-    return res.status(500).json({
-      error: "Error deleting report",
-    });
-  } else {
-    return res.status(200).json({
-      message: "Report deleted successfully",
-    });
-  }
-}
-
 export {
   createAccount,
   verifyAccountEmail,
@@ -463,6 +404,4 @@ export {
   changeUsername,
   changePassword,
   deleteAccount,
-  getReports,
-  removeReport,
 };

@@ -12,7 +12,5 @@ userRouter.post("/change_username", accController.changeUsername);
 userRouter.post("/delete_account", accController.deleteAccount);
 userRouter.post("/change_password", accController.changePassword);
 userRouter.post("/change_password", accController.changePassword);
-userRouter.post("/get_reports", accController.getReports);
-userRouter.post("/remove_report", accController.removeReport);
 
 export default userRouter;
