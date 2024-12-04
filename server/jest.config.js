@@ -6,7 +6,7 @@ export default {
     "!**/jest.config.js",
     "!**/coverage/**",
     "!**/server.js",
-    "!**/helpers/**",
+    "!**/utils/**",
   ],
   moduleFileExtensions: ["js"],
   testEnvironment: "node",

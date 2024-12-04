@@ -1,13 +1,16 @@
-import { Kafka } from "kafkajs";
+import { Kafka, Partitioners } from "kafkajs";
+import { GitAnalysisMeta } from "../types/kafkameta.type.js";
 
 const kafka = new Kafka({
   clientId: "my-backend",
   brokers: ["192.168.4.63:9092"], // Kafka broker URL
 });
 
-const producer = kafka.producer();
+const producer = kafka.producer({
+  createPartitioner: Partitioners.LegacyPartitioner,
+});
 
-async function sendKafkaEvent(eventType, metadata) {
+async function sendKafkaEvent(eventType: string, metadata: GitAnalysisMeta) {
   console.log("sendKafkaEvent()...");
   let status;
 

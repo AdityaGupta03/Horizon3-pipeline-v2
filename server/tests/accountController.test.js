@@ -3,12 +3,12 @@ import app from "../server";
 
 import * as accountQueries from "../database/queries/accountQueries.js";
 import * as verificationQueries from "../database/queries/verificationQueries.js";
-import * as emailFuncs from "../helpers/emailFuncs.js";
-import * as encryptionFuncs from "../helpers/encryptionFuncs.js";
+import * as emailFuncs from "../utils/emailFuncs.js";
+import * as encryptionFuncs from "../utils/encryptionFuncs.js";
 
-// Mock the helpers/dependencies
-jest.mock("../helpers/encryptionFuncs.js");
-jest.mock("../helpers/emailFuncs.js");
+// Mock the utils/dependencies
+jest.mock("../utils/encryptionFuncs.js");
+jest.mock("../utils/emailFuncs.js");
 jest.mock("../database/queries/verificationQueries.js");
 jest.mock("../database/queries/accountQueries.js");
 

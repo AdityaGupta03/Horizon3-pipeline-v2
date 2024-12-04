@@ -2,6 +2,7 @@
 import "./actions.css";
 import React, { useState, FormEvent, useEffect } from "react";
 import yaml from "js-yaml";
+const yamlContent = `name: H3-Pipeline-Analysis
 const yamlContent = `
 name: H3-Pipeline-Analysis
 
@@ -18,7 +19,7 @@ jobs:
       - name: Make API call to local server
         run: |
           # Use curl to call the API endpoint, for example:
-          curl -X POST "https://c93a-195-252-220-98.ngrok-free.app/api/git/analyze_repo" -H "Content-Type: application/json" -d '{"repo_id": "<your_hash>"}'
+          curl -X POST "https://718a-195-252-220-98.ngrok-free.app/api/git/analyze_repo" -H "Content-Type: application/json" -d '{"repo_id": "<your_hash>"}'
 `;
 
 const actions = () => {
