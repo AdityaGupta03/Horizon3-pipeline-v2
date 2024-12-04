@@ -1,39 +1,18 @@
 import { Router } from "express";
-import multer, { Multer } from "multer";
 
-const upload: Multer = multer({ dest: "../uploads/" });
-
-import {
-  createAccount,
-  verifyAccountEmail,
-  loginToAccount,
-  changeUsername,
-  changePassword,
-  deleteAccount,
-  getReports,
-  removeReport,
-} from "../controllers/accountController.js";
-
-import {
-  uploadFile,
-  createFolder,
-  downloadFile,
-  delete_file,
-} from "../controllers/fileController.js";
-
-import { runDocker } from "../controllers/binDiffController.js";
+import * as accController from "../controllers/accountController.js";
 
 const userRouter: Router = Router();
 
 // Define post routes and corresponding controller functions
-userRouter.post("/create_account", createAccount);
-userRouter.post("/verify_email", verifyAccountEmail);
-userRouter.post("/login", loginToAccount);
-userRouter.post("/change_username", changeUsername);
-userRouter.post("/delete_account", deleteAccount);
-userRouter.post("/change_password", changePassword);
-userRouter.post("/change_password", changePassword);
-userRouter.post("/get_reports", getReports);
-userRouter.post("/remove_report", removeReport);
+userRouter.post("/create_account", accController.createAccount);
+userRouter.post("/verify_email", accController.verifyAccountEmail);
+userRouter.post("/login", accController.loginToAccount);
+userRouter.post("/change_username", accController.changeUsername);
+userRouter.post("/delete_account", accController.deleteAccount);
+userRouter.post("/change_password", accController.changePassword);
+userRouter.post("/change_password", accController.changePassword);
+userRouter.post("/get_reports", accController.getReports);
+userRouter.post("/remove_report", accController.removeReport);
 
 export default userRouter;

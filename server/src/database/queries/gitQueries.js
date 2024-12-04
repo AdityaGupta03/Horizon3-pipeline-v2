@@ -32,6 +32,20 @@ async function createUserRepo(
   }
 }
 
+async function deleteRepoQueryFromHash(user_id, repo_hash) {
+  const query = `
+    DELETE FROM repos WHERE hash=$1 and creator_id=$2
+  `;
+
+  try {
+    const result = await db_pool.query(query, [repo_hash, user_id]);
+    return result.rowCount > 0;
+  } catch (error) {
+    console.error("Error deleting repos query", error);
+    throw error;
+  }
+}
+
 async function getReposFromUserID(user_id) {
   const query = `
     SELECT * FROM repos WHERE creator_id=$1;
@@ -88,10 +102,27 @@ async function getRepoFromHash(hash) {
   }
 }
 
+async function addRepoToTeam(repo_id, team_id) {
+  const query = `
+    INSERT INTO team_repos (repo_id, team_id)
+    VALUES ($1, $2)
+  `;
+
+  try {
+    const result = await db_pool.query(query, [repo_id, team_id]);
+    return result.rows[0];
+  } catch (error) {
+    console.error("Error adding repo to team:", error);
+    throw error;
+  }
+}
+
 export {
   createUserRepo,
   getReposFromUserID,
   getRepoFromName,
   getRepoFromID,
   getRepoFromHash,
+  deleteRepoQueryFromHash,
+  addRepoToTeam,
 };

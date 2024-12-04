@@ -5,8 +5,9 @@ import {
   createUserRepo,
   getReposFromUserID,
   getRepoFromName,
-  getRepoFromID,
   getRepoFromHash,
+  deleteRepoQueryFromHash,
+  addRepoToTeam,
 } from "../database/queries/gitQueries.js";
 
 import { sendKafkaEvent } from "../utils/kafkaFuncs.js";
@@ -103,6 +104,42 @@ async function addGithubRepo(req: any, res: any) {
     }
     return res.status(500).json({
       error: "Error adding repo",
+    });
+  }
+}
+
+async function removeGitRepo(req: any, res: any) {
+  const { user_id, repo_hash } = req.body;
+
+  // Check for missing request params
+  if (!user_id || !repo_hash) {
+    console.error("removeGitRepo(): Missing request params");
+    return res.status(400).json({
+      error: "Missing required information.",
+    });
+  }
+
+  try {
+    // TODO add logic for deleting a repository (assume exists?)
+    const deletedRepo = await deleteRepoQueryFromHash(repo_hash);
+
+    let msg: string;
+    let errCode: Number;
+    if (deletedRepo) {
+      msg = "Successfully deleted the repository!";
+      errCode = 200;
+    } else {
+      msg = "Failed to delete repository - does not exist.";
+      errCode = 404;
+    }
+
+    return res.status(errCode).json({
+      message: msg,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      error: "Error remove repository.",
     });
   }
 }
@@ -221,4 +258,44 @@ async function analyzeGithubRepo(req: any, res: any) {
   }
 }
 
-export { addGithubRepo, getGithubReposFromUser, analyzeGithubRepo };
+async function addTeamToRepo(req: any, res: any) {
+  let { team_id, repo_hash } = req.body;
+  if (!team_id || !repo_hash) {
+    console.error("Missing request fields.");
+    return res.status(400).json({
+      error: "Missing request fields.",
+    });
+  }
+
+  try {
+    const repo = await getRepoFromHash(repo_hash);
+    if (!repo) {
+      console.error("Repo doesn't exist: ", repo_hash);
+      return res.status(404).json({
+        error: "Repo not found",
+      });
+    }
+
+    const query_result = await addRepoToTeam(repo.id, team_id);
+    if (!query_result) {
+      throw Error("addTeamToRepo() failed");
+    }
+
+    return res.status(200).json({
+      message: "Successfully added team to repo.",
+    });
+  } catch (error) {
+    console.log("Failed: ", error);
+    return res.status(500).json({
+      error: "Error adding team to repo.",
+    });
+  }
+}
+
+export {
+  addGithubRepo,
+  getGithubReposFromUser,
+  analyzeGithubRepo,
+  removeGitRepo,
+  addTeamToRepo,
+};
