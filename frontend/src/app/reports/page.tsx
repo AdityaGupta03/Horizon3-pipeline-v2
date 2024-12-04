@@ -44,6 +44,7 @@ const Reports = () => {
         params: { url: selectedReport },
         responseType: "blob", // Important for handling binary data
       });
+
       // Create a URL for the downloaded file
       console.log(response.data);
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -57,7 +58,7 @@ const Reports = () => {
     }
   };
 
-  const handleDelete = async (e: FormEvent) => {
+  const handleDelete = async (e: FormEvent) => { 
     e.preventDefault();
     console.log(selectedReport);
     try {
@@ -72,6 +73,7 @@ const Reports = () => {
         delay(2000).then(() => {
           setActionMsg("");
         });
+
         console.log(data);
         try {
           const response = await fetch("/api/user/remove_report", {
