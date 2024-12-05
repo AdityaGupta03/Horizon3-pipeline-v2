@@ -16,6 +16,8 @@ import json
 AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 
+# Testing usage: python3 codeql_wrapper.py https://github.com/AdityaGupta03/JavaVulnerable.git JavaVulnerable cs407gitmetadata asdf
+
 s3 = boto3.client(
   's3',
   region_name='us-east-1',
@@ -41,7 +43,7 @@ def create_kafka_producer(bootstrap_servers):
 
 # Setup kafka connection and standard failure event
 kafka_failure = "codeql_failure"
-producer = create_kafka_producer(['192.168.4.63:9092'])
+producer = create_kafka_producer(['10.186.165.52:9092'])
 
 def send_kafka_msg(event_type, msg):
   metadata = {
@@ -74,12 +76,25 @@ class CodeQLAnalyzer:
   def create_database(self, language):
     """Create a CodeQL database for the source code."""
     try:
-      db_name = f"source-code-db"
+      db_name = "source-code-db"
       db_path = os.path.join(self.database_dir, db_name)
+
+      has_maven = os.path.exists(os.path.join(self.source_dir, "pom.xml"))
+      has_gradle = os.path.exists(os.path.join(self.source_dir, "build.gradle"))
+
+      build_command = ""
+      if language == "java":
+        if has_maven:
+          build_command = "--command='mvn compile'"
+        elif has_gradle:
+          build_command = "--command='gradle build'"
+        else:
+          build_command = "--no-run-unnecessary-builds"
+
 
       print(f"Creating CodeQL database for {language}")
       subprocess.run(
-        f"codeql database create {db_path} --language={language} --source-root={self.source_dir}",
+        f"codeql database create {db_path} --language={language} --source-root={self.source_dir} {build_command}",
         shell=True,
         check=True
       )
@@ -88,13 +103,14 @@ class CodeQLAnalyzer:
       print(f"Error creating database: {e}")
       return None
 
-  def run_analysis(self, db_path, query_suite="security-extended"):
+  def run_analysis(self, db_path, query_suite="java/command-line-injection"):
     """Run CodeQL analysis using a specific query suite."""
     try:
       results_path = f"{db_path}-results.sarif"
       print(f"Running CodeQL analysis with {query_suite} suite")
       subprocess.run(
         f"codeql database analyze {db_path} "
+        f"--ram=8192 "
         f"--format=sarif-latest "
         f"--output={results_path} "
         f"{query_suite}",
@@ -109,8 +125,8 @@ class CodeQLAnalyzer:
 def main():
   # Initialize analyzer
   if len(sys.argv) != 6 and len(sys.argv) != 5:
-    print("Usage: python githubProcessing.py <repo_url> <repo_name> <bucket_name> <github_token>")
-    send_kafka_msg(kafka_failure, f"Invalid usage...")
+    print("Usage: python codeql_wrapper.py <repo_url> <repo_name> <bucket_name> <repo_hash> <github_token>")
+    send_kafka_msg(kafka_failure, "Invalid usage...")
     sys.exit()
 
   repo_url = sys.argv[1]
@@ -132,7 +148,9 @@ def main():
       send_kafka_msg(kafka_failure, "Failed to create CodeQL database")
       sys.exit()
 
-    results_path = analyzer.run_analysis(db_path)
+
+    single_queries = 'codeql/java-queries:Security/CWE/CWE-078'
+    results_path = analyzer.run_analysis(db_path, single_queries)
     if not results_path:
       send_kafka_msg(kafka_failure, "Failed to run analysis")
       sys.exit()
@@ -164,7 +182,7 @@ def main():
 
     # Upload to S3
     timestamp = time.strftime("%Y%m%d-%H%M%S")
-    results_filename = f"{repo_name}_{timestamp}_sonar.json"
+    results_filename = f"{repo_name}_{timestamp}_codeql.json"
     s3.put_object(
       Bucket=bucket_name,
       Key=results_filename,
