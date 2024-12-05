@@ -16,7 +16,8 @@ import { emailUser } from "../utils/emailFuncs.js";
 import { GitAnalysisMeta } from "../types/kafkameta.type.js";
 
 async function addGithubRepo(req: any, res: any) {
-  const { user_id, url, token, owner, repo_name } = req.body;
+  const { user_id, url, token, owner, repo_name, staticAnalysisTool, LLMtool } = req.body;
+//@TODO have got the fields for type of static analyssi have to update
 
   // Check if request json is missing necessary parameters
   if (!user_id || !url || !owner || !repo_name) {

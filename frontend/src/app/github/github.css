@@ -50,12 +50,32 @@ input.github-input {
 .github-select {
   width: 100%;
   padding: 10px;
-  margin: 10px 0;
-  border: none;
-  border-radius: 5px;
-  background-color: #f2f2f2;
-  font-size: 14px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
   color: #333;
+  background-color: #f2f2f2;
+}
+
+/* Style for placeholder option */
+.github-select option[value=""] {
+  color: #666;
+  font-style: italic;
+}
+
+/* Style for actual options */
+.github-select option:not([value=""]) {
+  color: #333;
+  font-style: normal;
+}
+
+.github-select:required:invalid {
+  color: #666;
+}
+
+.github-select + .github-select {
+  margin-top: 10px;
 }
 
 .github-submit {
