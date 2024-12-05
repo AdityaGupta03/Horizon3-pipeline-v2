@@ -286,7 +286,7 @@ input[type="email"]:focus {
   margin-top: 5%;
 
   &::placeholder {
-    color: transparent;
+    color: #000;
   }
 
   &:placeholder-shown ~ .form__label {
