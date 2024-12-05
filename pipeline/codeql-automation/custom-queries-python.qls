@@ -1,3 +1,0 @@
-- query: python/ql/src/Security/CWE-089/SqlInjection.ql
-- query: python/ql/src/Imports/UnusedImport.ql
-- query: python/ql/src/Classes/UnusedClass.ql

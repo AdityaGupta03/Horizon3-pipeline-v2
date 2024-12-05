@@ -1,3 +1,0 @@
-queries:
-  - name: "Buffer Overflow"
-    query: /opt/codeql-repo/cpp/ql/src/Security/CWE-120/BufferOverflow.ql

@@ -56,7 +56,7 @@ def create_kafka_producer(bootstrap_servers):
 
 # Setup kafka connection and standard failure event
 kafka_failure = "sonar_qube_failure"
-producer = create_kafka_producer(['192.168.4.63:9092'])
+producer = create_kafka_producer(['10.186.165.52:9092'])
 
 def send_kafka_msg(event_type, msg):
   metadata = {
