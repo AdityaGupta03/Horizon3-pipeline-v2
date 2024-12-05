@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import subprocess
 import os
-import shutil
 import requests
 import boto3
 import sys
