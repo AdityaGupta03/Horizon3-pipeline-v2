@@ -17,6 +17,7 @@ import {
   verifyUserAccountQuery,
   getReportsQuery,
   remove_report,
+  getAllUsersQuery
 } from "../database/queries/accountQueries.js";
 
 /**
@@ -397,6 +398,22 @@ async function deleteAccount(req: any, res: any) {
   }
 }
 
+//add a function to get the userid, username, and email of all verified users
+async function getAllUsers(req: any, res: any) {
+  try {
+    const users = await getAllUsersQuery();
+    return res.status(200).json({
+      message: "Retrieved all users successfully",
+      users: users,
+    });
+  } catch (error) {
+    console.error("Error retrieving users:", error);
+    return res.status(500).json({
+      error: "Error retrieving users",
+    });
+  }
+}
+
 export {
   createAccount,
   verifyAccountEmail,
@@ -404,4 +421,5 @@ export {
   changeUsername,
   changePassword,
   deleteAccount,
+  getAllUsers
 };

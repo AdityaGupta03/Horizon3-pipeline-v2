@@ -1,3 +1,8 @@
+.selected-row {
+  background-color: #e0f7fa;
+  font-weight: bold;
+}
+
 .table-container {
   width: 100%;
   overflow-x: auto;

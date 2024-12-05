@@ -72,14 +72,12 @@ async function getTeamFromIDQuery(team_id: number) {
 }
 
 async function getTeamsFromUserIDQuery(user_id: string) {
+  
   const query = `
-    SELECT team_id, team_name
-    FROM teams
-    WHERE team_id IN (
-      SELECT team_id
-      FROM team_members
-      WHERE member_id = $1
-    )
+    SELECT tm.team_id, t.team_name, tm.member_role
+    FROM teams t
+    JOIN team_members tm ON t.team_id = tm.team_id
+    WHERE tm.member_id = $1
   `;
 
   try {
@@ -218,6 +216,42 @@ async function getTeamMembersQuery(team_id: number) {
   }
 } 
 
+// add a function to add a user to a team as a member
+async function addTeamMemberQuery(team_id: number, user_id: number) {
+  try {
+    const success: boolean = await addTeamMemberFunc(
+      team_id,
+      user_id,
+      TeamMemberPosition.Member,
+    );
+
+    if (!success) {
+      console.error("Failed to add creator to team. Rollback query.");
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error("Error creating team:", error);
+    throw error;
+  }
+}
+
+// add a function to get the team id and team name of all teams
+async function getAllTeamsQuery() {
+  const query = `
+    SELECT team_id, team_name
+    FROM teams
+  `;
+
+  try {
+    const res = await db_pool.query(query);
+    return res.rows;
+  } catch (error) {
+    console.error("getAllTeamsQuery(): ", error);
+    return null;
+  }
+}
+
 
 export {
   createTeamAndAddCreator,
@@ -229,5 +263,7 @@ export {
   leaveTeamQuery,
   getPendingMemberApprovalsQuery,
   approveMemberRequest,
-  getTeamMembersQuery
+  getTeamMembersQuery,
+  addTeamMemberQuery,
+  getAllTeamsQuery
 };
