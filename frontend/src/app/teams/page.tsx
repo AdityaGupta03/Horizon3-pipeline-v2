@@ -82,8 +82,10 @@ const Teams = () => {
       <div>
       <Table data={tableData} />
       </div>
-      <div>
-      <button onClick={() => setTableData([])}>Back</button>
+      <div className="team-container">
+      <div className="team-form-container">
+      <button className="team-submit" onClick={() => setTableData([])}>Back</button>
+      </div>
       </div>
     </div>
   ) : (
