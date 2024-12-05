@@ -8,6 +8,7 @@ import {
   removeTeamMember,
   leaveTeam,
   getPendingMemberApprovals,
+  getTeamMembers,
 } from "../controllers/teamController.js";
 
 const teamRouter: Router = Router();
@@ -20,5 +21,6 @@ teamRouter.post("/approve_team_request", approveTeamRequest);
 teamRouter.post("/kick_member", removeTeamMember);
 teamRouter.post("/leave_team", leaveTeam);
 teamRouter.post("/get_pending_requests", getPendingMemberApprovals);
+teamRouter.post("/get_team_members", getTeamMembers);
 
 export default teamRouter;

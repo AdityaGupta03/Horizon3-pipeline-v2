@@ -8,6 +8,7 @@ import {
   leaveTeamQuery,
   getPendingMemberApprovalsQuery,
   approveMemberRequest,
+  getTeamMembersQuery,
 } from "../database/queries/teamQueries.js";
 
 import { getAccountFromUserIDQuery } from "../database/queries/accountQueries.js";
@@ -285,6 +286,31 @@ async function removeTeamMember(req: any, res: any) {
   }
 }
 
+async function getTeamMembers(req: any, res: any) {
+  let { team_id } = req.body;
+  if (!team_id) {
+    console.error("Missing request fields.");
+    return res.status(400).json({
+      error: "Missing request fields.",
+    });
+  }
+
+  try {
+    const query_result = await getTeamMembersQuery(team_id);
+    if (!query_result) {
+      throw Error("getTeamMembers() failed");
+    }
+    return res.status(200).json({
+      members: query_result,
+    });
+  } catch (error) {
+    console.log("Failed: ", error);
+    return res.status(500).json({
+      error: "Error fetching team members.",
+    });
+  }
+}
+
 export {
   createTeam,
   addMember,
@@ -294,4 +320,5 @@ export {
   removeTeamMember,
   leaveTeam,
   getPendingMemberApprovals,
+  getTeamMembers,
 };

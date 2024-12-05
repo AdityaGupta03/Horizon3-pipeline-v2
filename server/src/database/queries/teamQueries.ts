@@ -48,6 +48,7 @@ async function createTeamAndAddCreator(team_name: string, creator_id: number) {
       console.error("Failed to add creator to team. Rollback query.");
       return false;
     }
+    return true;
   } catch (error) {
     console.error("Error creating team:", error);
     throw error;
@@ -199,6 +200,25 @@ async function approveMemberRequest(team_id: number, member_id: number) {
   }
 }
 
+// add a function to get members of a given team
+async function getTeamMembersQuery(team_id: number) {
+  const query = `
+    SELECT member_id, u.username, u.email
+    FROM team_members tm
+    JOIN users u ON tm.member_id = u.user_id
+    WHERE team_id = $1
+  `;
+
+  try {
+    const res = await db_pool.query(query, [team_id]);
+    return res.rows;
+  } catch (error) {
+    console.error("getTeamMembersQuery(): ", error);
+    return null;
+  }
+} 
+
+
 export {
   createTeamAndAddCreator,
   getTeamsFromUserIDQuery,
@@ -209,4 +229,5 @@ export {
   leaveTeamQuery,
   getPendingMemberApprovalsQuery,
   approveMemberRequest,
+  getTeamMembersQuery
 };

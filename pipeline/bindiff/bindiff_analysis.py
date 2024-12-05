@@ -18,7 +18,7 @@ def get_vertex_name(v):
     return str(hex(v.address)) + ': ' + v.mangled_name
 
 def render_graph(file, name):
-    dot = graphviz.Digraph()
+    dot = graphviz.Digraph(format='png')
     for v in file1.call_graph.vertex:
         s = get_vertex_name(v)
         dot.node(str(hex(v.address)), s)
