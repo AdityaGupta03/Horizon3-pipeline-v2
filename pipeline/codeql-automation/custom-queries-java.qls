@@ -1,0 +1,3 @@
+queries:
+  - name: "SQL Injection"
+    query: /opt/codeql-repo/java/ql/src/Security/CWE-089/SqlInjection.ql

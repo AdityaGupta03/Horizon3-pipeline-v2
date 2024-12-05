@@ -1,0 +1,3 @@
+queries:
+  - name: "XSS Vulnerability"
+    query: /opt/codeql-repo/javascript/ql/src/Security/CWE-079/XSS.ql
