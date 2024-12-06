@@ -299,9 +299,9 @@ const Teams = () => {
     </div>
     </div>
   ) : showSearchTeam ? (
-    <Search onSelectItem={handleSelectTeam} searchType="teams" />
+    <Search onSelectItem={handleSelectTeam} searchType="teams" onBack={() => setShowSearchTeam(false)} title="Search for a team to join"/>
   ) : showSearch ? (
-    <Search onSelectItem={handleSelectUser} searchType="users" />
+    <Search onSelectItem={handleSelectUser} searchType="users" onBack={() => setShowSearch(false)} title="Search for a user to add"/>
   ) : tableData.length > 0 ? (
     <div>
       <div>
