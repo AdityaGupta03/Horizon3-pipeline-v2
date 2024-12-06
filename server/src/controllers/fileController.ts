@@ -87,7 +87,7 @@ async function createFolder(req: any, res: any): Promise<void> {
 async function downloadFile(req: any, res: any) {
   console.log(req.body);
   const params = {
-    Bucket: "reports407",
+    Bucket: req.query.bucket,
     Key: req.query.url,
   };
 

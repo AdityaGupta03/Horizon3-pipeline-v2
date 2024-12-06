@@ -41,7 +41,7 @@ const Reports = () => {
     console.log(selectedReport);
     try {
       const response = await axios.get("/api/user/download_file", {
-        params: { url: selectedReport },
+        params: { bucket: "reports407", url: selectedReport },
         responseType: "blob", // Important for handling binary data
       });
 

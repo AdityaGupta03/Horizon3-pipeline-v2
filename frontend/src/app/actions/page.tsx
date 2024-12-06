@@ -1,30 +1,9 @@
 "use client";
 import "./actions.css";
+import axios from "axios";
 import React, { useState, FormEvent, useEffect } from "react";
-import yaml from "js-yaml";
-const yamlContent = `
-name: H3-Pipeline-Analysis
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  call-local-api:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Make API call to local server
-        run: |
-          # Use curl to call the API endpoint, for example:
-          curl -X POST "https://718a-195-252-220-98.ngrok-free.app/api/git/analyze_repo" -H "Content-Type: application/json" -d '{"repo_id": "<your_hash>"}'
-`;
-
+const url = "718a-195-252-220-98.ngrok-free.app";
 const actions = () => {
-  type YamlData = Record<string, any> | null;
-  const [data, setData] = useState<YamlData>(null);
-
   type GithubLink = {
     id: string;
     name: string;
@@ -33,13 +12,12 @@ const actions = () => {
   const [githubLinks, setGithubLinks] = useState<GithubLink[]>([]);
   const [selectedGithubLink, setSelectedGithubLink] = useState<string>("");
   const [githubAnalyzeError, setGithubAnalyzeError] = useState<string>("");
+  const [githubAnalyzeError2, setGithubAnalyzeError2] = useState<string>("");
 
   const user_id = sessionStorage.getItem("user_id");
 
   useEffect(() => {
     getGithubLinks();
-    const yamlData = yaml.load(yamlContent) as Record<string, any>; // Parse YAML to JSON
-    setData(yamlData);
   }, []);
 
   const getGithubLinks = async () => {
@@ -63,8 +41,26 @@ const actions = () => {
     console.log(selectedGithubLink);
     if (selectedGithubLink) {
       setGithubAnalyzeError(
-        "Please update <your_hash> to: " + selectedGithubLink,
+        "Please update <your_hash> to: " + selectedGithubLink
       );
+      setGithubAnalyzeError2("Please update <URL> to: " + url);
+      try {
+        const response = await axios.get("/api/user/download_file", {
+          params: { bucket: "horizon3configs", url: "example.yaml" },
+          responseType: "blob", // Important for handling binary data
+        });
+  
+        // Create a URL for the downloaded file
+        console.log(response.data);
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", "example.yaml");
+        document.body.appendChild(link);
+        link.click();
+      } catch (error) {
+        console.error("Error downloading the file", error);
+      }
     }
   };
 
@@ -95,10 +91,10 @@ const actions = () => {
           {githubAnalyzeError && (
             <p className="error-message">{githubAnalyzeError}</p>
           )}
+          {githubAnalyzeError2 && (
+            <p className="error-message">{githubAnalyzeError2}</p>
+          )}
         </form>
-      </div>
-      <div>
-        <pre>{data ? JSON.stringify(data, null, 2) : "Loading..."}</pre>
       </div>
     </div>
   );
