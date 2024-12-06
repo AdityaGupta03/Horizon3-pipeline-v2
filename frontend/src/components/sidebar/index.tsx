@@ -2,7 +2,7 @@
 
 "use client";
 
-import { LogOutIcon, GitFork, LayoutDashboard, Binary, CircleUserRound, } from "lucide-react";
+import { LogOutIcon, GitFork, LayoutDashboard, Binary, CircleUserRound, FileText, ActivitySquare, Users} from "lucide-react";
 import SidebarItem from "./item";
 import path from "path";
 
@@ -11,9 +11,9 @@ const items = [
   { name: "Github", path: "/github", icon: GitFork },
   { name: "Binaries", path: "/binaries", icon: Binary },
   { name: "Account", path: "/accounts", icon: CircleUserRound },
-  { name: "Reports", path: "/reports", icon: CircleUserRound }, 
-  {name: "Actions", path: "/actions", icon: CircleUserRound},
-  {name: "Teams", path: "/teams", icon: CircleUserRound},
+  { name: "Reports", path: "/reports", icon: FileText }, 
+  {name: "Actions", path: "/actions", icon: ActivitySquare},
+  {name: "Teams", path: "/teams", icon: Users},
 ];
 
 const Sidebar = ({ onLogout }: { onLogout: () => void }) => {
