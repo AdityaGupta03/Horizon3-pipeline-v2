@@ -20,7 +20,7 @@ async function addTeamMemberFunc(
   }
 }
 
-async function createTeamAndAddCreator(team_name: string, creator_id: number) {
+async function createTeamAndAddCreator(team_name: string, creator_id: number, repo_hash: string) {
   // TODO Migrate this to use transaction instead of manual rollback
   const createTeamQuery = `
     INSERT INTO teams (team_name)
@@ -37,17 +37,25 @@ async function createTeamAndAddCreator(team_name: string, creator_id: number) {
     }
 
     const team_id = res.rows[0].team_id;
-    const success: boolean = await addTeamMemberFunc(
+    var success: boolean = await addTeamMemberFunc(
       team_id,
       creator_id,
       TeamMemberPosition.Creator,
     );
+
+    if (success) {
+      const query_result = await addRepoToTeamQuery(team_id, repo_hash);
+      if (!query_result) {
+        success = false;
+      }
+    }
 
     if (!success) {
       await db_pool.query(rollbackQuery, [team_id]);
       console.error("Failed to add creator to team. Rollback query.");
       return false;
     }
+    
     return true;
   } catch (error) {
     console.error("Error creating team:", error);
@@ -252,6 +260,21 @@ async function getAllTeamsQuery() {
   }
 }
 
+async function addRepoToTeamQuery(team_id: number, repo_hash: string) {
+  const query = `
+    INSERT INTO team_repos (team_id, repo_hash)
+    VALUES ($1, $2)
+  `;
+
+  try {
+    await db_pool.query(query, [team_id, repo_hash]);
+    return true;
+  } catch (error) {
+    console.error("linkTeamToRepo(): ", error);
+    return false;
+  }
+}
+
 
 export {
   createTeamAndAddCreator,
@@ -265,5 +288,6 @@ export {
   approveMemberRequest,
   getTeamMembersQuery,
   addTeamMemberQuery,
-  getAllTeamsQuery
+  getAllTeamsQuery,
+  addRepoToTeamQuery
 };

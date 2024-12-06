@@ -11,6 +11,7 @@ import {
   getTeamMembersQuery,
   addTeamMemberQuery,
   getAllTeamsQuery,
+  addRepoToTeamQuery
 } from "../database/queries/teamQueries.js";
 
 import { getAccountFromUserIDQuery } from "../database/queries/accountQueries.js";
@@ -20,7 +21,7 @@ import { emailUser } from "../utils/emailFuncs.js";
 async function createTeam(req: any, res: any) {
   console.log("Creating a team...");
 
-  const { user_id, team_name } = req.body;
+  const { user_id, team_name, repo_hash } = req.body;
   if (!user_id || !team_name) {
     console.error("Missing request fields.");
     return res.status(400).json({
@@ -31,7 +32,7 @@ async function createTeam(req: any, res: any) {
   try {
     // Find any existing teams with the same name
 
-    const status = await createTeamAndAddCreator(team_name, user_id);
+    const status = await createTeamAndAddCreator(team_name, user_id, repo_hash);
     if (!status) {
       throw Error("createTeamRoutine() failed");
     }
@@ -412,6 +413,7 @@ async function getAllTeams(req: any, res: any) {
     });
   }
 }
+
 
 export {
   createTeam,

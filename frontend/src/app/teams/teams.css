@@ -82,3 +82,14 @@ input.team-input {
   font-size: 12px;
   margin-top: 10px;
 }
+
+.github-select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  color: #333;
+  background-color: #f2f2f2;
+}

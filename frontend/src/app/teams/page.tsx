@@ -18,12 +18,32 @@ const Teams = () => {
   const [showSearchTeam, setShowSearchTeam] = useState<boolean>(false);
   const [teamError2, setTeamError2] = useState<string>("");
   const [showPendingRequests, setShowPendingRequests] = useState<boolean>(false);
+  const [githubLinks, setGithubLinks] = useState<{ id: string; name: string }[]>([]);
+  const [selectedGithubLink, setSelectedGithubLink] = useState<string>("");
+
 
   const user_id = sessionStorage.getItem("user_id");
 
   useEffect(() => {
     getTeams();
+    getGithubLinks();
   }, []);
+
+  const getGithubLinks = async () => {
+    try {
+      const response = await fetch("/api/git/get_repos_from_user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setGithubLinks(data.repos);
+      }
+    } catch (error) {
+      console.error("Error fetching GitHub links:", error);
+    }
+  };
 
   const getTeams = async () => {
     try {
@@ -44,12 +64,11 @@ const Teams = () => {
 
   const handleTeamSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
     try {
       const response = await fetch("/api/team/create_team", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id, team_name: teamName }),
+        body: JSON.stringify({ user_id, team_name: teamName, repo_hash: selectedGithubLink }),
       });
 
       if (response.ok) {
@@ -346,7 +365,23 @@ const Teams = () => {
             placeholder="Team Name"
             value={teamName}
             onChange={(e) => setTeamName(e.target.value)}
+            required
           />
+          </div>
+          <div>
+          <select
+            required
+            value={selectedGithubLink}
+            onChange={(e) => setSelectedGithubLink(e.target.value)}
+            className="github-select"
+          >
+            <option value="" disabled>Choose Repository</option>
+            {githubLinks.map((link) => (
+              <option key={link.id} value={link.id}>
+                {link.name}
+              </option>
+            ))}
+          </select>
           </div>
           <button type="submit" className="team-submit">Create New Team</button>
           {teamError && <p className="error-message">{teamError}</p>}

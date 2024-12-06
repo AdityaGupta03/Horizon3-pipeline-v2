@@ -39,10 +39,10 @@ CREATE TABLE repos (
 
 CREATE TABLE team_repos (
   team_id INT,
-  repo_id INT,
-  PRIMARY KEY (team_id, repo_id), -- primary key is a combination of team and repo
+  repo_hash VARCHAR(255),
+  PRIMARY KEY (team_id, repo_hash), -- primary key is a combination of team and repo
   FOREIGN KEY (team_id) REFERENCES teams (team_id) ON DELETE CASCADE, -- foreign key to teams table with automatic delete
-  FOREIGN KEY (repo_id) REFERENCES repos (id) ON DELETE CASCADE -- foreign key to repos table with automatic delete
+  FOREIGN KEY (repo_hash) REFERENCES repos (hash) ON DELETE CASCADE -- foreign key to repos table with automatic delete
 );
 
 -- Create reports table
