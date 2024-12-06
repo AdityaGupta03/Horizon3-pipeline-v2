@@ -140,6 +140,23 @@ async function remove_report(report_id) {
   }
 }
 
+// add a function to get the userid, username, and email of all verified users
+async function getAllUsersQuery() {
+  const query = `
+    SELECT user_id, username, email
+    FROM users
+    WHERE verified = 1
+  `;
+
+  try {
+    const res = await db_pool.query(query);
+    return res.rows;
+  } catch (error) {
+    console.error("getAllUsersQuery(): ", error);
+    return null;
+  }
+}
+
 export {
   createAccountQuery,
   deleteAccountQuery,
@@ -149,5 +166,6 @@ export {
   updatePasswordQuery,
   verifyUserAccountQuery,
   getReportsQuery,
-  remove_report
+  remove_report,
+  getAllUsersQuery
 };

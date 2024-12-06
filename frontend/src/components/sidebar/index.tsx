@@ -13,6 +13,7 @@ const items = [
   { name: "Account", path: "/accounts", icon: CircleUserRound },
   { name: "Reports", path: "/reports", icon: CircleUserRound }, 
   {name: "Actions", path: "/actions", icon: CircleUserRound},
+  {name: "Teams", path: "/teams", icon: CircleUserRound},
 ];
 
 const Sidebar = ({ onLogout }: { onLogout: () => void }) => {

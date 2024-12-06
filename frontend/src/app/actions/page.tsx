@@ -2,7 +2,6 @@
 import "./actions.css";
 import React, { useState, FormEvent, useEffect } from "react";
 import yaml from "js-yaml";
-const yamlContent = `name: H3-Pipeline-Analysis
 const yamlContent = `
 name: H3-Pipeline-Analysis
 
