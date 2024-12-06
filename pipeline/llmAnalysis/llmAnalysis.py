@@ -99,20 +99,20 @@ def ask_llm(prompt):
 def main():
   try:
     if len(sys.argv) != 4:
-      print("Usage: python githubProcessing.py <sonar_file> <bucket_name> <hash>")
+      print("Usage: python githubProcessing.py <static_results> <bucket_name> <hash>")
       send_kafka_msg(kafka_failure, f"Invalid usage...")
       sys.exit()
 
-    sonar_file = sys.argv[1]
+    static_results = sys.argv[1]
     bucket_name = sys.argv[2]
     repo_hash = sys.argv[3]
 
-    repo_name = sonar_file.split('_')[0]
+    repo_name = static_results.split('_')[0]
 
     try:
-      json_obj = s3.get_object(Bucket=bucket_name, Key=sonar_file)
+      json_obj = s3.get_object(Bucket=bucket_name, Key=static_results)
       json_content = json.loads(json_obj['Body'].read().decode('utf-8'))
-      issues = json_content['issues']['issues']
+      issues = json_content['issues']
       print(issues)
     except Exception as e:
       send_kafka_msg(kafka_failure, f"Error retrieving JSON from S3: {e}")
