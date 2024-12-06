@@ -55,8 +55,12 @@ input[type="email"]:focus {
 
 h1.authform {
   font-weight: bold;
-  margin: 0;
   color: #000;
+  position: absolute;
+  left: 0;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  margin-bottom: 50%;
 }
 
 h1.welcome {
