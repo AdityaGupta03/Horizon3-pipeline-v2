@@ -13,6 +13,8 @@ AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 GOOGLE_API = os.getenv('GOOGLE_API')
 
+KAFKA_IP = os.getenv('KAFKA_IP')
+
 s3 = boto3.client(
   's3',
   region_name='us-east-1',
@@ -38,7 +40,7 @@ def create_kafka_producer(bootstrap_servers):
 
 # Setup kafka connection and standard failure event
 kafka_failure = "llm_analysis_fail"
-producer = create_kafka_producer(['192.168.4.63:9092'])
+producer = create_kafka_producer([f'{KAFKA_IP}:9092'])
 
 def send_kafka_msg(event_type, msg):
   metadata = {

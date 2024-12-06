@@ -12,7 +12,6 @@ from kafka import KafkaProducer
 from kafka.errors import NoBrokersAvailable
 import psycopg2
 import json
-
 from sonarqube import SonarQubeClient
 
 # Get AWS secrets
@@ -29,6 +28,8 @@ POSTGRES_PORT = os.getenv('POSTGRES_PORT')
 # Get SonarQube server info
 SONAR_HOST_URL = os.getenv('SONAR_HOST_URL')
 SONAR_QUBE_TOKEN = os.getenv('SONAR_QUBE_TOKEN')
+
+KAFKA_IP = os.getenv('KAFKA_IP')
 
 # Setup S3 bucket connection
 s3 = boto3.client(
@@ -56,7 +57,7 @@ def create_kafka_producer(bootstrap_servers):
 
 # Setup kafka connection and standard failure event
 kafka_failure = "sonar_qube_failure"
-producer = create_kafka_producer(['10.186.165.52:9092'])
+producer = create_kafka_producer([f'{KAFKA_IP}:9092'])
 
 def send_kafka_msg(event_type, msg):
   metadata = {
