@@ -36,9 +36,12 @@ async function deleteRepoQueryFromHash(user_id, repo_hash) {
   const query = `
     DELETE FROM repos WHERE hash=$1 and creator_id=$2
   `;
-
+  console.log(query);
+  console.log(repo_hash);
+  console.log(user_id);
   try {
     const result = await db_pool.query(query, [repo_hash, user_id]);
+
     return result.rowCount > 0;
   } catch (error) {
     console.error("Error deleting repos query", error);
@@ -117,6 +120,37 @@ async function addRepoToTeam(repo_id, team_id) {
   }
 }
 
+async function modifyTools(repo_id, static_tool, llm_tool) {
+  const query = `
+    UPDATE repo_analysis
+    SET static_tool = $2, llm_tool = $3
+    WHERE repo_id = $1
+  `;
+
+  try {
+    const result = await db_pool.query(query, [repo_id, static_tool, llm_tool]);
+    return true;
+  } catch (error) {
+    console.error("Error modifying tools:", error);
+    return false;
+  }
+}
+
+async function addDefaultTools(repo_id) {
+  const query = `
+    INSERT INTO repo_analysis (repo_id, static_tool, llm_tool)
+    VALUES ($1, $2, $3)
+  `;
+
+  try {
+    const result = await db_pool.query(query, [repo_id, 'codeql', 'gemini' ]);
+    return true;
+  } catch (error) {
+    console.error("Error adding tools:", error);
+    return false;
+  }
+}
+
 export {
   createUserRepo,
   getReposFromUserID,
@@ -125,4 +159,6 @@ export {
   getRepoFromHash,
   deleteRepoQueryFromHash,
   addRepoToTeam,
+  modifyTools,
+  addDefaultTools
 };

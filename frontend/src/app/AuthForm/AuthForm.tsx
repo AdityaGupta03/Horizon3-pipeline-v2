@@ -126,6 +126,7 @@ const AuthForm: React.FC = () => {
     {isSignUp ? (<div></div>) : (<div className="form-container sign-in-container">
         <form onSubmit={handleLogin}>
           <h1 className="authform">Sign in</h1>
+          
           <div>
           <input
             type="text"
@@ -155,12 +156,12 @@ const AuthForm: React.FC = () => {
       <div className="overlay-container">
         <div className="overlay">
           <div className="overlay-panel overlay-left">
-            <h1 className="authform">Welcome</h1>
+            <h1 className="welcome">Welcome</h1>
             <p>Have an account? Sign in!</p>
             <button className="ghost" onClick={togglePanel}>Sign In</button>
           </div>
           <div className="overlay-panel overlay-right">
-            <h1 className="authform">Welcome</h1>
+            <h1 className="welcome">Welcome</h1>
             <p>Don't have an account? Sign Up</p>
             <button className="ghost" onClick={togglePanel}>Sign Up</button>
           </div>

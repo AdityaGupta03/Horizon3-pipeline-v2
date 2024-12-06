@@ -4,9 +4,11 @@ import "./search.css";
 interface SearchProps {
   onSelectItem: (item: { id: string; name: string; email?: string }) => void;
   searchType: "users" | "teams";
+  onBack: () => void;
+  title: string;
 }
 
-const Search: React.FC<SearchProps> = ({ onSelectItem, searchType }) => {
+const Search: React.FC<SearchProps> = ({ onSelectItem, searchType, onBack, title }) => {
   const [query, setQuery] = useState<string>("");
   const [allItems, setAllItems] = useState<{ id: string; name: string; email?: string }[]>([]);
   const [filteredResults, setFilteredResults] = useState<{ id: string; name: string; email?: string }[]>([]);
@@ -51,6 +53,7 @@ const Search: React.FC<SearchProps> = ({ onSelectItem, searchType }) => {
 
   return (
     <div className="search-container">
+      <h1 className="search-title">{title}</h1>
       <div>
         <input
           type="text"
@@ -72,6 +75,13 @@ const Search: React.FC<SearchProps> = ({ onSelectItem, searchType }) => {
             </li>
           ))}
         </ul>
+      </div>
+      <div>
+        <button
+          onClick={onBack}
+          className="search-button">
+            Back
+          </button>
       </div>
     </div>
   );

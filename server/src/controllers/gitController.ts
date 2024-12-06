@@ -8,6 +8,8 @@ import {
   getRepoFromHash,
   deleteRepoQueryFromHash,
   addRepoToTeam,
+  modifyTools,
+  addDefaultTools,
 } from "../database/queries/gitQueries.js";
 
 import { sendKafkaEvent } from "../utils/kafkaFuncs.js";
@@ -16,7 +18,7 @@ import { emailUser } from "../utils/emailFuncs.js";
 import { GitAnalysisMeta } from "../types/kafkameta.type.js";
 
 async function addGithubRepo(req: any, res: any) {
-  const { user_id, url, token, owner, repo_name, staticAnalysisTool, LLMtool } = req.body;
+  const { user_id, url, token, owner, repo_name } = req.body;
 //@TODO have got the fields for type of static analyssi have to update
 
   // Check if request json is missing necessary parameters
@@ -90,6 +92,12 @@ async function addGithubRepo(req: any, res: any) {
       console.error("addGithubRepo(): Error creating repo");
       throw Error;
     } else {
+      const tools_res = await addDefaultTools(query_res.id);
+      console.log(tools_res);
+      if (!tools_res) {
+        console.error("addGithubRepo(): Error adding tools");
+        throw Error;
+      }
       return res.status(200).json({
         message: "Success adding repo!",
       });
@@ -122,7 +130,7 @@ async function removeGitRepo(req: any, res: any) {
 
   try {
     // TODO add logic for deleting a repository (assume exists?)
-    const deletedRepo = await deleteRepoQueryFromHash(repo_hash);
+    const deletedRepo = await deleteRepoQueryFromHash(user_id, repo_hash);
 
     let msg: string;
     let errCode: Number;
@@ -192,7 +200,7 @@ async function getGithubReposFromUser(req: any, res: any) {
 }
 
 async function analyzeGithubRepo(req: any, res: any) {
-  const { repo_id } = req.body;
+  const { repo_id, analysis_type, llm_type } = req.body;
 
   if (!repo_id) {
     console.error("analyzeGithubRepo): Missing user information...");
@@ -220,6 +228,11 @@ async function analyzeGithubRepo(req: any, res: any) {
       return res.status(404).json({
         error: "User account not found",
       });
+    }
+
+    const query_result = await modifyTools(repo.id, analysis_type, llm_type);
+    if (!query_result) {
+      throw Error("modifyTools() failed");
     }
 
     const email_subject = `Started analysis pipeline on ${repo.name}`;

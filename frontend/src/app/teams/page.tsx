@@ -168,7 +168,6 @@ const Teams = () => {
           });
           const data = await response.json();
           if (response.ok) {
-            console.log(data);
             setTableData(data.members);
             // setTeamError("Analysis started successfully!");
           } else {
@@ -176,8 +175,13 @@ const Teams = () => {
             setTeamError2("Error getting team members.");
           }
         } catch (error) {
+          console.log(error);
           setTeamError2("Error getting team members.");
         }
+      }
+      else {
+        console.log(data.error);
+        setTeamError2(data.error);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -200,6 +204,10 @@ const Teams = () => {
       console.log(data);
       if (response.ok) {
         setTeamError("Request sent successfully!");
+      }
+      else {
+        console.log(data.error);
+        setTeamError(data.error);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -291,9 +299,9 @@ const Teams = () => {
     </div>
     </div>
   ) : showSearchTeam ? (
-    <Search onSelectItem={handleSelectTeam} searchType="teams" />
+    <Search onSelectItem={handleSelectTeam} searchType="teams" onBack={() => setShowSearchTeam(false)} title="Search for a team to join"/>
   ) : showSearch ? (
-    <Search onSelectItem={handleSelectUser} searchType="users" />
+    <Search onSelectItem={handleSelectUser} searchType="users" onBack={() => setShowSearch(false)} title="Search for a user to add"/>
   ) : tableData.length > 0 ? (
     <div>
       <div>

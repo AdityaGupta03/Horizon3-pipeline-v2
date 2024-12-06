@@ -55,7 +55,18 @@ input[type="email"]:focus {
 
 h1.authform {
   font-weight: bold;
+  color: #000;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  margin-bottom: 3px;
+  position: relative;
+  left: 0;
+}
+
+h1.welcome {
+  font-weight: bold;
   margin: 0;
+  color: #fff;
 }
 
 p {
@@ -336,3 +347,8 @@ input[type="email"]:focus {
   font-size: 1.5rem;
   background-color:#222222;
 } */
+
+/* If you need to adjust the form container spacing */
+.form-container form {
+  padding-top: 20px;
+}

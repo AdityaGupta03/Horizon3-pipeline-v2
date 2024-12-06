@@ -59,10 +59,42 @@ async function addMember(req: any, res: any) {
 
   try {
     // TODO add logic
+    const current_members = await getTeamMembersQuery(team_id);
+    if (!current_members) {
+      throw Error("getTeamMembersQuery() failed");
+    }
+    if(current_members.find((member: any) => member.member_id == add_user_id)) {
+      return res.status(400).json({
+        error: "User is already a member of the team.",
+      });
+    }
     const status = await addTeamMemberQuery(team_id, add_user_id);
     if (!status) {
       throw Error("addMember() failed");
     }
+
+    //email the user that they have been added to the team
+    const user = await getAccountFromUserIDQuery(add_user_id);
+    if (!user) {
+      console.error("User account doesn't exist: ", add_user_id);
+      return res.status(404).json({
+        error: "User account not found",
+      });
+    }
+    const user_email = user.email;
+    const user_name = user.username;
+    const team_name = await getTeamFromIDQuery(team_id);
+    if (!team_name) {
+      throw Error("getTeamFromIDQuery() failed");
+    }
+    const team_name_string = team_name.team_name;
+    const email = await emailUser(user_email,
+      "Welcome to your team!",
+      `User ${user_name} has been added to team ${team_name_string}.`,);
+    if (!email) {
+      throw Error("Error sending approval email");
+    }
+
     return res.status(200).json({
       message: "Successfully added team member.",
     });
@@ -110,6 +142,15 @@ async function requestToJoinTeam(req: any, res: any) {
   }
 
   try {
+    const user_teams = await getTeamsFromUserIDQuery(user_id);
+    if (!user_teams) {
+      throw Error("getTeamsFromUserIDQuery() failed");
+    }
+    if (user_teams.find((team: any) => team.team_id == team_id)) {
+      return res.status(400).json({
+        error: "User is already a member of the team.",
+      });
+    }
     const query_result = await requestToJoinTeamQuery(team_id, user_id);
     if (!query_result) {
       throw Error("requestToJoinTeam() failed");
@@ -296,6 +337,27 @@ async function removeTeamMember(req: any, res: any) {
       res.status(400).json({
         error: "You are not an admin or creator of the team!",
       });
+    }
+
+    // email the user that they have been removed from the team
+    const user = await getAccountFromUserIDQuery(user_id);
+    if (!user) {
+      console.error("User account doesn't exist: ", user_id);
+      return res.status(404).json({
+        error: "User account not found",
+      });
+    }
+
+    console.log(user);
+
+    const email_status = await emailUser(
+      user.email,
+      "Team Member Removed",
+      `You have been removed from team ${team_id}.`,
+    );
+
+    if (!email_status) {
+      throw Error("Error sending removal email");
     }
 
     return res.status(200).json({
