@@ -17,13 +17,6 @@ from email.mime.multipart import MIMEMultipart
 AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 
-# Get Postgres secrets
-POSTGRES_HOST = os.getenv('POSTGRES_HOST')
-POSTGRES_DB = os.getenv('POSTGRES_DB')
-POSTGRES_USER = os.getenv('POSTGRES_USER')
-POSTGRES_PASS = os.getenv('POSTGRES_PASS')
-POSTGRES_PORT = os.getenv('POSTGRES_PORT')
-
 # Get mailer secrets
 EMAIL = os.getenv('EMAIL')
 EMAIL_PASS = os.getenv('EMAIL_PASS')
@@ -65,13 +58,20 @@ def send_kafka_msg(event_type, msg):
   producer.send(topic="pipeline-analysis", value=metadata)
   producer.flush()
 
-def create_pdf(answer, filename):
+def create_pdf(answer, bindiff_image, filename):
   text_to_html = markdown.markdown(answer)
   pdf = FPDF()
   pdf.add_page()
   pdf.set_auto_page_break(auto=True, margin=15)
   pdf.set_font("Arial", size=12)
   pdf.write_html(text_to_html)
+
+  if bindiff_image:
+    title = markdown.markdown("### Call Graph Image")
+    pdf.write_html(title)
+    pdf.image(bindiff_image, x=10, y=pdf.get_y() + 10, w=190)
+    pdf.ln(130)
+
   pdf.output(filename)
 
   return pdf
@@ -100,7 +100,17 @@ def main():
     timestamp = time.strftime("%Y%m%d-%H%M%S")
     report_filename = f"{repo_name}_{timestamp}_report.pdf"
 
-    report = create_pdf(llm_text, report_filename)
+    try:
+      s3.download_file(
+        llm_bucket_name,
+        "graph1.png",
+        "graph1.png"
+      )
+    except Exception as e:
+      send_kafka_msg(kafka_failure, f"Error retrieving PNG from S3: {e}")
+      sys.exit()
+
+    create_pdf(llm_text, "graph1.png", report_filename)
 
     s3.upload_file(
       report_filename,
@@ -121,72 +131,11 @@ def main():
               vuln_prob_flag = 1
             break
 
-    try:
-      pg_conn = psycopg2.connect(
-        host=POSTGRES_HOST,
-        database=POSTGRES_DB,
-        user=POSTGRES_USER,
-        password=POSTGRES_PASS,
-        port=POSTGRES_PORT
-      )
-      pg_cursor = pg_conn.cursor()
-      print("PostgreSQL connection created successfully.")
-
-      print("Repo hash: ", repo_hash)
-      pg_cursor.execute("SELECT id, creator_id FROM repos WHERE hash = %s", (repo_hash,))
-      result = pg_cursor.fetchone()
-
-      if result:
-        repo_id = result[0]
-        creator_id = result[1]
-      else:
-        send_kafka_msg(kafka_failure, f"No record found for hash: {repo_hash}")
-        sys.exit()
-
-      report_url = report_filename
-      if vuln_prob_flag:
-        pg_cursor.execute("INSERT INTO reports (report_url, creator_id, repo_id, high_prob_flag) VALUES (%s, %s, %s, 1)", (report_url, creator_id, repo_id))
-      else:
-        pg_cursor.execute("INSERT INTO reports (report_url, creator_id, repo_id) VALUES (%s, %s, %s)", (report_url, creator_id, repo_id))
-      pg_conn.commit()
-
-      pg_cursor.execute("SELECT email FROM users WHERE user_id = %s", (creator_id,))
-      result = pg_cursor.fetchone()
-
-      if result:
-        email = result[0]
-
-        smtp_server = "smtp.gmail.com"
-        smtp_port = 587
-        sender_email = "h3.pipeline.poc@gmail.com"
-        password = "wfug jwja jrvq uhoj"
-
-        msg = MIMEMultipart()
-        msg['From'] = sender_email
-        msg['To'] = email
-        if vuln_prob_flag:
-          msg['Subject'] = f"Analysis Report for {repo_name}! High Vulnerability Probability!"
-        else:
-          msg['Subject'] = f"Analysis Report for {repo_name}"
-
-        body = f"Your analysis report for repository {repo_name} is ready. Please check your reports on our website!\n Report: {report_filename}"
-        msg.attach(MIMEText(body, 'plain'))
-
-        with smtplib.SMTP(smtp_server, smtp_port) as server:
-          server.starttls()
-          server.login(sender_email, password)
-          server.send_message(msg)
-      else:
-        send_kafka_msg(kafka_failure, f"No user found: {creator_id}")
-        sys.exit()
-
-    except Exception as e:
-      send_kafka_msg(kafka_failure, f"Error running postgresql code: {e}")
-      sys.exit()
-
     message = {
       "report_file": report_filename,
-      "report_bucket": report_bucket_name
+      "report_bucket": report_bucket_name,
+      "vuln_prob_flag": vuln_prob_flag,
+      "repo_hash": repo_hash
     }
     send_kafka_msg("finished_report_gen", message)
   except Exception as e:

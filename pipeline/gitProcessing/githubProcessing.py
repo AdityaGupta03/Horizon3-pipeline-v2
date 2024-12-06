@@ -213,20 +213,22 @@ def clone_build_and_find_binary(repo_url, repo_name, owner, github_token) -> dic
 
 def main():
   try:
-    if len(sys.argv) != 5 and len(sys.argv) != 4:
-      print("Usage: python githubProcessing.py <repo_url> <repo_name> <owner> <github_token>")
+    if len(sys.argv) != 6 and len(sys.argv) != 5:
+      print("Usage: python githubProcessing.py <repo_url> <repo_name> <owner> <repo_hash> <github_token>")
       send_kafka_msg(kafka_failure, f"Invalid usage...")
       sys.exit()
 
     repo_url = sys.argv[1]
     repo_name = sys.argv[2]
     owner = sys.argv[3]
-    if(len(sys.argv) == 5):
+    repo_hash = sys.argv[4]
+    if(len(sys.argv) == 6):
       github_token = sys.argv[4]
     else:
       github_token = None
 
     files = clone_build_and_find_binary(repo_url, repo_name, owner, github_token)
+    files['repo_hash'] = repo_hash
     send_kafka_msg("finished_git_analysis", files)
   except Exception as e:
     send_kafka_msg(kafka_failure, f"Error running python script...")

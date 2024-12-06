@@ -32,10 +32,3 @@ The following is an initial layout of the expected .env file.
 AWS_ACCESS_KEY_ID=your_aws_access_key_id
 AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key
 ```
-
-#### Kafka Configuration
-```
-KAFKA_BROKER=your_kafka_broker:9092
-KAFKA_SUCCESS_TOPIC=success_topic
-KAFKA_ERROR_TOPIC=error_topic
-```

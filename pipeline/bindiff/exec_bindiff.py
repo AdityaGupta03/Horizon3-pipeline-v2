@@ -4,6 +4,8 @@ import boto3
 import json
 from kafka import KafkaProducer
 from subprocess import run, CalledProcessError
+import graphviz
+import BinExport2_pb2   # Import the generated protobuf classes
 
 AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
@@ -33,9 +35,34 @@ def send_kafka_message(event_type, message):
   producer.send(topic="pipeline-analysis", value=metadata)
   producer.flush()
 
+def parse_binexport_file(file_path):
+  try:
+    binexport = BinExport2_pb2.BinExport2()
+    with open(file_path, "rb") as f:
+      binexport.ParseFromString(f.read())
+    return binexport
+  except Exception as e:
+    print(f"Error parsing the .BinExport file: {e}")
+
+def get_vertex_name(v):
+  return str(hex(v.address)) + ': ' + v.mangled_name
+
+def render_graph(file, name):
+  dot = graphviz.Digraph(format='png')
+  for v in file.call_graph.vertex:
+    s = get_vertex_name(v)
+    dot.node(str(hex(v.address)), s)
+  for e in file.call_graph.edge:
+    dot.edge(str(hex(file.call_graph.vertex[e.source_vertex_index].address)), str(hex(file.call_graph.vertex[e.target_vertex_index].address)))
+  dot.render(name)
+
+  s3_png_path = name + ".png"
+  bucket_name = 'cs407gitmetadata'
+  s3.upload_file(f"{name}.png", bucket_name, s3_png_path)
+
 def main():
   try:
-    if len(sys.argv) != 4:
+    if len(sys.argv) != 5:
       err_msg = json.dumps({
         "log": "Failed to run script - invalid usage..."
       })
@@ -45,6 +72,7 @@ def main():
     source_bucket = sys.argv[1]
     binary1_s3_path = sys.argv[2]
     binary2_s3_path = sys.argv[3]
+    repo_hash = sys.argv[4]
 
     # Change to the /opt directory
     os.chdir('/opt')
@@ -77,22 +105,27 @@ def main():
     bucket_name = 'cs407gitmetadata'
     s3.upload_file('/opt/binary1_vs_binary2.BinDiff', bucket_name, s3_bindiff_path)
 
-    print("Sending success kafka message...")
+    file1 = parse_binexport_file('/opt/binary1.BinExport')
+    file2 = parse_binexport_file('/opt/binary2.BinExport')
+
+    render_graph(file1, "graph1")
+    render_graph(file2, "graph2")
 
     # Send success message to Kafka
+    print("Sending success kafka message...")
     message = {
       "bucket": bucket_name,
-      "file": s3_bindiff_path
+      "file": s3_bindiff_path,
+      "repo_hash": repo_hash
     }
     send_kafka_message("finished_bindiff", message)
-
     print("Sent")
 
   except CalledProcessError as e:
     send_kafka_message(err_event_type, f"Command '{e.cmd}' returned non-zero exit status {e.returncode}")
     sys.exit()
   except Exception as e:
-    send_kafka_message(err_event_type, "Failed to run bindiff...")
+    send_kafka_message(err_event_type, f"Failed to run bindiff: {e}")
     sys.exit()
 
 if __name__ == "__main__":
