@@ -7,7 +7,7 @@ import time
 # Create a Kafka consumer
 consumer = KafkaConsumer(
   'pipeline-analysis',  # Your Kafka topic name
-  bootstrap_servers=['192.168.4.63:9092'],
+  bootstrap_servers=['10.186.165.52:9092'],
   auto_offset_reset='earliest',
   enable_auto_commit=True,
   group_id='pipeline-consumer',
