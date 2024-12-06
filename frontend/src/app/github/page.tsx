@@ -11,6 +11,7 @@ const Github = () => {
   const [githubAnalyzeError, setGithubAnalyzeError] = useState<string>("");
   const [analysisType, setAnalysisType] = useState<string>("");
   const [llmType, setLlmType] = useState<string>("");
+  const [repoType, setRepoType] = useState<string>("");
 
   const user_id = sessionStorage.getItem("user_id");
 
@@ -36,29 +37,70 @@ const Github = () => {
 
   const handleGithubSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    const match = githubLink.match(/^https:\/\/github\.com\/([^\/]+)\/([^\/]+)$/);
-    if (!match) {
-      setGithubError("Invalid GitHub link.");
+    
+    // Reset error message
+    setGithubError("");
+    
+    // Validate repository type selection
+    if (!repoType) {
+      setGithubError("Please select a repository type.");
       return;
     }
 
+    // Validate repository link
+    if (!githubLink) {
+      setGithubError("Please enter a GitHub repository link.");
+      return;
+    }
+
+    const match = githubLink.match(/^https:\/\/github\.com\/([^\/]+)\/([^\/]+?)(\.git)?$/);
+    if (!match) {
+      setGithubError("Invalid GitHub repository link format. Expected: https://github.com/owner/repo");
+      return;
+    }
+    
     const [_, owner, repo_name] = match;
+    const cleanRepoName = repo_name.replace(/\.git$/, '');
+    
+    // Validate API key for private repositories
+    if (repoType === "private") {
+      if (!githubKey || githubKey.trim() === "") {
+        setGithubError("API Key is required for private repositories.");
+        return;
+      }
+      if (githubKey.length < 40) {  // GitHub personal access tokens are typically 40+ characters
+        setGithubError("Invalid API Key format. Please check your GitHub personal access token.");
+        return;
+      }
+    }
+
     try {
       const response = await fetch("/api/git/create_git_repo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        //TODO fix the api endpoint
-        body: JSON.stringify({ user_id, url: githubLink, token: githubKey, owner, repo_name, staticAnalysisTool: analysisType, LLMtool: llmType}),
+        body: JSON.stringify({ 
+          user_id, 
+          url: githubLink, 
+          token: repoType === "private" ? githubKey : null,
+          owner, 
+          repo_name: cleanRepoName,
+          is_private: repoType === "private"
+        }),
       });
 
       if (response.ok) {
         setGithubError("Repository added successfully!");
+        // Clear form
+        setGithubLink("");
+        setGithubKey("");
+        setRepoType("");
         getGithubLinks();
       } else {
-        setGithubError("Error adding repository.");
+        const errorData = await response.json();
+        setGithubError(errorData.message || "Error adding repository.");
       }
     } catch (error) {
-      setGithubError("Error adding repository.");
+      setGithubError("Error connecting to server. Please try again.");
     }
   };
 
@@ -96,24 +138,41 @@ const Github = () => {
       <div className="github-form-container">
         <h1 className="github-title">GitHub Integration</h1>
         <form onSubmit={handleGithubSubmit}>
+          <select
+            required
+            value={repoType}
+            onChange={(e) => setRepoType(e.target.value)}
+            className="github-select"
+          >
+            <option value="" disabled>Choose Repository Access Type</option>
+            <option value="public">Repository Only (Public)</option>
+            <option value="private">Repository + API Key (Private)</option>
+          </select>
+
           <div>
-          <input
-            type="url"
-            className="github-input"
-            placeholder="GitHub Repository Link"
-            value={githubLink}
-            onChange={(e) => setGithubLink(e.target.value)}
-          />
+            <input
+              type="url"
+              className="github-input"
+              placeholder="GitHub Repository Link"
+              value={githubLink}
+              onChange={(e) => setGithubLink(e.target.value)}
+              required
+            />
           </div>
-          <div>
-          <input
-            type="text"
-            className="github-input"
-            placeholder="GitHub API Key"
-            value={githubKey}
-            onChange={(e) => setGithubKey(e.target.value)}
-          />
-          </div>
+          
+          {repoType === "private" && (
+            <div>
+              <input
+                type="text"
+                className="github-input"
+                placeholder="GitHub API Key"
+                value={githubKey}
+                onChange={(e) => setGithubKey(e.target.value)}
+                required
+              />
+            </div>
+          )}
+          
           <button type="submit" className="github-submit">Add Repository</button>
           {githubError && <p className="error-message">{githubError}</p>}
         </form>
