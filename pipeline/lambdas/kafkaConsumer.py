@@ -3,8 +3,13 @@ import subprocess
 from kafka import KafkaConsumer
 import json
 import time
+from dotenv import load_dotenv
+
+load_dotenv()
 
 KAFKA_IP = os.getenv('KAFKA_IP')
+
+print(f'{KAFKA_IP}:9092')
 
 # Create a Kafka consumer
 consumer = KafkaConsumer(
@@ -40,7 +45,7 @@ def start_gitprocessing_docker(url, repo_name, repo_owner, repo_hash, repo_token
   # ]
 
   command = [
-    "docker", "run", "--env-file", ".env", "--rm", "--platform linux/amd64", "codeql_static",
+    "docker", "run", "--env-file", ".env", "--rm", "-d", "--platform", "linux/amd64", "codeql_static",
     url, repo_name, "cs407gitmetadata", repo_hash
   ]
 
@@ -126,7 +131,8 @@ try:
             else:
               start_gitprocessing_docker(**metadata)
           case 'finished_git_analysis':
-            start_bindiff_docker("cs407gitmetadata", metadata['bin1'][0], metadata['bin2'][0])
+            # start_bindiff_docker("cs407gitmetadata", metadata['bin1'][0], metadata['bin2'][0])
+            pass
           case 'finished_sonar_qube':
             start_llm_analysis(metadata['sonar_results'], metadata['repo_hash'])
           case 'finished_codeql':
