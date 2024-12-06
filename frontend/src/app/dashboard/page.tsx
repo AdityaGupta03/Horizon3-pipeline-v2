@@ -4,7 +4,7 @@ import React from "react";
 import "./dashboard.css";
 
 const Dashboard = () => {
-  const email = typeof window !== "undefined" ? sessionStorage.getItem("email") : null;
+  const email = typeof window !== "undefined" ? sessionStorage.getItem("username") : null;
 
   return (
     <div className="dashboard-wrapper">
