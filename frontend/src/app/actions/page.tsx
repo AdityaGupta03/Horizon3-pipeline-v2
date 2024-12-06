@@ -2,7 +2,7 @@
 import "./actions.css";
 import axios from "axios";
 import React, { useState, FormEvent, useEffect } from "react";
-const url = "718a-195-252-220-98.ngrok-free.app";
+const url = "6902-195-252-220-98.ngrok-free.app";
 const actions = () => {
   type GithubLink = {
     id: string;
@@ -41,7 +41,7 @@ const actions = () => {
     console.log(selectedGithubLink);
     if (selectedGithubLink) {
       setGithubAnalyzeError(
-        "Please update <your_hash> to: " + selectedGithubLink
+        "Please update <your_hash> to: " + selectedGithubLink,
       );
       setGithubAnalyzeError2("Please update <URL> to: " + url);
       try {
@@ -49,7 +49,7 @@ const actions = () => {
           params: { bucket: "horizon3configs", url: "example.yaml" },
           responseType: "blob", // Important for handling binary data
         });
-  
+
         // Create a URL for the downloaded file
         console.log(response.data);
         const url = window.URL.createObjectURL(new Blob([response.data]));

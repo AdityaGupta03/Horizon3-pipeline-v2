@@ -19,7 +19,7 @@ import { GitAnalysisMeta } from "../types/kafkameta.type.js";
 
 async function addGithubRepo(req: any, res: any) {
   const { user_id, url, token, owner, repo_name } = req.body;
-//@TODO have got the fields for type of static analyssi have to update
+  //@TODO have got the fields for type of static analyssi have to update
 
   // Check if request json is missing necessary parameters
   if (!user_id || !url || !owner || !repo_name) {
@@ -200,13 +200,21 @@ async function getGithubReposFromUser(req: any, res: any) {
 }
 
 async function analyzeGithubRepo(req: any, res: any) {
-  const { repo_id, analysis_type, llm_type } = req.body;
+  let { repo_id, analysis_type, llm_type } = req.body;
 
   if (!repo_id) {
     console.error("analyzeGithubRepo): Missing user information...");
     return res.status(400).json({
       error: "Missing required information.",
     });
+  }
+
+  if (!analysis_type) {
+    analysis_type = "codeql";
+  }
+
+  if (!llm_type) {
+    llm_type = "gemini";
   }
 
   try {

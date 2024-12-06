@@ -39,7 +39,7 @@ WHERE hash = %s;
 get_creator_email_query = """
 SELECT email
 FROM users
-JOIN repos ON users.id = repos.creator_id
+JOIN repos ON users.user_id = repos.creator_id
 WHERE repos.hash = %s;
 """
 
@@ -218,6 +218,8 @@ def report_generated(metadata):
   vuln_prob_flag = metadata['vuln_prob_flag']
 
   try:
+    pg_conn.rollback()
+
     pg_cursor.execute(get_repo_id_from_hash, (repo_hash,))
     result = pg_cursor.fetchone()
     if not result:
@@ -231,7 +233,6 @@ def report_generated(metadata):
       pg_cursor.execute(insert_report_query_high_vuln, (report_filename, creator_id, repo_id))
     else:
       pg_cursor.execute(insert_report_query_normal, (report_filename, creator_id, repo_id))
-    pg_conn.commit()
 
     pg_cursor.execute(get_creator_email_query, (repo_hash,))
     result = pg_cursor.fetchone()
@@ -241,6 +242,8 @@ def report_generated(metadata):
       return
     print(result)
     creator_email = result[0]
+
+    pg_conn.commit()
   except Exception as e:
     print(f"Error querying database: {e}")
     handle_failure()

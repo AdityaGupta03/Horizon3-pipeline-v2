@@ -11,7 +11,8 @@ import {
   getTeamMembersQuery,
   addTeamMemberQuery,
   getAllTeamsQuery,
-  addRepoToTeamQuery
+  addRepoToTeamQuery,
+  getCreatorFromTeadIDQuery,
 } from "../database/queries/teamQueries.js";
 
 import { getAccountFromUserIDQuery } from "../database/queries/accountQueries.js";
@@ -64,7 +65,9 @@ async function addMember(req: any, res: any) {
     if (!current_members) {
       throw Error("getTeamMembersQuery() failed");
     }
-    if(current_members.find((member: any) => member.member_id == add_user_id)) {
+    if (
+      current_members.find((member: any) => member.member_id == add_user_id)
+    ) {
       return res.status(400).json({
         error: "User is already a member of the team.",
       });
@@ -89,9 +92,11 @@ async function addMember(req: any, res: any) {
       throw Error("getTeamFromIDQuery() failed");
     }
     const team_name_string = team_name.team_name;
-    const email = await emailUser(user_email,
+    const email = await emailUser(
+      user_email,
       "Welcome to your team!",
-      `User ${user_name} has been added to team ${team_name_string}.`,);
+      `User ${user_name} has been added to team ${team_name_string}.`,
+    );
     if (!email) {
       throw Error("Error sending approval email");
     }
@@ -302,10 +307,41 @@ async function leaveTeam(req: any, res: any) {
   }
 
   try {
-    // TODO add logic
+    const member_user = await getAccountFromUserIDQuery(user_id);
+    if (!member_user) {
+      console.error("User account doesn't exist: ", user_id);
+      return res.status(404).json({
+        error: "User account not found",
+      });
+    }
+
     const query_result = await leaveTeamQuery(team_id, user_id);
     if (!query_result) {
       throw Error("leaveTeam() failed");
+    }
+
+    const creator_id = await getCreatorFromTeadIDQuery(team_id);
+    if (!creator_id) {
+      throw Error("getCreatorFromTeadIDQuery() failed");
+    }
+
+    const user = await getAccountFromUserIDQuery(creator_id);
+    if (!user) {
+      console.error("User account doesn't exist: ", user_id);
+      return res.status(404).json({
+        error: "Error fetching team creator data",
+      });
+    }
+
+    // email the user that they have been removed from the team
+    const email_status = await emailUser(
+      user.email,
+      "Team Member Removed",
+      `User ${member_user.username} has left team ${team_id}.`,
+    );
+
+    if (!email_status) {
+      throw Error("Error sending removal email");
     }
 
     return res.status(200).json({
@@ -413,7 +449,6 @@ async function getAllTeams(req: any, res: any) {
     });
   }
 }
-
 
 export {
   createTeam,

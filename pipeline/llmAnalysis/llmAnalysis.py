@@ -125,7 +125,10 @@ def compile_prompt(issues, repo_url, static_tool, github_token):
       report = sonar_issue_report(iss, i)
     prompt += report + "\n"
 
-  prompt += f"\nGiven the following file contents, {files}, and the issues that we found above, please estimate a confidence score (between 0 and 1) for the severity of each issue, and suggest recommendations to fix them. Include code examples or best practices where applicable."
+  if not issues:
+    prompt = "There are no issues found in the codebase. Can you tell me a great job! :)"
+  else
+    prompt += f"\nGiven the following file contents, {files}, and the issues that we found above, please estimate a confidence score (between 0 and 1) for the severity of each issue, and suggest recommendations to fix them. Include code examples or best practices where applicable."
 
   return prompt
 

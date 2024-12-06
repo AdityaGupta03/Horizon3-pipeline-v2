@@ -20,7 +20,11 @@ async function addTeamMemberFunc(
   }
 }
 
-async function createTeamAndAddCreator(team_name: string, creator_id: number, repo_hash: string) {
+async function createTeamAndAddCreator(
+  team_name: string,
+  creator_id: number,
+  repo_hash: string,
+) {
   // TODO Migrate this to use transaction instead of manual rollback
   const createTeamQuery = `
     INSERT INTO teams (team_name)
@@ -55,7 +59,7 @@ async function createTeamAndAddCreator(team_name: string, creator_id: number, re
       console.error("Failed to add creator to team. Rollback query.");
       return false;
     }
-    
+
     return true;
   } catch (error) {
     console.error("Error creating team:", error);
@@ -80,7 +84,6 @@ async function getTeamFromIDQuery(team_id: number) {
 }
 
 async function getTeamsFromUserIDQuery(user_id: string) {
-  
   const query = `
     SELECT tm.team_id, t.team_name, tm.member_role
     FROM teams t
@@ -222,7 +225,7 @@ async function getTeamMembersQuery(team_id: number) {
     console.error("getTeamMembersQuery(): ", error);
     return null;
   }
-} 
+}
 
 // add a function to add a user to a team as a member
 async function addTeamMemberQuery(team_id: number, user_id: number) {
@@ -275,6 +278,21 @@ async function addRepoToTeamQuery(team_id: number, repo_hash: string) {
   }
 }
 
+async function getCreatorFromTeadIDQuery(team_id: number) {
+  const query = `
+    SELECT member_id
+    FROM team_members
+    WHERE team_id = $1 AND member_role = 'creator'
+  `;
+
+  try {
+    const res = await db_pool.query(query, [team_id]);
+    return res.rows[0].member_id;
+  } catch (error) {
+    console.error("getCreatorFromTeadIDQuery(): ", error);
+    return null;
+  }
+}
 
 export {
   createTeamAndAddCreator,
@@ -289,5 +307,6 @@ export {
   getTeamMembersQuery,
   addTeamMemberQuery,
   getAllTeamsQuery,
-  addRepoToTeamQuery
+  addRepoToTeamQuery,
+  getCreatorFromTeadIDQuery,
 };
