@@ -97,6 +97,7 @@ const Github = () => {
         getGithubLinks();
       } else {
         const errorData = await response.json();
+        console.log(errorData);
         setGithubError(errorData.message || "Error adding repository.");
       }
     } catch (error) {
@@ -211,7 +212,7 @@ const Github = () => {
           >
             <option value="" disabled>Choose LLM Type</option>
             <option value="gemini">Gemini</option>
-            <option value="gpt">GPT</option>
+            <option value="GPT4o">GPT4o</option>
           </select>
 
           <button type="submit" className="github-submit">Analyze Repository</button>

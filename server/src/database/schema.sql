@@ -67,3 +67,11 @@ CREATE TABLE team_members (
   FOREIGN KEY (member_id) REFERENCES users (user_id) ON DELETE CASCADE, -- foreign key to users table with automatic delete
   FOREIGN KEY (team_id) REFERENCES teams (team_id) ON DELETE CASCADE -- foreign key to teams table with automatic delete
 );
+
+CREATE TABLE repo_analysis (
+  repo_id INT,
+  static_tool VARCHAR(255) NOT NULL,
+  llm_tool VARCHAR(255) NOT NULL,
+  PRIMARY KEY (repo_id),
+  FOREIGN KEY (repo_id) REFERENCES repos (id) ON DELETE CASCADE
+);
