@@ -34,4 +34,4 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Set the default entrypoint
-ENTRYPOINT ["/bin/bash"]
+ENTRYPOINT ["python3", "codeql_wrapper.py"]

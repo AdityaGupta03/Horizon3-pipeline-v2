@@ -15,6 +15,7 @@ import json
 # Get AWS secrets
 AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+KAFKA_IP = os.getenv('KAFKA_IP')
 
 # Testing usage: python3 codeql_wrapper.py https://github.com/AdityaGupta03/JavaVulnerable.git JavaVulnerable cs407gitmetadata asdf
 
@@ -43,7 +44,7 @@ def create_kafka_producer(bootstrap_servers):
 
 # Setup kafka connection and standard failure event
 kafka_failure = "codeql_failure"
-producer = create_kafka_producer(['10.186.165.52:9092'])
+producer = create_kafka_producer([f'{KAFKA_IP}:9092'])
 
 def send_kafka_msg(event_type, msg):
   metadata = {
@@ -195,7 +196,7 @@ def main():
       "codeql_results": results_filename,
       "repo_hash": repo_hash
     }
-    send_kafka_msg("finished_sonar_qube", message)
+    send_kafka_msg("finished_codeql", message)
   except Exception as e:
     send_kafka_msg(kafka_failure, f"Error running python script: {e}")
     sys.exit()
