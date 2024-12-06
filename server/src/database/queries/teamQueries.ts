@@ -77,7 +77,7 @@ async function getTeamsFromUserIDQuery(user_id: string) {
     SELECT tm.team_id, t.team_name, tm.member_role
     FROM teams t
     JOIN team_members tm ON t.team_id = tm.team_id
-    WHERE tm.member_id = $1
+    WHERE tm.member_id = $1 and tm.member_role != 'requested'
   `;
 
   try {
@@ -204,7 +204,7 @@ async function getTeamMembersQuery(team_id: number) {
     SELECT member_id, u.username, u.email
     FROM team_members tm
     JOIN users u ON tm.member_id = u.user_id
-    WHERE team_id = $1
+    WHERE team_id = $1 and tm.member_role != 'requested'
   `;
 
   try {

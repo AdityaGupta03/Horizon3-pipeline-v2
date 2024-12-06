@@ -126,11 +126,19 @@ async function requestToJoinTeam(req: any, res: any) {
       throw Error("No team admins found");
     }
 
+    const user = await getAccountFromUserIDQuery(user_id);
+    if (!user) {
+      console.error("User account doesn't exist: ", user_id);
+      return res.status(404).json({
+        error: "User account not found",
+      });
+    }
+
     const sendEmailPromises = team_admins.map((admin: any) => {
       return emailUser(
         admin.email,
         "New Team Join Request",
-        `User ${user_id} has requested to join your team ${team_info.team_name}.`,
+        `User ${user.username} has requested to join your team ${team_info.team_name}.`,
       );
     });
 
@@ -197,6 +205,11 @@ async function approveTeamRequest(req: any, res: any) {
 
       if (!email_status) {
         throw Error("Error sending denial email");
+      }
+
+      const query_result = await leaveTeamQuery(team_id, user_id);
+      if (!query_result) {
+        throw Error("leaveTeam() failed");
       }
 
       return res.status(200).json({

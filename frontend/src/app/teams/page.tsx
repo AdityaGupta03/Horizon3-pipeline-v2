@@ -11,9 +11,13 @@ const Teams = () => {
   const [currentRole, setCurrentRole] = useState<string>("");
   const [teamError, setTeamError] = useState<string>("");
   const [tableData, setTableData] = useState<{ member_id: string; username: string; email: string }[]>([]);
+  const [pendingData, setPendingData] = useState<{ member_id: string; username: string; email: string }[]>([]);
   const [selectedMember, setSelectedMember] = useState<{ member_id: string; username: string; email: string } | null>(null);
+  const [selectedPendingMember, setSelectedPendingMember] = useState<{ member_id: string; username: string; email: string } | null>(null);
   const [showSearch, setShowSearch] = useState<boolean>(false);
   const [showSearchTeam, setShowSearchTeam] = useState<boolean>(false);
+  const [teamError2, setTeamError2] = useState<string>("");
+  const [showPendingRequests, setShowPendingRequests] = useState<boolean>(false);
 
   const user_id = sessionStorage.getItem("user_id");
 
@@ -74,10 +78,10 @@ const Teams = () => {
         // setTeamError("Analysis started successfully!");
       } else {
         console.log(data);
-        // setGithubAnalyzeError("Error starting analysis.");
+        setTeamError("Error getting team members.");
       }
     } catch (error) {
-      // setGithubAnalyzeError("Error starting analysis.");
+      setTeamError("Error getting team members.");
     }
   };
 
@@ -93,6 +97,7 @@ const Teams = () => {
       if (response.ok) {
         console.log(data);
         getTeams();
+        setSelectedMember(null);
         setTableData([]);
       }
     } catch (error) {
@@ -126,10 +131,10 @@ const Teams = () => {
             // setTeamError("Analysis started successfully!");
           } else {
             console.log(data);
-            // setGithubAnalyzeError("Error starting analysis.");
+            setTeamError2("Error getting team members.");
           }
         } catch (error) {
-          // setGithubAnalyzeError("Error starting analysis.");
+          setTeamError2("Error getting team members.");
         }
       }
     } catch (error) {
@@ -138,6 +143,7 @@ const Teams = () => {
   };
 
   const handleAddUser = () => {
+    setSelectedMember(null);
     setShowSearch(true);
   };
 
@@ -167,10 +173,10 @@ const Teams = () => {
             // setTeamError("Analysis started successfully!");
           } else {
             console.log(data);
-            // setGithubAnalyzeError("Error starting analysis.");
+            setTeamError2("Error getting team members.");
           }
         } catch (error) {
-          // setGithubAnalyzeError("Error starting analysis.");
+          setTeamError2("Error getting team members.");
         }
       }
     } catch (error) {
@@ -185,47 +191,108 @@ const Teams = () => {
     console.log("Selected team:", team);
     //add logic to add the current user to the selected team
     try {
-      const response = await fetch("/api/team/add_member", {
+      const response = await fetch("/api/team/request_join_team", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ team_id: team.id.toString(), add_user_id: user_id }),
+        body: JSON.stringify({ team_id: team.id.toString(), user_id: user_id }),
       });
       const data = await response.json();
       console.log(data);
       if (response.ok) {
-        getTeams();
+        setTeamError("Request sent successfully!");
       }
     } catch (error) {
       console.error("Error:", error);
     }
     setShowSearchTeam(false);
+  };
+
+  const handleViewPendingRequests = async (e: FormEvent) => {
+    e.preventDefault();
     try {
-      const response = await fetch("/api/team/get_team_members", {
+      const response = await fetch("/api/team/get_pending_requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ team_id: team.id.toString() }),
+        body: JSON.stringify({ team_id: selectedTeam }),
       });
       const data = await response.json();
       if (response.ok) {
         console.log(data);
-        setTableData(data.members);
-        // setTeamError("Analysis started successfully!");
+        if(data.pending_approvals.length === 0) {
+          setTeamError2("No pending requests");
+        } else {
+          // setTeamError2("Pending approvals: " + data.pending_approvals.length);
+          setPendingData(data.pending_approvals);
+          setSelectedMember(null);
+          setShowPendingRequests(true);
+        }
       } else {
         console.log(data);
-        // setGithubAnalyzeError("Error starting analysis.");
+        setTeamError2("Error getting team members.");
       }
     } catch (error) {
-      // setGithubAnalyzeError("Error starting analysis.");
+      setTeamError2("Error getting team members.");
     }
-    setSelectedTeam(team.id.toString());
   };
- // if showSearchTeam is true, show the search component for teams
-  if (showSearchTeam) {
-    return (
-      <Search onSelectItem={handleSelectTeam} searchType="teams" />
-    );
-  }
-  return showSearch ? (
+
+  const handleRequestDecision = async (decision: boolean) => {
+    try {
+      const response = await fetch("/api/team/approve_team_request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ team_id: selectedTeam, user_id: selectedPendingMember?.member_id, approve: decision }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        console.log(data);
+        try {
+          const response = await fetch("/api/team/get_team_members", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ team_id: selectedTeam }),
+          });
+          const data = await response.json();
+          if (response.ok) {
+            console.log(data);
+            setTableData(data.members);
+            setTeamError2("Successfully " + (decision ? "approved" : "denied") + " request");
+          } else {
+            console.log(data);
+            setTeamError2("Error getting team members.");
+          }
+        } catch (error) {
+          setTeamError2("Error getting team members.");
+        }
+        setShowPendingRequests(false);
+        setSelectedPendingMember(null);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  return showPendingRequests ? (
+    <div>
+      <div>
+      <Table data={pendingData} onRowSelect={setSelectedPendingMember} rowClassName={(row) => (row.member_id === selectedPendingMember?.member_id ? "selected-row" : "")} />
+    </div>
+    <div className="team-container">
+        <div className="team-form-container">
+    {selectedPendingMember && (
+      <div>
+        <button className="team-submit" onClick={() => handleRequestDecision(true)}>Approve</button>
+        <button className="team-submit" onClick={() => handleRequestDecision(false)}>Deny</button>
+      </div>
+    )}
+    <div>
+    <button className="team-submit" onClick={() => {setShowPendingRequests(false);setSelectedPendingMember(null);}}>Back</button>
+    </div>
+    </div>
+    </div>
+    </div>
+  ) : showSearchTeam ? (
+    <Search onSelectItem={handleSelectTeam} searchType="teams" />
+  ) : showSearch ? (
     <Search onSelectItem={handleSelectUser} searchType="users" />
   ) : tableData.length > 0 ? (
     <div>
@@ -244,11 +311,17 @@ const Teams = () => {
           )}
           {currentRole === "admin" || currentRole === "creator" ? (
             <div>
-              <button className="team-submit" onClick={handleAddUser}>Add Member</button>
+              <div>
+              <button className="team-submit" onClick={handleViewPendingRequests}>View Pending Reqeusts</button>
+            </div>
+              <div>
+                <button className="team-submit" onClick={handleAddUser}>Add Member</button>
+              </div>
             </div>
           ) : null}
           <div>
-            <button className="team-submit" onClick={() => setTableData([])}>Back</button>
+            <button className="team-submit" onClick={() => {setTableData([]);setSelectedMember(null);}}>Back</button>
+            {teamError2 && <p className="error-message">{teamError2}</p>}
           </div>
         </div>
       </div>
