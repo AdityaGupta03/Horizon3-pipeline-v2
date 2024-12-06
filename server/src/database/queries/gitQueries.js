@@ -124,15 +124,15 @@ async function modifyTools(repo_id, static_tool, llm_tool) {
   const query = `
     UPDATE repo_analysis
     SET static_tool = $2, llm_tool = $3
-    WHERE id = $1
+    WHERE repo_id = $1
   `;
 
   try {
     const result = await db_pool.query(query, [repo_id, static_tool, llm_tool]);
-    return result.rows[0];
+    return true;
   } catch (error) {
     console.error("Error modifying tools:", error);
-    throw error;
+    return false;
   }
 }
 
