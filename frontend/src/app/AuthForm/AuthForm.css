@@ -56,6 +56,13 @@ input[type="email"]:focus {
 h1.authform {
   font-weight: bold;
   margin: 0;
+  color: #000;
+}
+
+h1.welcome {
+  font-weight: bold;
+  margin: 0;
+  color: #fff;
 }
 
 p {
