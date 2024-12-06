@@ -15,6 +15,8 @@ from kafka.errors import NoBrokersAvailable
 AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 
+KAFKA_IP = os.getenv('KAFKA_IP')
+
 # Setup S3 bucket connection
 s3 = boto3.client(
   's3',
@@ -41,7 +43,7 @@ def create_kafka_producer(bootstrap_servers):
 
 # Setup kafka connection and standard failure event
 kafka_failure = "git_analysis_failed"
-producer = create_kafka_producer(['192.168.4.63:9092'])
+producer = create_kafka_producer([f'{KAFKA_IP}:9092'])
 
 def send_kafka_msg(event_type, msg):
   metadata = {

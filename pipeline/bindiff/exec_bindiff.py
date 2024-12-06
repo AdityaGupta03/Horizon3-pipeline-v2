@@ -8,6 +8,8 @@ from subprocess import run, CalledProcessError
 AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 
+KAFKA_IP = os.getenv('KAFKA_IP')
+
 # Initialize AWS S3 client
 s3 = boto3.client(
   's3',
@@ -19,7 +21,7 @@ s3 = boto3.client(
 # Initialize Kafka producer
 err_event_type = "bindiff_failure"
 producer = KafkaProducer(
-  bootstrap_servers=['192.168.4.63:9092'],
+  bootstrap_servers=[f'{KAFKA_IP}:9092'],
   value_serializer=lambda v: json.dumps(v).encode('utf-8')
 )
 

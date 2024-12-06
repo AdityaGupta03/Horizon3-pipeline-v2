@@ -4,10 +4,12 @@ from kafka import KafkaConsumer
 import json
 import time
 
+KAFKA_IP = os.getenv('KAFKA_IP')
+
 # Create a Kafka consumer
 consumer = KafkaConsumer(
   'pipeline-analysis',  # Your Kafka topic name
-  bootstrap_servers=['10.186.165.52:9092'],
+  bootstrap_servers=[f'{KAFKA_IP}:9092'],
   auto_offset_reset='earliest',
   enable_auto_commit=True,
   group_id='pipeline-consumer',
@@ -31,10 +33,15 @@ def start_gitprocessing_docker(url, repo_name, repo_owner, repo_hash, repo_token
 
   print("Started github processing container...")
 
+  # command = [
+  #   "docker", "run", "--add-host=host.docker.internal:host-gateway", "--network=host",
+  #   "--env-file", ".env", "--rm", "-d",
+  #   "sonar_scanner", url, repo_name, "cs407gitmetadata", repo_hash
+  # ]
+
   command = [
-    "docker", "run", "--add-host=host.docker.internal:host-gateway", "--network=host",
-    "--env-file", ".env", "--rm", "-d",
-    "sonar_scanner", url, repo_name, "cs407gitmetadata", repo_hash
+    "docker", "run", "--env-file", ".env", "--rm", "--platform linux/amd64", "codeql_static",
+    url, repo_name, "cs407gitmetadata", repo_hash
   ]
 
   if repo_token:
@@ -46,7 +53,8 @@ def start_gitprocessing_docker(url, repo_name, repo_owner, repo_hash, repo_token
     print(f"Error running Docker container: {e.stderr}")
     return
 
-  print("Started sonar_scanner docker container")
+  # print("Started sonar_scanner docker container")
+  print("Started codeql docker container")
 
 def start_bindiff_docker(bucket_name, binary1, binary2):
   command = [
@@ -111,18 +119,25 @@ try:
         metadata = message.value['metadata']
 
         # Process messages based on event type
-        if event_type == 'github_analysis':
-          if metadata['repo_token']:
-            start_gitprocessing_docker(metadata['url'], metadata['repo_name'], metadata['repo_owner'], metadata['repo_hash'])
-          else:
-            start_gitprocessing_docker(**metadata)
-        elif event_type == 'finished_git_analysis':
-          start_bindiff_docker("cs407gitmetadata", metadata['bin1'][0], metadata['bin2'][0])
-        elif event_type == 'finished_sonar_qube':
-          start_llm_analysis(metadata['sonar_results'], metadata['repo_hash'])
-        elif event_type == 'finished_llm_analysis':
-          report_gen(metadata['llm_text_file'], 'cs407gitmetadata', 'reports407', metadata['repo_hash'])
+        match event_type:
+          case 'github_analysis':
+            if metadata['repo_token']:
+              start_gitprocessing_docker(metadata['url'], metadata['repo_name'], metadata['repo_owner'], metadata['repo_hash'])
+            else:
+              start_gitprocessing_docker(**metadata)
+          case 'finished_git_analysis':
+            start_bindiff_docker("cs407gitmetadata", metadata['bin1'][0], metadata['bin2'][0])
+          case 'finished_sonar_qube':
+            start_llm_analysis(metadata['sonar_results'], metadata['repo_hash'])
+          case 'finished_codeql':
+            start_llm_analysis(metadata['codeql_results'], metadata['repo_hash'])
+          case 'finished_llm_analysis':
+            report_gen(metadata['llm_text_file'], 'cs407gitmetadata', 'reports407', metadata['repo_hash'])
+          case _:
+            print(f"Unknown event type: {event_type}")
+
         print("Processed message.")
+
       except Exception as e:
         print(f"Error processing message: {e}")
 
