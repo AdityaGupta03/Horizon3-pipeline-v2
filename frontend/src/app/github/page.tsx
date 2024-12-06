@@ -12,12 +12,46 @@ const Github = () => {
   const [analysisType, setAnalysisType] = useState<string>("");
   const [llmType, setLlmType] = useState<string>("");
   const [repoType, setRepoType] = useState<string>("");
+  const [selectedRepoToDelete, setSelectedRepoToDelete] = useState<string>("");
+  const [deleteError, setDeleteError] = useState<string>("");
 
   const user_id = sessionStorage.getItem("user_id");
 
   useEffect(() => {
     getGithubLinks();
   }, []);
+
+
+  const handleDeleteRepo = async (e: FormEvent) => {
+    e.preventDefault();
+    setDeleteError("");
+  
+    if (!selectedRepoToDelete) {
+      setDeleteError("Please select a repository to delete.");
+      return;
+    }
+  
+    try {
+      const response = await fetch("/api/git/delete_repo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          repo_hash: selectedRepoToDelete,  // Changed from repo_id to repo_hash
+          user_id 
+        }),
+      });
+      if (response.ok) {
+        setDeleteError("Repository deleted successfully!");
+        setSelectedRepoToDelete("");
+        getGithubLinks(); // Refresh the list
+      } else {
+        const errorData = await response.json();
+        setDeleteError(errorData.message || "Error deleting repository.");
+      }
+    } catch (error) {
+      setDeleteError("Error connecting to server. Please try again.");
+    }
+  };
 
   const getGithubLinks = async () => {
     try {
@@ -98,7 +132,7 @@ const Github = () => {
       } else {
         const errorData = await response.json();
         console.log(errorData);
-        setGithubError(errorData.message || "Error adding repository.");
+        setGithubError("Error adding repository. " + errorData.error);
       }
     } catch (error) {
       setGithubError("Error connecting to server. Please try again.");
@@ -177,6 +211,25 @@ const Github = () => {
           <button type="submit" className="github-submit">Add Repository</button>
           {githubError && <p className="error-message">{githubError}</p>}
         </form>
+
+        <form onSubmit={handleDeleteRepo}>
+          <select
+            required
+            value={selectedRepoToDelete}
+            onChange={(e) => setSelectedRepoToDelete(e.target.value)}
+            className="github-select"
+          >
+            <option value="" disabled>Choose Repository to Delete</option>
+            {githubLinks.map((link) => (
+              <option key={link.id} value={link.id}>
+                {link.name}
+              </option>
+            ))}
+          </select>
+          
+          <button type="submit" className="github-submit">Delete Repository</button>
+          {deleteError && <p className="error-message">{deleteError}</p>}
+        </form>        
 
         <form onSubmit={handleExistingGithubSubmit}>
           <select

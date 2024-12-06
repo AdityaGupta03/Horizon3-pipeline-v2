@@ -130,7 +130,7 @@ async function removeGitRepo(req: any, res: any) {
 
   try {
     // TODO add logic for deleting a repository (assume exists?)
-    const deletedRepo = await deleteRepoQueryFromHash(repo_hash);
+    const deletedRepo = await deleteRepoQueryFromHash(user_id, repo_hash);
 
     let msg: string;
     let errCode: Number;

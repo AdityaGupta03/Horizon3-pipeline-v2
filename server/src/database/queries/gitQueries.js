@@ -36,9 +36,12 @@ async function deleteRepoQueryFromHash(user_id, repo_hash) {
   const query = `
     DELETE FROM repos WHERE hash=$1 and creator_id=$2
   `;
-
+  console.log(query);
+  console.log(repo_hash);
+  console.log(user_id);
   try {
     const result = await db_pool.query(query, [repo_hash, user_id]);
+
     return result.rowCount > 0;
   } catch (error) {
     console.error("Error deleting repos query", error);
