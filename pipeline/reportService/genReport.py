@@ -65,13 +65,18 @@ def send_kafka_msg(event_type, msg):
   producer.send(topic="pipeline-analysis", value=metadata)
   producer.flush()
 
-def create_pdf(answer, filename):
+def create_pdf(answer, bindiff_image, filename):
   text_to_html = markdown.markdown(answer)
   pdf = FPDF()
   pdf.add_page()
   pdf.set_auto_page_break(auto=True, margin=15)
   pdf.set_font("Arial", size=12)
   pdf.write_html(text_to_html)
+
+  if bindiff_image:
+    pdf.image(bindiff_image, x=10, y=pdf.get_y() + 10, w=190)
+    pdf.ln(130)
+
   pdf.output(filename)
 
   return pdf
@@ -100,7 +105,17 @@ def main():
     timestamp = time.strftime("%Y%m%d-%H%M%S")
     report_filename = f"{repo_name}_{timestamp}_report.pdf"
 
-    report = create_pdf(llm_text, report_filename)
+    try:
+      s3.download_file(
+        llm_bucket_name,
+        "graph1.png",
+        "graph1.png"
+      )
+    except Exception as e:
+      send_kafka_msg(kafka_failure, f"Error retrieving PNG from S3: {e}")
+      sys.exit()
+
+    report = create_pdf(llm_text, "graph1.png", report_filename)
 
     s3.upload_file(
       report_filename,

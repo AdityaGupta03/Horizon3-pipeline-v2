@@ -71,7 +71,7 @@ def issue_report(issue, idx):
 
   return report
 
-def compile_prompt(issues):
+def sonar_compile_prompt(issues):
   file = """
   class Temp {
     public static void main(String[] args) {
@@ -98,25 +98,34 @@ def ask_llm(prompt):
 
 def main():
   try:
-    if len(sys.argv) != 4:
-      print("Usage: python githubProcessing.py <static_results> <bucket_name> <hash>")
+    if len(sys.argv) != 5:
+      print("Usage: python githubProcessing.py <static_results> <bucket_name> <hash> <static_type>")
       send_kafka_msg(kafka_failure, f"Invalid usage...")
       sys.exit()
 
     static_results = sys.argv[1]
     bucket_name = sys.argv[2]
     repo_hash = sys.argv[3]
+    static_type = sys.argv[4]
 
     repo_name = static_results.split('_')[0]
 
     try:
       json_obj = s3.get_object(Bucket=bucket_name, Key=static_results)
       json_content = json.loads(json_obj['Body'].read().decode('utf-8'))
-      issues = json_content['issues']
-      print(issues)
     except Exception as e:
       send_kafka_msg(kafka_failure, f"Error retrieving JSON from S3: {e}")
       sys.exit()
+
+    match static_type:
+      case "codeql":
+        issues = json_content['issues']
+        prompt =
+      case "sonarqube":
+        issues = json_content['issues']['issues']
+        prompt = sonar_compile_prompt(issues)
+      case _:
+        raise Exception("Unsupported static analysis type")
 
     prompt = compile_prompt(issues)
     response = ask_llm(prompt)

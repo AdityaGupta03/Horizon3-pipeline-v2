@@ -32,6 +32,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   tk-dev \
   libffi-dev \
   liblzma-dev \
+  graphviz \
   && pip3 install awscli \
   && ln -fs /usr/share/zoneinfo/America/New_York /etc/localtime \
   && echo "America/New_York" > /etc/timezone
@@ -71,6 +72,7 @@ RUN sed -i 's/^\(.*systemctl.*\)$/#\1/g' /var/lib/dpkg/info/bindiff.postinst
 WORKDIR /opt
 COPY export_binexport.py /opt/scripts/export_binexport.py
 COPY exec_bindiff.py /opt/exec_bindiff.py
+COPY BinExport2_pb2.py /opt/BinExport2_pb2.py
 COPY requirements.txt /opt/requirements.txt
 
 RUN pip install --no-cache-dir -r requirements.txt

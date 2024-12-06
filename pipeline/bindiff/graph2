@@ -1,8 +1,0 @@
-digraph {
-	"0x100003e10" [label="0x100003e10: _binarySearch"]
-	"0x100003ee8" [label="0x100003ee8: entry"]
-	"0x100003f80" [label="0x100003f80: ___stack_chk_fail"]
-	"0x100003ee8" -> "0x100003f80"
-	"0x100003ee8" -> "0x100003e10"
-	"0x100003f80" -> "0x100003f80"
-}
