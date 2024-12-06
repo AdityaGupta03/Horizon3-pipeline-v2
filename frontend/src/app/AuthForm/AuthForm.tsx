@@ -126,6 +126,7 @@ const AuthForm: React.FC = () => {
     {isSignUp ? (<div></div>) : (<div className="form-container sign-in-container">
         <form onSubmit={handleLogin}>
           <h1 className="authform">Sign in</h1>
+          
           <div>
           <input
             type="text"
