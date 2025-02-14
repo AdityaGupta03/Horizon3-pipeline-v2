@@ -9,13 +9,13 @@ RUN apt-get update && apt-get install -y \
   git \
   python3 \
   python3-pip \
-  openjdk-11-jdk \
+  openjdk-8-jdk \
   maven \
   gradle \
   && rm -rf /var/lib/apt/lists/*
 
 # SET Java Home
-ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
 # Make sure the `codeql` binary is in the PATH
@@ -34,4 +34,5 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Set the default entrypoint
-ENTRYPOINT ["python3", "codeql_wrapper.py"]
+# ENTRYPOINT ["python3", "codeql_wrapper.py"]
+ENTRYPOINT [ "/bin/bash" ]

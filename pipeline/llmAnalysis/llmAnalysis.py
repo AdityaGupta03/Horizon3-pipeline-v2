@@ -13,13 +13,15 @@ from urllib.parse import urlparse
 from kafka import KafkaProducer
 from kafka.errors import NoBrokersAvailable
 
+# AWS secrets required
 AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
-GOOGLE_API = os.getenv('GOOGLE_API')
 
+# LLM API secrets
+GOOGLE_API = os.getenv('GOOGLE_API')
 OPEN_AI_KEY = os.getenv('OPEN_AI_KEY')
 
-KAFKA_IP = os.getenv('KAFKA_IP')
+# KAFKA_IP = os.getenv('KAFKA_IP')
 
 s3 = boto3.client(
   's3',
