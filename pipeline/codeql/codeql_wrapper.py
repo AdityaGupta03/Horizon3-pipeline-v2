@@ -17,7 +17,7 @@ AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 # KAFKA_IP = os.getenv('KAFKA_IP')
 
-# Testing usage: python3 codeql_wrapper.py https://github.com/hawtio/hawtio hawtio bucket_name fb3c03549e0c06dedef5eb97e8a1965369689fe1
+# Testing usage: python3 codeql_wrapper.py https://github.com/greenlucky/spring-security-oauth2-resource-di.git spring-security-oauth2-resource-di asdf 787c9b47d801b0cf08d35bca4805986c43f56836
 
 s3 = boto3.client(
   's3',
@@ -167,7 +167,7 @@ class CodeQLAnalyzer:
       print(f"Running CodeQL analysis with {query_suite} suite")
       subprocess.run(
         f"codeql database analyze {db_path} "
-        f"--ram=8192 "
+        f"--ram=1024 --threads=1 "
         f"--format=sarif-latest "
         f"--output={results_path} "
         f"{query_suite}",
@@ -210,7 +210,7 @@ def main():
       sys.exit()
 
 
-    single_queries = 'codeql/java-queries:Security/CWE/CWE-078'
+    single_queries = 'codeql/java-queries'
     results_path = analyzer.run_analysis(db_path, single_queries)
     if not results_path:
       # send_kafka_msg(kafka_failure, "Failed to run analysis")
