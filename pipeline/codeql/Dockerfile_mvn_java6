@@ -1,0 +1,7 @@
+FROM maven:3.9.9-eclipse-temurin-8
+
+# Set Java 6 compatibility
+ENV MAVEN_OPTS="-XX:MaxPermSize=128m -Xmx512m"
+ENV JAVA_TOOL_OPTIONS="-source 1.6 -target 1.6"
+
+WORKDIR /app

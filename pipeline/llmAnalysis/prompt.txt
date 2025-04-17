@@ -1,0 +1,8 @@
+I’ve got a CodeQL alert with these details:
+```Issue goes here```
+
+1. Analyze whether this represents a real security flaw or a false positive.
+2. If it’s exploitable, give a concrete example (e.g. a crafted HTTP request or input) and explain what goes wrong.
+3. Show at least two remediation approaches (one that preserves existing behavior safely, and one that replaces it with a more robust alternative), with code snippets.
+
+Keep the answer clear and focused on the core issue.
