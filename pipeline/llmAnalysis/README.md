@@ -20,10 +20,10 @@ python llm_integration.py poe path/to/issue.json
 ```
 
 The command line interface supports:
-    - 'simple': Basic prompting style
-    - 'cot': Chain-of-thought reasoning
-    - 'poe': Principles-of-explanation method
-    - Specify the path to your CodeQL issue file as the second argument
+- 'simple': Basic prompting style
+- 'cot': Chain-of-thought reasoning
+- 'poe': Principles-of-explanation method
+- Specify the path to your CodeQL issue file as the second argument
 
 ## Note
 
