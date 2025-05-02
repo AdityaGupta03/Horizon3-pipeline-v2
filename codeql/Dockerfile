@@ -1,0 +1,44 @@
+# Use the official CodeQL container as the base image
+FROM mcr.microsoft.com/cstsectools/codeql-container:latest
+
+# Fix permissions for setup.py
+USER root
+RUN chmod +x /usr/local/startup_scripts/setup.py
+
+RUN apt-get update && apt-get install -y \
+    git \
+    python3 \
+    python3-pip \
+    openjdk-8-jdk \
+    maven \
+    gradle \
+    && rm -rf /var/lib/apt/lists/*
+
+# SET Java Home
+ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
+
+# Make sure the `codeql` binary is in the PATH
+ENV PATH="/usr/local/bin:$PATH"
+RUN chmod +x $(which codeql)
+
+# codeql setup
+WORKDIR /opt/codeql
+RUN mkdir -p /opt/codeql/databases
+
+# Clone CodeQL repositories for Java queries
+RUN git clone --depth 1 https://github.com/github/codeql /opt/codeql/codeql-repo
+
+# Precompile Java queries (so they don't compile at runtime!)
+RUN codeql pack install --verbose --log-to-stderr --additional-packs /usr/local/codeql-home/codeql-repo/java/ql/src
+
+# Our scripts
+WORKDIR /app
+COPY codeql_wrapper.py .
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Set the default entrypoint
+# ENTRYPOINT ["python3", "codeql_wrapper.py"]
+ENTRYPOINT [ "/bin/bash" ]

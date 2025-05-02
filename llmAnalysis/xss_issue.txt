@@ -1,0 +1,108 @@
+Issue #1: java/xss (java/xss)
+Severity: error
+Security Severity: 6.1
+Description: Writing user input directly to a web page allows for a cross-site scripting vulnerability.
+Message: Cross-site scripting vulnerability due to a [user-provided value](1).
+Locations:
+  1. File: samples/oauth2/sparklr/src/main/java/org/springframework/security/oauth/examples/sparklr/mvc/PhotoController.java
+     Line: 73:10 to 73:76
+
+Related Locations:
+  1. ID: 1
+     Message: user-provided value
+     File: samples/oauth2/sparklr/src/main/java/org/springframework/security/oauth/examples/sparklr/mvc/PhotoController.java
+     Line: 51:46 to 51:113
+
+Data Flow Path:
+  Flow #1:
+    Step 1:
+      File: samples/oauth2/sparklr/src/main/java/org/springframework/security/oauth/examples/sparklr/mvc/PhotoController.java
+      Line: 51:46 to 51:113
+      Message: callback : String
+    Step 2:
+      File: samples/oauth2/sparklr/src/main/java/org/springframework/security/oauth/examples/sparklr/mvc/PhotoController.java
+      Line: 55:15 to 55:23
+      Message: callback : String
+    Step 3:
+      File: samples/oauth2/sparklr/src/main/java/org/springframework/security/oauth/examples/sparklr/mvc/PhotoController.java
+      Line: 55:4 to 55:7
+      Message: out [post update] : StringBuilder
+    Step 4:
+      File: samples/oauth2/sparklr/src/main/java/org/springframework/security/oauth/examples/sparklr/mvc/PhotoController.java
+      Line: 73:37 to 73:40
+      Message: out : StringBuilder
+    Step 5:
+      File: samples/oauth2/sparklr/src/main/java/org/springframework/security/oauth/examples/sparklr/mvc/PhotoController.java
+      Line: 73:37 to 73:51
+      Message: toString(...) : String
+    Step 6:
+      File: samples/oauth2/sparklr/src/main/java/org/springframework/security/oauth/examples/sparklr/mvc/PhotoController.java
+      Line: 73:10 to 73:76
+      Message: new ResponseEntity<String>(...)
+
+Source Code Context:
+  samples/oauth2/sparklr/src/main/java/org/springframework/security/oauth/examples/sparklr/mvc/PhotoController.java (full function with vulnerability):
+    --- Function containing line 73 ---
+      51: 	public ResponseEntity<String> getJsonPhotos(@RequestParam(value = "callback", required = false) String callback, Principal principal) {
+      52: 		Collection<PhotoInfo> photos = getPhotoService().getPhotosForCurrentUser(principal.getName());
+      53: 		StringBuilder out = new StringBuilder();
+      54: 		if (callback != null) {
+      55: 			out.append(callback).append("( ");
+      56: 		}
+      57: 		out.append("{ \"photos\" : [ ");
+      58: 		Iterator<PhotoInfo> photosIt = photos.iterator();
+      59: 		while (photosIt.hasNext()) {
+      60: 			PhotoInfo photo = photosIt.next();
+      61: 			out.append(String.format("{ \"id\" : \"%s\" , \"name\" : \"%s\" }", photo.getId(), photo.getName()));
+      62: 			if (photosIt.hasNext()) {
+      63: 				out.append(" , ");
+      64: 			}
+      65: 		}
+      66: 		out.append("] }");
+      67: 		if (callback != null) {
+      68: 			out.append(" )");
+      69: 		}
+      70:
+      71: 		HttpHeaders headers = new HttpHeaders();
+      72: 		headers.set("Content-Type", "application/json");
+    → 73: 		return new ResponseEntity<String>(out.toString(), headers, HttpStatus.OK);
+      74: 	}
+
+  samples/oauth2/sparklr/src/main/java/org/springframework/security/oauth/examples/sparklr/mvc/PhotoController.java (context around vulnerability):
+    68: 			out.append(" )");
+    69: 		}
+    70:
+    71: 		HttpHeaders headers = new HttpHeaders();
+    72: 		headers.set("Content-Type", "application/json");
+    73: 		return new ResponseEntity<String>(out.toString(), headers, HttpStatus.OK);
+    74: 	}
+    75:
+    76: 	@RequestMapping(value = "/photos", params = "format=xml")
+    77: 	public ResponseEntity<String> getXmlPhotos(Principal principal) {
+    78: 		Collection<PhotoInfo> photos = photoService.getPhotosForCurrentUser(principal.getName());
+
+  samples/oauth2/sparklr/src/main/java/org/springframework/security/oauth/examples/sparklr/mvc/PhotoController.java (user-provided value):
+    46: 			return new ResponseEntity<byte[]>(out.toByteArray(), headers, HttpStatus.OK);
+    47: 		}
+    48: 	}
+    49:
+    50: 	@RequestMapping(value = "/photos", params = "format=json")
+    51: 	public ResponseEntity<String> getJsonPhotos(@RequestParam(value = "callback", required = false) String callback, Principal principal) {
+    52: 		Collection<PhotoInfo> photos = getPhotoService().getPhotosForCurrentUser(principal.getName());
+    53: 		StringBuilder out = new StringBuilder();
+    54: 		if (callback != null) {
+    55: 			out.append(callback).append("( ");
+    56: 		}
+
+  samples/oauth2/sparklr/src/main/java/org/springframework/security/oauth/examples/sparklr/mvc/PhotoController.java (data flow source):
+    46: 			return new ResponseEntity<byte[]>(out.toByteArray(), headers, HttpStatus.OK);
+    47: 		}
+    48: 	}
+    49:
+    50: 	@RequestMapping(value = "/photos", params = "format=json")
+    51: 	public ResponseEntity<String> getJsonPhotos(@RequestParam(value = "callback", required = false) String callback, Principal principal) {
+    52: 		Collection<PhotoInfo> photos = getPhotoService().getPhotosForCurrentUser(principal.getName());
+    53: 		StringBuilder out = new StringBuilder();
+    54: 		if (callback != null) {
+    55: 			out.append(callback).append("( ");
+    56: 		}
