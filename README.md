@@ -1,5 +1,7 @@
 # Pipeline
 
+Note that the README below is an older version and shouldn't be closely followed.
+
 This folder contains core analysis used in the event-driven pipeline. Most, if not all, of the code is written using Python 3.11.
 
 ## Building Docker Containers
